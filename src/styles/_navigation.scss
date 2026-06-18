@@ -1,0 +1,65 @@
+@use "tokens" as *;
+@use "mixins" as *;
+
+.sidebar {
+    background: linear-gradient(180deg, rgba(9, 13, 24, 0.96), rgba(5, 8, 15, 0.94));
+    border-right: 1px solid $line;
+    padding: 24px 18px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.brand {
+    margin-bottom: 28px;
+
+    &__logo {
+        display: block;
+        width: 190px;
+        margin: 0 auto;
+        height: auto;
+        filter: drop-shadow(0 0 22px rgba($cyan-primary, .16));
+        transform: translateX(-5px);
+    }
+
+    p {
+        margin: 8px 0 0;
+        color: $text-muted;
+        font-size: 14px;
+        padding-left: 4px;
+    }
+}
+
+.side-nav {
+    display: grid;
+    gap: 7px;
+
+    button {
+        @include button-reset;
+        color: $text-muted;
+        text-align: left;
+        padding: 13px 13px;
+        border-radius: 13px;
+        font-weight: 850;
+        font-size: 15px;
+        position: relative;
+        transition: transform .18s ease, color .18s ease, background .18s ease, box-shadow .18s ease;
+
+        &:hover {
+            color: $text;
+            background: rgba($cyan-primary, 0.07);
+            transform: translateX(2px);
+        }
+
+        &.active {
+            color: $text;
+            background: linear-gradient(135deg, rgba($cyan-primary, 0.20), rgba($violet-accent, 0.14));
+            box-shadow: inset 3px 0 0 $cyan-primary, 0 0 28px rgba($cyan-primary, 0.08);
+        }
+
+        &:focus-visible {
+            @include focus-ring;
+        }
+    }
+}

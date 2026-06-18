@@ -1,0 +1,174 @@
+@use "tokens" as *;
+
+// Compact list rows for Ledger, Maintenance, Needs/Wants, and any future record listings.
+// Goal: show more items, reduce giant card spacing, preserve scanability.
+
+.record-list {
+    display: grid;
+    gap: 8px;
+}
+
+.record-row {
+    background:
+        linear-gradient(135deg, rgba($cyan-primary, 0.055), rgba($violet-accent, 0.045)),
+        rgba(8, 13, 22, 0.66);
+    border: 1px solid rgba($cyan-primary, 0.14);
+    border-radius: 14px;
+    padding: 10px 12px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    min-height: 62px;
+    text-align: left;
+}
+
+.record-row > div:first-child {
+    min-width: 0;
+}
+
+.record-row strong {
+    display: block;
+    font-size: 15px;
+    line-height: 1.15;
+    letter-spacing: -0.035em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+}
+
+.record-row p {
+    margin: 5px 0 0;
+    color: $text-muted;
+    font-size: 13px;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+}
+
+.record-row b {
+    font-family: $font-display;
+    font-size: 17px;
+    line-height: 1;
+    white-space: nowrap;
+    letter-spacing: -0.045em;
+}
+
+.record-row .priority,
+.record-row .period-tag,
+.record-row .mini-button {
+    flex: 0 0 auto;
+}
+
+.list-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 9px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+}
+
+.period-tag {
+    display: inline-flex;
+    width: fit-content;
+    margin-top: 7px;
+    border-radius: 999px;
+    background: rgba($violet-accent, .18);
+    color: #ded7ff;
+    padding: 5px 9px;
+    font-size: 11px;
+    line-height: 1;
+    max-width: 100%;
+}
+
+.url-text {
+    display: block;
+    max-width: 100%;
+    color: rgba($text-muted, .86);
+    margin-top: 6px;
+    line-height: 1.35;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+// Needs & Wants can have long product URLs. Keep them compact unless user opens the full item later.
+.record-row:has(.url-text) {
+    min-height: 74px;
+}
+
+// Better compact maintenance rows, because they often only need title/location/next due/price/action.
+.maintenance-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba($cyan-primary, 0.13);
+    text-align: left;
+
+    strong {
+        display: block;
+        font-size: 14px;
+        line-height: 1.15;
+        letter-spacing: -0.03em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: left;
+    }
+
+    p {
+        margin: 4px 0 0;
+        color: $text-muted;
+        font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: left;
+    }
+}
+
+.maintenance-side {
+    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 9px;
+    white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+    .record-row {
+        grid-template-columns: 1fr;
+        align-items: start;
+        gap: 10px;
+    }
+
+    .list-actions {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .record-row strong,
+    .record-row p,
+    .url-text {
+        white-space: normal;
+    }
+
+    .maintenance-item {
+        grid-template-columns: 1fr;
+        align-items: start;
+    }
+
+    .maintenance-side {
+        justify-content: space-between;
+        width: 100%;
+    }
+}

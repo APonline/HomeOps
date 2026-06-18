@@ -1,0 +1,404 @@
+@use "tokens" as *;
+
+// Dashboard bills: simple mini-table.
+// Wide: Item | Type | Due | Amount | Status
+// Tight: Item | Due | Amount | Status
+// The Type column hides when space is tight to avoid horizontal overflow.
+
+$dashboard-feature-height: 360px;
+
+.dashboard-grid--balanced {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+        "chart chart"
+        "bills bills"
+        "periods maintenance";
+    gap: 16px;
+    align-items: stretch;
+}
+
+.chart-panel--full {
+    grid-area: chart;
+    min-height: $dashboard-feature-height;
+    height: $dashboard-feature-height;
+    display: flex;
+    flex-direction: column;
+}
+
+.bills-panel--full {
+    grid-area: bills;
+    min-height: $dashboard-feature-height;
+    height: $dashboard-feature-height;
+    display: flex;
+    flex-direction: column;
+}
+
+.periods-panel {
+    grid-area: periods;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+}
+
+.maintenance-panel {
+    grid-area: maintenance;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-panel--full .panel-header,
+.bills-panel--full .panel-header,
+.periods-panel .panel-header,
+.maintenance-panel .panel-header {
+    flex: 0 0 auto;
+}
+
+.chart-panel--full .chart-wrap {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.dashboard-bills {
+    min-height: 0;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    container-type: inline-size;
+}
+
+.dashboard-bills__table-scroll {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow: auto;
+    padding-right: 4px;
+    overscroll-behavior: contain;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    scrollbar-width: thin;
+    scrollbar-color: rgba($cyan-primary, 0.45) rgba(255, 255, 255, 0.06);
+
+    &.is-dragging {
+        cursor: grabbing;
+    }
+
+    &:focus-visible {
+        outline: 2px solid rgba($cyan-primary, 0.75);
+        outline-offset: 4px;
+        border-radius: 14px;
+    }
+
+    &::-webkit-scrollbar {
+        width: 9px;
+        height: 9px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 999px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: linear-gradient(
+            180deg,
+            rgba($cyan-primary, 0.78),
+            rgba($violet-accent, 0.78)
+        );
+        border-radius: 999px;
+    }
+}
+
+.dashboard-bill-table {
+    min-width: 650px;
+    display: grid;
+    gap: 7px;
+}
+
+.dashboard-bill-table__head,
+.dashboard-bill-record {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) 112px 92px 104px 104px;
+    gap: 12px;
+    align-items: center;
+}
+
+.dashboard-bill-table__head {
+    padding: 0 12px 2px;
+    color: $text-muted;
+    font-size: 10px;
+    font-weight: 950;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+}
+
+.dashboard-bill-table__head span:nth-child(4),
+.dashboard-bill-table__head span:nth-child(5) {
+    text-align: right;
+}
+
+.dashboard-bill-table__body {
+    display: grid;
+    gap: 7px;
+}
+
+.dashboard-bill-record {
+    min-height: 48px;
+    padding: 8px 12px;
+    border-radius: 13px;
+    border: 1px solid rgba($cyan-primary, 0.16);
+    background:
+        linear-gradient(
+            135deg,
+            rgba($cyan-primary, 0.08),
+            rgba($violet-accent, 0.055)
+        ),
+        rgba(8, 13, 22, 0.68);
+}
+
+.dashboard-bill-record__item {
+    min-width: 0;
+}
+
+.dashboard-bill-record__item strong {
+    display: block;
+    font-size: 14px;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dashboard-bill-record__item span {
+    display: block;
+    margin-top: 4px;
+    color: $text-muted;
+    font-size: 10px;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.bill-type,
+.bill-due,
+.dashboard-bill-record .status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 26px;
+    padding: 0 9px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 900;
+    white-space: nowrap;
+    width: fit-content;
+    max-width: 100%;
+}
+
+.bill-type {
+    border: 1px solid transparent;
+    margin: 0 auto;
+
+    &.recurring,
+    &.monthly {
+        background: rgba($cyan-primary, 0.16);
+        color: #d7eeff;
+        border-color: rgba($cyan-primary, 0.28);
+    }
+
+    &.annual {
+        background: rgba($violet-accent, 0.18);
+        color: #e7ddff;
+        border-color: rgba($violet-accent, 0.30);
+    }
+
+    &.quarterly {
+        background: rgba($warning, 0.18);
+        color: #ffe1a6;
+        border-color: rgba($warning, 0.28);
+    }
+
+    &.one-time {
+        background: rgba($success, 0.16);
+        color: #dfffe4;
+        border-color: rgba($success, 0.28);
+    }
+
+    &.weekly {
+        background: rgba($danger, 0.16);
+        color: #ffd8d8;
+        border-color: rgba($danger, 0.28);
+    }
+}
+
+.bill-due {
+    background: rgba(255, 255, 255, 0.055);
+    border: 1px solid rgba($cyan-primary, 0.12);
+    color: $text-soft;
+    margin: 0 auto;
+}
+
+.bill-amount {
+    font-family: $font-display;
+    font-size: 16px;
+    font-weight: 950;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+    text-align: right;
+}
+
+.dashboard-bill-record .status {
+    justify-self: end;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dashboard-bills__footer {
+    flex: 0 0 auto;
+    border-top: 1px solid rgba($cyan-primary, 0.12);
+    margin-top: 10px;
+    padding-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+
+    span {
+        color: $text-muted;
+        font-size: 12px;
+    }
+}
+
+.periods-panel .period-list,
+.maintenance-panel .maintenance-list {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding-right: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba($cyan-primary, 0.45) rgba(255, 255, 255, 0.06);
+
+    &::-webkit-scrollbar {
+        width: 9px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 999px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: linear-gradient(
+            180deg,
+            rgba($cyan-primary, 0.78),
+            rgba($violet-accent, 0.78)
+        );
+        border-radius: 999px;
+    }
+}
+
+// Tight dashboard panels: hide Type and avoid x-scroll.
+@container (max-width: 610px) {
+    .dashboard-bills__table-scroll {
+        overflow-x: hidden;
+    }
+
+    .dashboard-bill-table {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .dashboard-bill-table__head,
+    .dashboard-bill-record {
+        grid-template-columns: minmax(150px, 1fr) 74px 82px 74px;
+        gap: 8px;
+    }
+
+    .bill-type-col {
+        display: none !important;
+    }
+
+    .dashboard-bill-table__head {
+        padding-inline: 10px;
+        font-size: 9px;
+    }
+
+    .dashboard-bill-record {
+        min-height: 48px;
+        padding: 8px 10px;
+    }
+
+    .dashboard-bill-record__item strong {
+        font-size: 13px;
+    }
+
+    .dashboard-bill-record__item span {
+        font-size: 9px;
+    }
+
+    .bill-due,
+    .dashboard-bill-record .status {
+        min-height: 24px;
+        padding: 0 7px;
+        font-size: 9px;
+    }
+
+    .bill-amount {
+        font-size: 14px;
+    }
+}
+
+// Very tight: hide the status header text spacing and let rows stay compact.
+@container (max-width: 430px) {
+    .dashboard-bill-table__head,
+    .dashboard-bill-record {
+        grid-template-columns: minmax(130px, 1fr) 66px 76px 64px;
+        gap: 6px;
+    }
+
+    .dashboard-bill-table__head {
+        letter-spacing: 0.08em;
+    }
+
+    .dashboard-bills__footer {
+        align-items: stretch;
+        flex-direction: column;
+
+        .mini-button {
+            width: 100%;
+        }
+    }
+}
+
+@media (max-width: 1180px) {
+    .dashboard-grid--balanced {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "chart"
+            "bills"
+            "periods"
+            "maintenance";
+    }
+
+    .chart-panel--full,
+    .bills-panel--full {
+        height: $dashboard-feature-height;
+        min-height: $dashboard-feature-height;
+    }
+
+    .periods-panel,
+    .maintenance-panel {
+        min-height: 300px;
+    }
+}
+
+@media (max-width: 760px) {
+    .chart-panel--full,
+    .bills-panel--full {
+        height: 330px;
+        min-height: 330px;
+    }
+}

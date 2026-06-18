@@ -1,0 +1,44 @@
+<svg width="1600" height="260" viewBox="0 0 1600 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="skyFade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="1" stop-color="#E8EED9" stop-opacity="0.3"/>
+    </linearGradient>
+    <linearGradient id="hill1" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#EEF2E1"/>
+      <stop offset="1" stop-color="#D9E8C5"/>
+    </linearGradient>
+    <linearGradient id="hill2" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#E4EAE8"/>
+      <stop offset="1" stop-color="#D1DFCB"/>
+    </linearGradient>
+    <linearGradient id="hill3" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#D7E5C8"/>
+      <stop offset="1" stop-color="#C1D8B0"/>
+    </linearGradient>
+    <g id="treeA">
+      <rect x="-1.8" y="18" width="3.6" height="18" rx="1.8" fill="#9AA89B" opacity="0.45"/>
+      <path d="M0 0 10 18H-10L0 0Z" fill="#A9B8A7" opacity="0.62"/>
+      <path d="M0 8 12 28H-12L0 8Z" fill="#A7B89F" opacity="0.56"/>
+      <path d="M0 18 14 40H-14L0 18Z" fill="#9DB091" opacity="0.52"/>
+    </g>
+  </defs>
+
+  <rect width="1600" height="260" fill="url(#skyFade)"/>
+  <path d="M0 152C140 126 214 120 358 156C514 196 668 210 826 184C954 162 1084 120 1222 128C1384 138 1472 180 1600 182V260H0V152Z" fill="url(#hill2)"/>
+  <path d="M0 174C98 144 230 140 344 178C520 238 630 214 792 188C936 166 1054 172 1180 206C1306 238 1444 232 1600 188V260H0V174Z" fill="url(#hill1)"/>
+  <path d="M0 198C142 178 242 192 336 230C432 268 632 268 758 234C854 208 990 192 1158 210C1342 230 1480 228 1600 214V260H0V198Z" fill="url(#hill3)"/>
+
+  <g opacity="0.9">
+    <use href="#treeA" transform="translate(48 184) scale(1.15)"/>
+    <use href="#treeA" transform="translate(90 190) scale(0.86)"/>
+    <use href="#treeA" transform="translate(132 177) scale(1.05)"/>
+    <use href="#treeA" transform="translate(176 198) scale(0.72)"/>
+    <use href="#treeA" transform="translate(244 184) scale(1.12)"/>
+    <use href="#treeA" transform="translate(298 192) scale(0.82)"/>
+    <use href="#treeA" transform="translate(1372 188) scale(1.06)"/>
+    <use href="#treeA" transform="translate(1420 196) scale(0.78)"/>
+    <use href="#treeA" transform="translate(1470 180) scale(1.18)"/>
+    <use href="#treeA" transform="translate(1516 196) scale(0.78)"/>
+  </g>
+</svg>

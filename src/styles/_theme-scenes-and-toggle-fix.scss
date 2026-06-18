@@ -1,0 +1,519 @@
+/*
+  Last-load HomeOps nav / theme patch.
+  Keep this imported LAST in src/styles/index.scss.
+
+  Goals:
+  - desktop = real left sidebar
+  - mobile = top bar + hamburger drawer
+  - no old .side-nav / .brand responsive rules leaking into the new nav
+  - logo image, not text heading
+  - actual SVG scene backgrounds from /public/theme
+*/
+
+/* ---------- Scene backgrounds ---------- */
+body::after {
+    content: "";
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: auto;
+    bottom: 0;
+    height: min(30vh, 260px);
+    z-index: 0;
+    pointer-events: none;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: cover;
+    opacity: .88;
+    mask-image: linear-gradient(to top, rgba(0, 0, 0, .96) 0%, rgba(0, 0, 0, .72) 48%, transparent 100%);
+}
+
+:root[data-theme="dark"] body::after,
+:root:not([data-theme]) body::after {
+    background-image:
+        linear-gradient(to top, rgba(4, 8, 20, .78), transparent 68%),
+        url("/theme/city-night.svg");
+}
+
+:root[data-theme="light"] body::after {
+    background-image:
+        linear-gradient(to top, rgba(245, 248, 238, .58), transparent 70%),
+        url("/theme/nature-light.svg");
+}
+
+.app-shell {
+    position: relative;
+    z-index: 1;
+}
+
+/* ---------- Theme toggle ---------- */
+.homeops-theme-toggle {
+    appearance: none;
+    width: auto !important;
+    min-width: 78px;
+    height: 42px;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 4px !important;
+    border-radius: 999px;
+    border: 1px solid rgba(99, 151, 255, 0.55) !important;
+    background: rgba(9, 15, 31, 0.72) !important;
+    color: #dbe6ff !important;
+    box-shadow: 0 0 18px rgba(117, 91, 255, 0.24);
+    cursor: pointer;
+    line-height: 1;
+    flex: 0 0 auto;
+}
+
+:root[data-theme="light"] .homeops-theme-toggle {
+    background: rgba(255, 255, 255, .82) !important;
+    color: #53617f !important;
+    border-color: rgba(96, 137, 210, .32) !important;
+    box-shadow: 0 12px 26px rgba(80, 95, 140, .10);
+}
+
+.homeops-theme-toggle__chip,
+.theme-chip {
+    width: 32px !important;
+    height: 32px !important;
+    flex: 0 0 32px;
+    border-radius: 999px;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    color: #9ba8c8;
+    background: transparent;
+    transition: background .18s ease, color .18s ease, transform .18s ease;
+}
+
+.homeops-theme-toggle__chip.active,
+.theme-chip.active {
+    color: #ffffff;
+    background: linear-gradient(135deg, #42aaff, #7d62ff);
+    transform: translateY(-1px);
+}
+
+.homeops-theme-toggle__icon,
+.theme-chip svg,
+.homeops-theme-toggle svg {
+    width: 17px !important;
+    height: 17px !important;
+    display: block;
+    stroke-width: 2;
+}
+
+/* ---------- Desktop sidebar nav ---------- */
+.homeops-nav.sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: 100vh;
+    width: auto;
+    padding: 24px 18px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-right: 1px solid var(--ho-border, rgba(123, 199, 255, .20));
+    border-bottom: 0;
+    background: var(--ho-sidebar-bg, linear-gradient(180deg, rgba(6, 11, 24, 0.90), rgba(5, 8, 18, 0.82)));
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+}
+
+.homeops-nav__topbar {
+    display: grid;
+    justify-items: center;
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.homeops-nav__brand {
+    display: grid;
+    place-items: center;
+    min-width: 0;
+}
+
+.homeops-nav__logo {
+    display: block;
+    width: 188px;
+    max-width: 100%;
+    height: auto;
+    filter: drop-shadow(0 0 22px rgba(52, 152, 219, .18));
+}
+
+.homeops-nav__actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.homeops-nav__menu-button,
+.homeops-nav__drawer-head,
+.homeops-nav-backdrop {
+    display: none;
+}
+
+.homeops-nav__drawer {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+    transform: none;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+}
+
+.homeops-nav-list {
+    display: grid;
+    gap: 8px;
+}
+
+.homeops-nav-item {
+    appearance: none;
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: var(--ho-text-muted, #a9b7c7);
+    text-align: left;
+    padding: 12px 14px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-weight: 850;
+    font-size: 15px;
+    line-height: 1.15;
+    cursor: pointer;
+    transition: color .18s ease, background .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.homeops-nav-item:hover:not(:disabled) {
+    color: var(--ho-text, #f7fbff);
+    background: rgba(93, 184, 255, .08);
+    transform: translateX(2px);
+}
+
+.homeops-nav-item.is-active {
+    color: var(--ho-text-strong, #ffffff);
+    background: linear-gradient(90deg, rgba(55, 157, 255, 0.18), rgba(126, 91, 255, 0.20));
+    box-shadow: inset 3px 0 0 #42aaff, inset 0 0 0 1px rgba(76, 163, 255, .62), 0 0 18px rgba(126, 91, 255, .14);
+}
+
+.homeops-nav-item.is-locked {
+    opacity: .56;
+    cursor: not-allowed;
+}
+
+.homeops-nav-item__main,
+.homeops-nav-item__meta {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.homeops-nav-item__icon {
+    width: 22px;
+    height: 22px;
+    flex: 0 0 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: currentColor;
+}
+
+.homeops-nav-item__icon svg {
+    width: 19px;
+    height: 19px;
+    display: block;
+}
+
+.homeops-nav-item__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.homeops-nav-divider {
+    height: 1px;
+    background: rgba(130, 145, 180, .18);
+    margin: 14px 8px 10px;
+}
+
+.homeops-nav-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    padding: 3px 7px;
+    border-radius: 999px;
+    border: 1px solid rgba(130, 145, 180, .20);
+    color: #99a4be;
+    background: rgba(255, 255, 255, .035);
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.homeops-nav-lock {
+    width: 13px;
+    height: 13px;
+    color: #99a4be;
+}
+
+/* Override the old tablet-polish top-nav rules. Keep desktop sidebar until true mobile. */
+@media (min-width: 861px) and (max-width: 1180px) {
+    .app-shell {
+        display: grid !important;
+        grid-template-columns: 276px minmax(0, 1fr) !important;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .homeops-nav.sidebar {
+        position: sticky !important;
+        top: 0;
+        height: 100vh !important;
+        width: auto !important;
+        padding: 24px 18px !important;
+        border-right: 1px solid var(--ho-border, rgba(123, 199, 255, .20)) !important;
+        border-bottom: 0 !important;
+    }
+
+    .homeops-nav__topbar {
+        display: grid !important;
+        justify-items: center;
+        margin-bottom: 22px;
+    }
+
+    .homeops-nav__logo {
+        width: 188px !important;
+    }
+
+    .homeops-nav-list {
+        display: grid !important;
+        gap: 8px;
+        overflow: visible;
+        padding: 0;
+    }
+
+    .homeops-nav-item {
+        width: 100%;
+        min-width: 0;
+        white-space: normal;
+    }
+
+    .app-main {
+        width: 100%;
+        max-width: 1420px;
+        padding: 34px 30px 48px;
+    }
+}
+
+/* ---------- Mobile shell + drawer ---------- */
+@media (max-width: 860px) {
+    body.homeops-mobile-nav-open {
+        overflow: hidden;
+    }
+
+    body::after {
+        height: 175px;
+        opacity: .78;
+    }
+
+    .app-shell {
+        display: block !important;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .homeops-nav.sidebar {
+        position: sticky !important;
+        top: 0;
+        z-index: 900;
+        height: auto !important;
+        width: 100% !important;
+        padding: 12px 16px !important;
+        overflow: visible;
+        border-right: 0 !important;
+        border-bottom: 1px solid var(--ho-border, rgba(123, 199, 255, .20)) !important;
+        background: var(--ho-sidebar-bg, rgba(5, 8, 18, .94));
+    }
+
+    .homeops-nav__topbar {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin: 0;
+    }
+
+    .homeops-nav__brand {
+        min-width: 0;
+        justify-items: start;
+    }
+
+    .homeops-nav__logo {
+        width: clamp(150px, 42vw, 188px) !important;
+        max-width: 100%;
+    }
+
+    .homeops-nav__actions {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .homeops-nav__menu-button {
+        appearance: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 999px;
+        border: 1px solid rgba(99, 151, 255, .45);
+        background: rgba(9, 15, 31, .72);
+        color: #f5f7ff;
+        font-size: 20px;
+        font-weight: 900;
+        line-height: 1;
+        cursor: pointer;
+        box-shadow: 0 0 18px rgba(117, 91, 255, .18);
+    }
+
+    :root[data-theme="light"] .homeops-nav__menu-button {
+        background: rgba(255, 255, 255, .82);
+        color: #53617f;
+        border-color: rgba(96, 137, 210, .32);
+    }
+
+    .homeops-nav__drawer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 1002;
+        width: min(330px, 88vw);
+        height: 100dvh;
+        margin: 0;
+        padding: 18px;
+        overflow-y: auto;
+        transform: translateX(-105%);
+        transition: transform .20s ease;
+        border-right: 1px solid rgba(99, 151, 255, .25);
+        box-shadow: 24px 0 90px rgba(0, 0, 0, .48);
+        background:
+            linear-gradient(180deg, rgba(5, 9, 24, .96), rgba(5, 9, 24, .92)),
+            var(--ho-sidebar-bg, #050916);
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+    }
+
+    :root[data-theme="light"] .homeops-nav__drawer {
+        background:
+            linear-gradient(180deg, rgba(255, 252, 246, .96), rgba(255, 250, 241, .92)),
+            var(--ho-sidebar-bg, #fbf6ed);
+    }
+
+    .homeops-nav__drawer.is-open {
+        transform: translateX(0);
+    }
+
+    .homeops-nav__drawer-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+
+    .homeops-nav__drawer-logo {
+        width: 162px;
+        max-width: 70%;
+        height: auto;
+        filter: drop-shadow(0 0 18px rgba(52, 152, 219, .16));
+    }
+
+    .homeops-nav__drawer-close {
+        appearance: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        border: 1px solid rgba(99, 151, 255, .35);
+        background: rgba(255, 255, 255, .04);
+        color: var(--ho-text-strong, #fff);
+        font-size: 25px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .homeops-nav-list {
+        display: grid !important;
+        gap: 8px;
+        padding: 0;
+        overflow: visible;
+    }
+
+    .homeops-nav-item {
+        min-width: 0;
+        white-space: normal;
+        padding: 13px 14px;
+    }
+
+    .homeops-nav-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 1001;
+        padding: 0;
+        border: 0;
+        background: rgba(0, 0, 0, .54);
+        cursor: pointer;
+    }
+
+    .app-main {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 24px 14px 38px !important;
+        overflow-x: hidden;
+    }
+}
+
+@media (max-width: 420px) {
+    .homeops-nav.sidebar {
+        padding-inline: 12px !important;
+    }
+
+    .homeops-nav__logo {
+        width: 142px !important;
+    }
+
+    .homeops-theme-toggle {
+        min-width: 72px;
+        height: 38px;
+        gap: 4px;
+    }
+
+    .homeops-theme-toggle__chip,
+    .theme-chip {
+        width: 29px !important;
+        height: 29px !important;
+        flex-basis: 29px;
+    }
+
+    .homeops-nav__menu-button {
+        width: 38px;
+        height: 38px;
+    }
+}

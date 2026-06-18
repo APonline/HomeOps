@@ -1,0 +1,165 @@
+@use "tokens" as *;
+
+// HomeOps responsive data tables.
+// Fixes narrow dashboard panels without turning every row into a giant phone card.
+
+.table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    container-type: inline-size;
+    scrollbar-width: thin;
+    scrollbar-color: rgba($cyan-primary, 0.45) rgba(255, 255, 255, 0.06);
+
+    &::-webkit-scrollbar {
+        height: 10px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 999px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: linear-gradient(90deg, rgba($cyan-primary, 0.78), rgba($violet-accent, 0.78));
+        border-radius: 999px;
+    }
+}
+
+.responsive-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 620px;
+}
+
+.responsive-table th,
+.responsive-table td {
+    white-space: normal;
+}
+
+.responsive-table .primary-cell {
+    min-width: 160px;
+}
+
+.responsive-table .amount-cell,
+.responsive-table .action-cell {
+    white-space: nowrap;
+}
+
+// Tight panel layout: compact cards, not huge stacked forms.
+@container (max-width: 560px) {
+    .responsive-table {
+        min-width: 0;
+    }
+
+    .responsive-table thead {
+        display: none;
+    }
+
+    .responsive-table,
+    .responsive-table tbody,
+    .responsive-table tr,
+    .responsive-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .responsive-table tbody {
+        display: grid;
+        gap: 10px;
+    }
+
+    .responsive-table tr {
+        background:
+            linear-gradient(135deg, rgba($cyan-primary, 0.075), rgba($violet-accent, 0.055)),
+            rgba(8, 13, 22, 0.68);
+        border: 1px solid rgba($cyan-primary, 0.16);
+        border-radius: 15px;
+        padding: 12px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.14);
+        user-select: none;
+    }
+
+    .responsive-table td {
+        border: 0;
+        padding: 0;
+        font-weight: 850;
+        text-align: left;
+    }
+
+    .responsive-table .primary-cell {
+        min-width: 0;
+        font-size: 17px;
+        line-height: 1.15;
+        margin-bottom: 10px;
+        letter-spacing: -0.025em;
+    }
+
+    .responsive-table .primary-cell::before {
+        display: none;
+    }
+
+    .responsive-table td:not(.primary-cell) {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        min-height: 30px;
+        font-size: 15px;
+    }
+
+    .responsive-table td:not(.primary-cell) + td:not(.primary-cell) {
+        border-top: 1px solid rgba($cyan-primary, 0.10);
+        padding-top: 8px;
+        margin-top: 8px;
+    }
+
+    .responsive-table td::before {
+        content: attr(data-label);
+        color: $text-muted;
+        font-size: 10px;
+        font-weight: 950;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        flex: 0 0 auto;
+    }
+
+    .responsive-table .amount-cell {
+        font-family: $font-display;
+        font-size: 18px;
+        letter-spacing: -0.035em;
+    }
+
+    .responsive-table .status {
+        transform: scale(0.95);
+        transform-origin: right center;
+    }
+
+    .responsive-table .action-cell {
+        padding-top: 10px !important;
+    }
+
+    .responsive-table .mini-button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@container (max-width: 390px) {
+    .responsive-table tr {
+        padding: 11px;
+    }
+
+    .responsive-table .primary-cell {
+        font-size: 16px;
+    }
+
+    .responsive-table td:not(.primary-cell) {
+        font-size: 14px;
+    }
+}
+
+.panel table {
+    max-width: 100%;
+}

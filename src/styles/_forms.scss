@@ -1,0 +1,146 @@
+@use "tokens" as *;
+@use "mixins" as *;
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 14px;
+    align-items: end;
+}
+
+.form-grid label {
+    display: grid;
+    gap: 6px;
+    color: $text-muted;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+
+    span {
+        display: block;
+    }
+}
+
+.form-grid input,
+.form-grid select,
+.form-grid textarea,
+.modal-card input,
+.modal-card select,
+.modal-card textarea {
+    width: 100%;
+    min-width: 0;
+    border: 1px solid $line;
+    background: rgba(5, 8, 15, .74);
+    color: $text;
+    border-radius: 13px;
+    padding: 12px 14px;
+    font-size: 15px;
+    text-transform: none;
+    letter-spacing: normal;
+    outline: none;
+    transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+
+    &:focus {
+        border-color: rgba($cyan-primary, .72);
+        box-shadow: 0 0 0 4px rgba($cyan-primary, .10);
+        background: rgba(8, 13, 23, .94);
+    }
+
+    &::placeholder {
+        color: rgba($text-muted, .58);
+    }
+}
+
+.form-grid textarea,
+.modal-card textarea {
+    min-height: 84px;
+    resize: vertical;
+}
+
+.span-3 { grid-column: span 3; }
+.span-4 { grid-column: span 4; }
+.span-6 { grid-column: span 6; }
+.span-8 { grid-column: span 8; }
+.span-12 { grid-column: span 12; }
+
+.primary-action {
+    width: 100%;
+    margin-top: 0;
+    border: 0;
+    background: $gradient-brand;
+    color: white;
+    border-radius: 13px;
+    padding: 14px 16px;
+    font-weight: 950;
+    box-shadow: 0 14px 36px rgba($violet-accent, .18);
+    transition: transform .18s ease, box-shadow .18s ease;
+
+    &:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 18px 44px rgba($cyan-primary, .16), 0 14px 36px rgba($violet-accent, .18);
+    }
+
+    &:disabled {
+        opacity: .65;
+        cursor: not-allowed;
+    }
+}
+
+.form-error {
+    grid-column: 1 / -1;
+    margin: 0;
+    border: 1px solid rgba($danger, .45);
+    background: rgba($danger, .15);
+    color: #ffd7d7;
+    border-radius: 13px;
+    padding: 10px 12px;
+    font-size: 14px;
+    text-transform: none;
+    letter-spacing: normal;
+}
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(1, 3, 8, 0.74);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.modal-card {
+    @include glass-panel;
+    @include brand-border;
+    width: min(620px, 100%);
+    border-radius: $radius-lg;
+    padding: 26px;
+    color: $text;
+    position: relative;
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
+
+    h2 {
+        margin: 0 0 20px;
+        font-family: $font-display;
+        font-size: 24px;
+        font-weight: 900;
+        letter-spacing: -0.045em;
+    }
+}
+
+.modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: 1px solid $line;
+    background: rgba(20, 30, 44, 0.84);
+    color: $text;
+    font-size: 20px;
+    line-height: 1;
+}

@@ -1,0 +1,219 @@
+/* 
+  HomeOps side-scene backgrounds.
+  Import this LAST, after theme-modes and theme-scenes-and-toggle-fix.
+
+  Uses the transparent WEBP side art:
+  /public/assets/backgrounds/homeops-city-night-transparent-bg.webp
+  /public/assets/backgrounds/homeops-nature-light-transparent-bg.webp
+*/
+
+:root,
+:root[data-theme="dark"] {
+    --homeops-page-bg:
+        radial-gradient(circle at 58% 8%, rgba(124, 91, 255, 0.34), transparent 34rem),
+        radial-gradient(circle at 52% 68%, rgba(60, 158, 255, 0.12), transparent 40rem),
+        linear-gradient(180deg, #07111f 0%, #070a15 52%, #050712 100%);
+
+    --homeops-scene-bg: url("/assets/backgrounds/homeops-city-night-transparent-bg.webp");
+    --homeops-scene-opacity: 0.88;
+    --homeops-scene-width: min(46vw, 620px);
+    --homeops-scene-height: min(118vh, 1320px);
+    --homeops-sidebar-glass: rgba(3, 8, 20, 0.76);
+    --homeops-sidebar-border: rgba(115, 145, 255, 0.20);
+}
+
+:root[data-theme="light"] {
+    --homeops-page-bg:
+        radial-gradient(circle at 56% 9%, rgba(124, 91, 255, 0.18), transparent 34rem),
+        radial-gradient(circle at 62% 74%, rgba(115, 151, 112, 0.12), transparent 38rem),
+        linear-gradient(180deg, #fbf8f1 0%, #f7f4eb 48%, #eef5e8 100%);
+
+    --homeops-scene-bg: url("/assets/backgrounds/homeops-nature-light-transparent-bg.webp");
+    --homeops-scene-opacity: 0.78;
+    --homeops-scene-width: min(44vw, 600px);
+    --homeops-scene-height: min(116vh, 1280px);
+    --homeops-sidebar-glass: rgba(255, 255, 255, 0.66);
+    --homeops-sidebar-border: rgba(105, 125, 170, 0.18);
+}
+
+html,
+body,
+#root {
+    min-height: 100%;
+}
+
+html {
+    background: var(--homeops-page-bg);
+}
+
+/* kill the old fake SVG/gradient scene layer and replace with the WEBP side art */
+body {
+    margin: 0;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    isolation: isolate;
+    background: var(--homeops-page-bg) !important;
+}
+
+/* Scene sizing */
+:root,
+:root[data-theme="dark"] {
+    --homeops-scene-width: min(64vw, 900px);
+    --homeops-scene-height: min(122vh, 1360px);
+    --homeops-scene-bleed: clamp(120px, 14vw, 240px);
+}
+
+:root[data-theme="light"] {
+    --homeops-scene-width: min(64vw, 900px);
+    --homeops-scene-height: min(122vh, 1360px);
+    --homeops-scene-bleed: clamp(120px, 14vw, 240px);
+}
+
+/* Shared side artwork layer */
+body::before,
+body::after {
+    content: "";
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    z-index: 0;
+    width: calc(var(--homeops-scene-width) + var(--homeops-scene-bleed));
+    height: var(--homeops-scene-height);
+    pointer-events: none;
+
+    background-image: var(--homeops-scene-bg) !important;
+    background-repeat: no-repeat;
+    background-size: auto 100%;
+    opacity: var(--homeops-scene-opacity);
+
+    filter: blur(0.2px);
+    will-change: opacity, transform;
+}
+
+/* Left side — mirrored, pulled past viewport so it truly reaches x:0 */
+body::before {
+    // left: calc(-1 * var(--homeops-scene-bleed));
+    right: auto;
+    background-position: right bottom;
+    transform: scaleX(-1);
+    transform-origin: center bottom;
+
+    -webkit-mask-image: linear-gradient(
+        to left,
+        #000 0%,
+        #000 48%,
+        rgba(0, 0, 0, 0.82) 62%,
+        rgba(0, 0, 0, 0.35) 78%,
+        transparent 100%
+    );
+    mask-image: linear-gradient(
+        to left,
+        #000 0%,
+        #000 48%,
+        rgba(0, 0, 0, 0.82) 62%,
+        rgba(0, 0, 0, 0.35) 78%,
+        transparent 100%
+    );
+}
+
+/* Right side — original, faded toward the page middle */
+body::after {
+    right: calc(-1 * var(--homeops-scene-bleed));
+    left: auto;
+    background-position: right bottom;
+    transform: none;
+
+    -webkit-mask-image: linear-gradient(
+        to left,
+        #000 0%,
+        #000 56%,
+        rgba(0, 0, 0, 0.82) 66%,
+        rgba(0, 0, 0, 0.38) 82%,
+        transparent 100%
+    );
+    mask-image: linear-gradient(
+        to left,
+        #000 0%,
+        #000 56%,
+        rgba(0, 0, 0, 0.82) 66%,
+        rgba(0, 0, 0, 0.38) 82%,
+        transparent 100%
+    );
+}
+
+/* keep app content above the background art */
+#root,
+.app-shell,
+.app-main,
+.page-shell,
+.homeops-page {
+    position: relative;
+    z-index: 1;
+}
+
+.app-shell,
+.app-main,
+.page-shell,
+.homeops-page {
+    background: transparent !important;
+}
+
+/* let the side art breathe behind the nav */
+.sidebar {
+    background: var(--homeops-sidebar-glass) !important;
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border-right-color: var(--homeops-sidebar-border) !important;
+}
+
+.sidebar-nav-drawer {
+    background:
+        linear-gradient(180deg, var(--homeops-sidebar-glass), var(--homeops-sidebar-glass)),
+        var(--homeops-page-bg) !important;
+}
+
+/* Mobile: one centred scene is cleaner than mirrored side curtains */
+@media (max-width: 860px) {
+    body::before {
+        display: none;
+    }
+
+    body::after {
+        left: 0;
+        right: 0;
+        width: 100vw;
+        height: 105vh;
+        background-position: center bottom;
+        background-size: auto 105vh;
+        opacity: calc(var(--homeops-scene-opacity) * 0.76);
+
+        transform: none;
+
+        -webkit-mask-image: linear-gradient(
+            to bottom,
+            transparent 0%,
+            #000 20%,
+            #000 100%
+        );
+        mask-image: linear-gradient(
+            to bottom,
+            transparent 0%,
+            #000 20%,
+            #000 100%
+        );
+    }
+
+    .sidebar {
+        border-right: 0 !important;
+        border-bottom-color: var(--homeops-sidebar-border) !important;
+    }
+}
+
+@media (max-width: 520px) {
+    body::after {
+        height: 100vh;
+        background-size: auto 100vh;
+        opacity: calc(var(--homeops-scene-opacity) * 0.74);
+    }
+}

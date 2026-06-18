@@ -1,0 +1,103 @@
+@use "tokens" as *;
+
+// Fixes the dashboard chart being clipped after the brand SCSS pass.
+// Adds native horizontal scrolling + mouse/touch drag scrolling.
+
+.chart-wrap {
+    width: 100%;
+    overflow: hidden;
+}
+
+.chart-scroller {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    cursor: grab;
+    user-select: none;
+    touch-action: pan-x;
+    padding-bottom: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba($cyan-primary, 0.45) rgba(255, 255, 255, 0.06);
+
+    &::-webkit-scrollbar {
+        height: 10px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 999px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: linear-gradient(90deg, rgba($cyan-primary, 0.78), rgba($violet-accent, 0.78));
+        border-radius: 999px;
+    }
+
+    &.is-dragging {
+        cursor: grabbing;
+    }
+
+    &:focus-visible {
+        outline: 2px solid rgba($cyan-primary, 0.78);
+        outline-offset: 4px;
+        border-radius: 14px;
+    }
+}
+
+.bar-chart {
+    height: 220px;
+    width: max-content;
+    min-width: 100%;
+    display: flex;
+    align-items: end;
+    gap: 10px;
+    border-bottom: 1px solid $line;
+    padding: 0 6px;
+}
+
+.bar-column {
+    flex: 0 0 44px;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    align-items: center;
+}
+
+.bar {
+    width: 100%;
+    min-width: 0;
+    max-width: 44px;
+}
+
+.chart-legend {
+    width: max-content;
+    min-width: 100%;
+    display: flex;
+    gap: 14px;
+    color: $text-muted;
+    font-size: 13px;
+    padding: 12px 6px 0;
+}
+
+.chart-drag-hint {
+    margin-top: 4px;
+    color: rgba($text-muted, 0.7);
+    font-size: 12px;
+    text-align: right;
+}
+
+@media (max-width: 760px) {
+    .bar-column {
+        flex-basis: 38px;
+    }
+
+    .bar {
+        max-width: 38px;
+    }
+
+    .chart-drag-hint {
+        text-align: left;
+    }
+}

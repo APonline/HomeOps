@@ -1,0 +1,357 @@
+[
+  {
+    "file": "homeops-logo-stack-master-transparent.png",
+    "size": [
+      1042,
+      896
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 648190,
+      "opaque_pixels": 271013
+    }
+  },
+  {
+    "file": "homeops-logo-horizontal-master-transparent.png",
+    "size": [
+      2013,
+      448
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 685845,
+      "opaque_pixels": 202630
+    }
+  },
+  {
+    "file": "homeops-icon-master-transparent.png",
+    "size": [
+      1187,
+      827
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 661917,
+      "opaque_pixels": 309389
+    }
+  },
+  {
+    "file": "homeops-logo-social-master-transparent.png",
+    "size": [
+      1005,
+      764
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 538313,
+      "opaque_pixels": 216398
+    }
+  },
+  {
+    "file": "homeops-favicon-master-transparent.png",
+    "size": [
+      1176,
+      872
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 633104,
+      "opaque_pixels": 382159
+    }
+  },
+  {
+    "file": "homeops-logo-stack-1024.png",
+    "size": [
+      1024,
+      1024
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 823014,
+      "opaque_pixels": 190945
+    }
+  },
+  {
+    "file": "homeops-logo-stack-512.png",
+    "size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 200977,
+      "opaque_pixels": 43046
+    }
+  },
+  {
+    "file": "homeops-logo-horizontal-1200x400.png",
+    "size": [
+      1200,
+      400
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 417623,
+      "opaque_pixels": 43685
+    }
+  },
+  {
+    "file": "homeops-logo-horizontal-900x300.png",
+    "size": [
+      900,
+      300
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 233318,
+      "opaque_pixels": 22670
+    }
+  },
+  {
+    "file": "homeops-logo-horizontal-600x200.png",
+    "size": [
+      600,
+      200
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 102424,
+      "opaque_pixels": 8714
+    }
+  },
+  {
+    "file": "homeops-logo-horizontal-300x100.png",
+    "size": [
+      300,
+      100
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 24834,
+      "opaque_pixels": 1360
+    }
+  },
+  {
+    "file": "homeops-logo-social-1200x630.png",
+    "size": [
+      1200,
+      630
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 638772,
+      "opaque_pixels": 91535
+    }
+  },
+  {
+    "file": "homeops-logo-open-graph-1200x630.png",
+    "size": [
+      1200,
+      630
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 713934,
+      "opaque_pixels": 26860
+    }
+  },
+  {
+    "file": "homeops-icon-1024.png",
+    "size": [
+      1024,
+      1024
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 881049,
+      "opaque_pixels": 145846
+    }
+  },
+  {
+    "file": "homeops-icon-512.png",
+    "size": [
+      512,
+      512
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 217562,
+      "opaque_pixels": 33796
+    }
+  },
+  {
+    "file": "homeops-icon-256.png",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 53255,
+      "opaque_pixels": 7149
+    }
+  },
+  {
+    "file": "homeops-icon-192.png",
+    "size": [
+      192,
+      192
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 29542,
+      "opaque_pixels": 3555
+    }
+  },
+  {
+    "file": "homeops-apple-touch-icon-180.png",
+    "size": [
+      180,
+      180
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 25933,
+      "opaque_pixels": 3039
+    }
+  },
+  {
+    "file": "homeops-favicon-64.png",
+    "size": [
+      64,
+      64
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 2801,
+      "opaque_pixels": 305
+    }
+  },
+  {
+    "file": "homeops-favicon-48.png",
+    "size": [
+      48,
+      48
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 1509,
+      "opaque_pixels": 162
+    }
+  },
+  {
+    "file": "homeops-favicon-32.png",
+    "size": [
+      32,
+      32
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 655,
+      "opaque_pixels": 70
+    }
+  },
+  {
+    "file": "homeops-favicon-16.png",
+    "size": [
+      16,
+      16
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 158,
+      "opaque_pixels": 4
+    }
+  },
+  {
+    "file": "favicon.ico",
+    "size": [
+      256,
+      256
+    ],
+    "mode": "RGBA",
+    "has_alpha": true,
+    "alpha_stats": {
+      "min": 0,
+      "max": 255,
+      "transparent_pixels": 49309,
+      "opaque_pixels": 10757
+    }
+  },
+  {
+    "file": "homeops-alpha-proof-sheet.png",
+    "size": [
+      1260,
+      960
+    ],
+    "mode": "RGB",
+    "has_alpha": false,
+    "alpha_stats": null
+  }
+]

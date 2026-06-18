@@ -1,0 +1,34 @@
+@use "tokens" as *;
+
+// Sticky mini-table header for the dashboard bills panel.
+// Load this after _dashboard-bills.scss.
+
+.dashboard-bill-table__head {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    padding-top: 4px;
+    padding-bottom: 6px;
+    background:
+        linear-gradient(180deg, rgba(11, 15, 25, 0.98), rgba(11, 15, 25, 0.88)),
+        rgba(11, 15, 25, 0.94);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba($cyan-primary, 0.12);
+    border-radius: 0 0 0 0;
+}
+
+.dashboard-bill-table__body {
+    padding-top: 2px;
+}
+
+@container (max-width: 610px) {
+    .dashboard-bill-table__head {
+        grid-template-columns: minmax(150px, 1fr) 74px 82px 74px;
+    }
+}
+
+@container (max-width: 430px) {
+    .dashboard-bill-table__head {
+        grid-template-columns: minmax(130px, 1fr) 66px 76px 64px;
+    }
+}

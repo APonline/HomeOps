@@ -1,0 +1,202 @@
+@use "tokens" as *;
+
+// Tablet / in-between polish.
+// This covers the ugly zone between desktop and phone: 761px–1180px.
+
+@media (min-width: 761px) and (max-width: 1180px) {
+    html,
+    body,
+    #root {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .app-shell {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .sidebar {
+        position: relative;
+        height: auto;
+        width: 100%;
+        padding: 20px 24px 14px;
+        border-right: 0;
+        border-bottom: 1px solid rgba($cyan-primary, 0.18);
+        background:
+            radial-gradient(circle at 50% 0%, rgba($cyan-primary, 0.14), transparent 20rem),
+            linear-gradient(180deg, rgba(9, 13, 24, 0.98), rgba(5, 8, 15, 0.96));
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        margin: 0 0 14px;
+
+        &__logo {
+            width: 176px;
+            transform: none;
+        }
+
+        p {
+            margin: 0;
+            padding: 0;
+            font-size: 13px;
+        }
+    }
+
+    .side-nav {
+        display: flex;
+        gap: 9px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 4px 2px 10px;
+        scroll-snap-type: x proximity;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        button {
+            flex: 0 0 auto;
+            min-width: max-content;
+            scroll-snap-align: start;
+            padding: 11px 14px;
+            border-radius: 13px;
+            font-size: 14px;
+            line-height: 1;
+            white-space: nowrap;
+
+            &:hover {
+                transform: none;
+            }
+
+            &.locked {
+                display: none;
+            }
+        }
+    }
+
+    .app-main {
+        width: min(960px, 100%);
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 26px 22px 42px;
+        overflow-x: hidden;
+    }
+
+    .topbar {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .topbar h1,
+    .page-header h1 {
+        font-size: clamp(38px, 5.8vw, 54px);
+    }
+
+    .topbar p,
+    .page-header p {
+        font-size: 16px;
+    }
+
+    .top-actions {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        width: 100%;
+        white-space: normal;
+
+        button {
+            width: 100%;
+            min-width: 0;
+            text-align: center;
+        }
+    }
+
+    .metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 14px;
+    }
+
+    .metric-card {
+        min-height: 122px;
+        padding: 20px 18px;
+    }
+
+    .dashboard-grid,
+    .dashboard-grid--balanced {
+        width: 100%;
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "chart"
+            "bills"
+            "periods"
+            "maintenance";
+        gap: 14px;
+    }
+
+    .panel,
+    .full-panel {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    .chart-panel--full,
+    .bills-panel--full {
+        height: 340px;
+        min-height: 340px;
+    }
+
+    .periods-panel,
+    .maintenance-panel {
+        min-height: 300px;
+    }
+
+    .period-list.wide {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .record-row {
+        min-height: 60px;
+        padding: 11px 12px;
+    }
+
+    .table-wrap {
+        max-width: 100%;
+    }
+
+    .responsive-table {
+        min-width: 640px;
+    }
+
+    .responsive-table .primary-cell {
+        min-width: 160px;
+    }
+}
+
+@media (min-width: 900px) and (max-width: 1180px) {
+    .dashboard-grid--balanced {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-areas:
+            "chart chart"
+            "bills bills"
+            "periods maintenance";
+    }
+
+    .periods-panel,
+    .maintenance-panel {
+        min-height: 320px;
+    }
+}

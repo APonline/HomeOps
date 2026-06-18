@@ -1,0 +1,69 @@
+<svg width="1600" height="260" viewBox="0 0 1600 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="glow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="1" stop-color="#3C2E80" stop-opacity="0.35"/>
+    </linearGradient>
+    <linearGradient id="fog" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7A63FF" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#7A63FF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="tower" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0E1740"/>
+      <stop offset="1" stop-color="#060D24"/>
+    </linearGradient>
+    <linearGradient id="windowA" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6BB2FF"/>
+      <stop offset="1" stop-color="#B073FF"/>
+    </linearGradient>
+    <g id="b1">
+      <rect width="34" height="92" rx="2" fill="url(#tower)"/>
+      <g opacity="0.85" fill="url(#windowA)">
+        <rect x="6" y="18" width="4" height="4"/>
+        <rect x="14" y="18" width="4" height="4"/>
+        <rect x="22" y="18" width="4" height="4"/>
+        <rect x="6" y="30" width="4" height="4"/>
+        <rect x="14" y="30" width="4" height="4"/>
+        <rect x="22" y="30" width="4" height="4"/>
+        <rect x="6" y="44" width="4" height="4"/>
+        <rect x="14" y="44" width="4" height="4"/>
+        <rect x="22" y="44" width="4" height="4"/>
+      </g>
+    </g>
+    <g id="b2">
+      <rect width="52" height="128" rx="2" fill="url(#tower)"/>
+      <rect x="0" y="0" width="52" height="4" fill="#1E2C73" opacity="0.45"/>
+      <g opacity="0.85" fill="url(#windowA)">
+        <rect x="8" y="22" width="5" height="5"/>
+        <rect x="20" y="22" width="5" height="5"/>
+        <rect x="32" y="22" width="5" height="5"/>
+        <rect x="8" y="36" width="5" height="5"/>
+        <rect x="20" y="36" width="5" height="5"/>
+        <rect x="32" y="36" width="5" height="5"/>
+        <rect x="8" y="50" width="5" height="5"/>
+        <rect x="20" y="50" width="5" height="5"/>
+        <rect x="32" y="50" width="5" height="5"/>
+        <rect x="8" y="64" width="5" height="5"/>
+        <rect x="20" y="64" width="5" height="5"/>
+        <rect x="32" y="64" width="5" height="5"/>
+      </g>
+    </g>
+  </defs>
+
+  <rect width="1600" height="260" fill="url(#glow)"/>
+  <rect y="170" width="1600" height="90" fill="url(#fog)" opacity="0.5"/>
+
+  <g opacity="0.95">
+    <use href="#b1" transform="translate(36 148)"/>
+    <use href="#b2" transform="translate(88 112)"/>
+    <use href="#b1" transform="translate(154 162) scale(1.08)"/>
+    <use href="#b2" transform="translate(228 126) scale(0.92)"/>
+    <use href="#b1" transform="translate(312 144) scale(1.2)"/>
+    <use href="#b2" transform="translate(1330 122)"/>
+    <use href="#b1" transform="translate(1406 150) scale(1.08)"/>
+    <use href="#b2" transform="translate(1468 114) scale(1.06)"/>
+    <use href="#b1" transform="translate(1544 162) scale(0.9)"/>
+  </g>
+
+  <rect y="226" width="1600" height="34" fill="#050B1D"/>
+</svg>
