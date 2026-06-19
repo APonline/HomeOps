@@ -163,3 +163,15 @@
 .panel table {
     max-width: 100%;
 }
+
+@container (max-width: 560px) {
+    .responsive-table .bill-actions {
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .responsive-table .bill-actions .mini-button {
+        flex: 1 1 0;
+        width: auto;
+    }
+}

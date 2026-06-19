@@ -451,3 +451,39 @@ td {
     color: $text-muted;
     font-size: 13px;
 }
+
+.table-link-action {
+    display: inline;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 950;
+    text-align: left;
+    cursor: pointer;
+}
+
+.table-link-action:hover {
+    color: $cyan-primary;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+.bill-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.mini-button--danger {
+    border-color: rgba($danger, 0.36);
+    color: #ffd7dd;
+}
+
+.mini-button--danger:hover:not(:disabled) {
+    border-color: rgba($danger, 0.76);
+    box-shadow: 0 0 20px rgba($danger, 0.13);
+}

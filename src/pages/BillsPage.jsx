@@ -4,8 +4,10 @@ import Modal from "../components/Modal";
 import {
     HOMEOPS_MONTH,
     createBill,
+    deleteBill,
     getBills,
     markBillPaid,
+    updateBill,
     money,
     nullableNumber,
     todayIso,
@@ -26,6 +28,7 @@ export default function BillsPage({ refreshToken, refreshEverything }) {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
     const [activeModal, setActiveModal] = useState(null);
+    const [editingBill, setEditingBill] = useState(null);
     const [form, setForm] = useState(defaultBillForm);
 
     const loadBills = useCallback(async () => {
@@ -74,28 +77,89 @@ export default function BillsPage({ refreshToken, refreshEverything }) {
         }
     }
 
-    async function handleCreateBill(event) {
+    function resetBillModal() {
+        setForm(defaultBillForm);
+        setEditingBill(null);
+        setActiveModal(null);
+    }
+
+    function openCreateBillModal() {
+        setError("");
+        setEditingBill(null);
+        setForm(defaultBillForm);
+        setActiveModal("bill");
+    }
+
+    function dueDayFromBill(bill) {
+        if (bill.due_day) return bill.due_day;
+        if (!bill.due_date) return "";
+
+        const date = new Date(`${bill.due_date}T00:00:00`);
+        if (Number.isNaN(date.getTime())) return "";
+
+        return String(date.getDate());
+    }
+
+    function handleEditBill(bill) {
+        setError("");
+        setEditingBill(bill);
+        setForm({
+            payee: bill.payee || bill.name || "",
+            amount: bill.expected_amount ?? bill.amount ?? "",
+            due_day: dueDayFromBill(bill),
+            frequency: bill.frequency || "monthly",
+            notes: bill.notes || "",
+        });
+        setActiveModal("bill");
+    }
+
+    async function handleSaveBill(event) {
         event.preventDefault();
         setSaving(true);
         setError("");
 
-        try {
-            await createBill({
-                payee: form.payee,
-                amount: nullableNumber(form.amount),
-                due_day: nullableNumber(form.due_day),
-                frequency: form.frequency,
-                notes: form.notes || null,
-            });
+        const payload = {
+            payee: form.payee,
+            amount: nullableNumber(form.amount),
+            due_day: nullableNumber(form.due_day),
+            frequency: form.frequency,
+            notes: form.notes || null,
+        };
 
-            setForm(defaultBillForm);
-            setActiveModal(null);
+        try {
+            if (editingBill) {
+                await updateBill(editingBill.id, payload);
+            } else {
+                await createBill(payload);
+            }
+
+            resetBillModal();
             refreshEverything?.();
             await loadBills();
         } catch (err) {
             setError(err.message || "Could not save bill.");
         } finally {
             setSaving(false);
+        }
+    }
+
+    async function handleDeleteBill(bill) {
+        const label = bill.payee || bill.name || "this bill";
+        const confirmed = window.confirm(`Delete ${label}? This removes its bill schedule and monthly instances.`);
+
+        if (!confirmed) return;
+
+        setSavingId(bill.id);
+        setError("");
+
+        try {
+            await deleteBill(bill.id);
+            refreshEverything?.();
+            await loadBills();
+        } catch (err) {
+            setError(err.message || "Could not delete bill.");
+        } finally {
+            setSavingId(null);
         }
     }
 
@@ -117,10 +181,7 @@ export default function BillsPage({ refreshToken, refreshEverything }) {
                         <button
                             className="page-primary-action page-primary-action--compact"
                             type="button"
-                            onClick={() => {
-                                setError("");
-                                setActiveModal("bill");
-                            }}
+                            onClick={openCreateBillModal}
                         >
                             + Bill
                         </button>
@@ -136,13 +197,19 @@ export default function BillsPage({ refreshToken, refreshEverything }) {
                         bills={bills}
                         money={money}
                         onMarkPaid={handleMarkPaid}
+                        onEditBill={handleEditBill}
+                        onDeleteBill={handleDeleteBill}
                         savingId={savingId}
                     />
                 )}
             </section>
 
-            <Modal active={activeModal === "bill"} onClose={() => setActiveModal(null)} title="Add Bill">
-                <form className="form-grid" onSubmit={handleCreateBill}>
+            <Modal
+                active={activeModal === "bill"}
+                onClose={resetBillModal}
+                title={editingBill ? "Edit Bill" : "Add Bill"}
+            >
+                <form className="form-grid" onSubmit={handleSaveBill}>
                     {error && <div className="form-error">{error}</div>}
 
                     <label className="span-6">
@@ -201,7 +268,7 @@ export default function BillsPage({ refreshToken, refreshEverything }) {
                     </label>
 
                     <button className="primary-action span-12" disabled={saving}>
-                        {saving ? "Saving..." : "Save Bill"}
+                        {saving ? "Saving..." : editingBill ? "Save Changes" : "Save Bill"}
                     </button>
                 </form>
             </Modal>

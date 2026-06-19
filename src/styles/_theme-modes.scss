@@ -1,6 +1,5 @@
 @use "tokens" as *;
 
-
 :root,
 :root[data-theme="dark"] {
     color-scheme: dark;
@@ -79,91 +78,14 @@ body {
     overflow-x: hidden;
 }
 
-body::before,
-body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-}
+/*
+  body::before/body::after are intentionally NOT used here.
 
-body::before {
-    z-index: 0;
-    background:
-        radial-gradient(ellipse at 70% 18%, var(--ho-cloud-2), transparent 35rem),
-        radial-gradient(ellipse at 25% 33%, var(--ho-cloud-3), transparent 32rem),
-        radial-gradient(ellipse at 82% 45%, var(--ho-cloud-1), transparent 42rem),
-        linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
-    background-size: auto, auto, auto, 64px 64px, 64px 64px;
-    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, .92), rgba(0, 0, 0, .70) 68%, rgba(0, 0, 0, .22));
-}
-
-body::after {
-    z-index: 0;
-    top: auto;
-    height: 38vh;
-    opacity: .92;
-    mask-image: linear-gradient(to top, rgba(0, 0, 0, .94) 0%, rgba(0, 0, 0, .64) 52%, transparent 100%);
-}
-
-:root[data-theme="dark"] body::after,
-:root:not([data-theme]) body::after {
-    background-image:
-        radial-gradient(ellipse at 50% 112%, rgba(52, 152, 219, .18), transparent 45%),
-        linear-gradient(to top, rgba(3, 6, 15, .96), rgba(7, 12, 26, .36) 58%, transparent 100%),
-        linear-gradient(to top, rgba(14, 22, 42, .97), rgba(16, 24, 48, .92)),
-        linear-gradient(to top, rgba(7, 12, 28, .97), rgba(7, 12, 28, .97)),
-        linear-gradient(to top, rgba(13, 20, 38, .97), rgba(13, 20, 38, .97)),
-        linear-gradient(to top, rgba(8, 14, 31, .97), rgba(8, 14, 31, .97)),
-        linear-gradient(to top, rgba(17, 26, 48, .97), rgba(17, 26, 48, .97)),
-        linear-gradient(to top, rgba(9, 15, 32, .98), rgba(9, 15, 32, .98)),
-        repeating-linear-gradient(90deg, rgba(123, 199, 255, .0) 0 10px, rgba(123, 199, 255, .22) 10px 12px, transparent 12px 20px),
-        linear-gradient(90deg, rgba(52, 152, 219, .18), rgba(108, 92, 231, .24), rgba(255, 85, 212, .16));
-    background-size:
-        100% 100%,
-        100% 100%,
-        7% 58%,
-        9% 42%,
-        8% 68%,
-        11% 52%,
-        8% 61%,
-        13% 36%,
-        100% 32%,
-        100% 8px;
-    background-position:
-        center bottom,
-        center bottom,
-        2% bottom,
-        12% bottom,
-        23% bottom,
-        73% bottom,
-        84% bottom,
-        96% bottom,
-        center bottom,
-        center bottom;
-    background-repeat: no-repeat;
-}
-
-:root[data-theme="light"] body::after {
-    background-image:
-        radial-gradient(ellipse at 50% 112%, rgba(124, 160, 117, .22), transparent 46%),
-        linear-gradient(155deg, transparent 0 42%, rgba(196, 216, 184, .52) 43% 100%),
-        linear-gradient(25deg, transparent 0 48%, rgba(149, 179, 133, .34) 49% 100%),
-        linear-gradient(160deg, transparent 0 53%, rgba(218, 222, 207, .56) 54% 100%),
-        repeating-linear-gradient(90deg, transparent 0 46px, rgba(72, 112, 88, .22) 47px 50px, transparent 51px 88px),
-        linear-gradient(to top, rgba(240, 246, 232, .78), transparent 62%);
-    background-size:
-        100% 100%,
-        100% 82%,
-        100% 74%,
-        100% 90%,
-        100% 44%,
-        100% 100%;
-    background-position: center bottom;
-    background-repeat: no-repeat;
-    opacity: .86;
-}
+  The side-scene background file owns those pseudo-elements.
+  This avoids the old gradient/building layers fighting with:
+  - homeops-city-night-transparent-bg.webp
+  - homeops-nature-light-transparent-bg.webp
+*/
 
 .app-shell {
     position: relative;
@@ -295,10 +217,21 @@ th,
     border-color: color-mix(in srgb, var(--metric-tone, var(--ho-border-strong)) 72%, transparent);
 }
 
-.metric-grid .metric-card:nth-child(1) { --metric-tone: var(--metric-expected); }
-.metric-grid .metric-card:nth-child(2) { --metric-tone: var(--metric-paid); }
-.metric-grid .metric-card:nth-child(3) { --metric-tone: var(--metric-due); }
-.metric-grid .metric-card:nth-child(4) { --metric-tone: var(--metric-marked); }
+.metric-grid .metric-card:nth-child(1) {
+    --metric-tone: var(--metric-expected);
+}
+
+.metric-grid .metric-card:nth-child(2) {
+    --metric-tone: var(--metric-paid);
+}
+
+.metric-grid .metric-card:nth-child(3) {
+    --metric-tone: var(--metric-due);
+}
+
+.metric-grid .metric-card:nth-child(4) {
+    --metric-tone: var(--metric-marked);
+}
 
 .metric-card::before {
     content: "";
@@ -381,11 +314,6 @@ th,
 }
 
 @media (max-width: 760px) {
-    body::after {
-        height: 30vh;
-        opacity: .74;
-    }
-
     .theme-toggle {
         width: inherit;
         justify-content: center;

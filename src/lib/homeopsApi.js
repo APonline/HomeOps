@@ -1,5 +1,12 @@
 export const HOMEOPS_MONTH = "2026-06-01";
 
+const API_BASE_URL = (import.meta.env.VITE_HOMEOPS_API_BASE_URL || "").replace(/\/$/, "");
+
+function apiUrl(path) {
+    const cleanPath = path.startsWith("/") ? path : `/${path}`;
+    return `${API_BASE_URL}${cleanPath}`;
+}
+
 export function money(value) {
     if (value === null || value === undefined || value === "") return "—";
 
@@ -41,7 +48,7 @@ async function parseResponse(response) {
 }
 
 export async function apiGet(url) {
-    const response = await fetch(url, {
+    const response = await fetch(apiUrl(url), {
         headers: { Accept: "application/json" },
     });
 
@@ -49,7 +56,7 @@ export async function apiGet(url) {
 }
 
 export async function apiPost(url, payload = {}) {
-    const response = await fetch(url, {
+    const response = await fetch(apiUrl(url), {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -62,7 +69,7 @@ export async function apiPost(url, payload = {}) {
 }
 
 export async function apiPatch(url, payload = {}) {
-    const response = await fetch(url, {
+    const response = await fetch(apiUrl(url), {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json",
@@ -84,6 +91,19 @@ export function getBills(month = HOMEOPS_MONTH) {
 
 export function createBill(payload) {
     return apiPost("/api/homeops/bills", payload);
+}
+
+export function updateBill(billId, payload = {}) {
+    return apiPatch(`/api/homeops/bills/${billId}`, payload);
+}
+
+export function deleteBill(billId) {
+    const response = fetch(apiUrl(`/api/homeops/bills/${billId}`), {
+        method: "DELETE",
+        headers: { Accept: "application/json" },
+    });
+
+    return response.then(parseResponse);
 }
 
 export function markBillPaid(billId, payload = {}) {

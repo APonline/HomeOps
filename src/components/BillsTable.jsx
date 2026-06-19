@@ -9,7 +9,16 @@ function statusClass(status) {
     return "";
 }
 
-export default function BillsTable({ bills = [], money, onMarkPaid, savingId = null }) {
+export default function BillsTable({
+    bills = [],
+    money,
+    onMarkPaid,
+    onEditBill,
+    onDeleteBill,
+    savingId = null,
+}) {
+    const hasActions = Boolean(onMarkPaid || onEditBill || onDeleteBill);
+
     return (
         <div className="table-wrap">
             <table className="responsive-table bills-table">
@@ -19,7 +28,7 @@ export default function BillsTable({ bills = [], money, onMarkPaid, savingId = n
                         <th>Due</th>
                         <th>Status</th>
                         <th className="right">Amount</th>
-                        {onMarkPaid ? <th className="right">Action</th> : null}
+                        {hasActions ? <th className="right">Action</th> : null}
                     </tr>
                 </thead>
 
@@ -32,7 +41,13 @@ export default function BillsTable({ bills = [], money, onMarkPaid, savingId = n
                         return (
                             <tr key={bill.id}>
                                 <td data-label="Payee" className="primary-cell">
-                                    {bill.payee || bill.name}
+                                    <button
+                                        type="button"
+                                        className="table-link-action"
+                                        onClick={() => onEditBill?.(bill)}
+                                    >
+                                        {bill.payee || bill.name}
+                                    </button>
                                 </td>
 
                                 <td data-label="Due">
@@ -49,19 +64,40 @@ export default function BillsTable({ bills = [], money, onMarkPaid, savingId = n
                                     {money(bill.amount ?? bill.expected_amount)}
                                 </td>
 
-                                {onMarkPaid ? (
+                                {hasActions ? (
                                     <td data-label="Action" className="right action-cell">
-                                        {isPaid ? (
-                                            <span className="muted">done</span>
-                                        ) : (
+                                        <div className="bill-actions">
                                             <button
                                                 className="mini-button"
+                                                type="button"
                                                 disabled={isSaving}
-                                                onClick={() => onMarkPaid(bill)}
+                                                onClick={() => onEditBill?.(bill)}
                                             >
-                                                {isSaving ? "Saving..." : "Mark paid"}
+                                                Edit
                                             </button>
-                                        )}
+
+                                            {!isPaid && onMarkPaid ? (
+                                                <button
+                                                    className="mini-button"
+                                                    type="button"
+                                                    disabled={isSaving}
+                                                    onClick={() => onMarkPaid(bill)}
+                                                >
+                                                    {isSaving ? "Saving..." : "Mark paid"}
+                                                </button>
+                                            ) : null}
+
+                                            {onDeleteBill ? (
+                                                <button
+                                                    className="mini-button mini-button--danger"
+                                                    type="button"
+                                                    disabled={isSaving}
+                                                    onClick={() => onDeleteBill(bill)}
+                                                >
+                                                    Delete
+                                                </button>
+                                            ) : null}
+                                        </div>
                                     </td>
                                 ) : null}
                             </tr>
