@@ -144,3 +144,36 @@
     font-size: 20px;
     line-height: 1;
 }
+
+.modal-intro {
+    margin: -10px 0 20px;
+    color: $text-muted;
+    line-height: 1.45;
+}
+
+.modal-card--wide {
+    width: min(860px, 100%);
+    max-height: min(92vh, 860px);
+    overflow: auto;
+}
+
+/* Modal portal/layering correction */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    width: 100vw;
+    height: 100dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.modal-card {
+    max-height: calc(100dvh - 40px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.modal-card--wide {
+    max-height: calc(100dvh - 40px);
+}

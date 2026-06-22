@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import Modal from "../components/Modal";
+import { useHomeOps } from "../context/HomeOpsContext";
 import {
     createWishlistItem,
     getWishlistItems,
@@ -20,6 +21,7 @@ const defaultForm = {
 };
 
 export default function WishlistPage({ refreshToken, refreshEverything }) {
+    const { apiContext } = useHomeOps();
     const [items, setItems] = useState([]);
     const [form, setForm] = useState(defaultForm);
     const [saving, setSaving] = useState(false);
@@ -32,14 +34,14 @@ export default function WishlistPage({ refreshToken, refreshEverything }) {
         setError("");
 
         try {
-            const json = await getWishlistItems();
+            const json = await getWishlistItems(apiContext);
             setItems(json.items || []);
         } catch (err) {
             setError(err.message || "Could not load needs/wants.");
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [apiContext]);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -61,7 +63,7 @@ export default function WishlistPage({ refreshToken, refreshEverything }) {
                 target_date: form.target_date || null,
                 product_url: form.product_url || null,
                 notes: form.notes || null,
-            });
+            }, apiContext);
 
             setForm(defaultForm);
             setActiveModal(null);
@@ -78,7 +80,7 @@ export default function WishlistPage({ refreshToken, refreshEverything }) {
         setError("");
 
         try {
-            await markWishlistPurchased(item.id);
+            await markWishlistPurchased(item.id, {}, apiContext);
             refreshEverything?.();
             await loadItems();
         } catch (err) {

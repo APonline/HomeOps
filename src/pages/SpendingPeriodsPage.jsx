@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Modal from "../components/Modal";
+import { useHomeOps } from "../context/HomeOpsContext";
 import {
-    HOMEOPS_MONTH,
     createSpendingPeriod,
     getSpendingPeriods,
     money,
@@ -16,6 +16,7 @@ const defaultForm = {
 };
 
 export default function SpendingPeriodsPage({ refreshToken, refreshEverything }) {
+    const { apiContext } = useHomeOps();
     const [periods, setPeriods] = useState([]);
     const [form, setForm] = useState(defaultForm);
     const [saving, setSaving] = useState(false);
@@ -28,14 +29,14 @@ export default function SpendingPeriodsPage({ refreshToken, refreshEverything })
         setError("");
 
         try {
-            const json = await getSpendingPeriods(HOMEOPS_MONTH);
+            const json = await getSpendingPeriods(apiContext);
             setPeriods(json.periods || []);
         } catch (err) {
             setError(err.message || "Could not load periods.");
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [apiContext]);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -51,7 +52,7 @@ export default function SpendingPeriodsPage({ refreshToken, refreshEverything })
             await createSpendingPeriod({
                 ...form,
                 notes: form.notes || null,
-            });
+            }, apiContext);
 
             setForm(defaultForm);
             setActiveModal(null);

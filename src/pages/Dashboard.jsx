@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import MetricCard from "../components/MetricCard";
 import PeriodChart from "../components/PeriodChart";
 import DashboardBillsList from "../components/DashboardBillsList";
 import Modal from "../components/Modal";
+import { useHomeOps } from "../context/HomeOpsContext";
 import {
-    HOMEOPS_MONTH,
     createBill,
     createReceipt,
     createSpendingPeriod,
@@ -49,13 +49,60 @@ const demoData = {
         { day: 15, amount: 0, marked: false }, { day: 16, amount: 0, marked: false },
         { day: 17, amount: 900, marked: false }, { day: 18, amount: 190, marked: false },
     ],
+    recentLedger: [],
     paidBillCount: 1,
     unpaidBillCount: 5,
+    annual: { status: "Foundation", spend_total: 0, major_period_count: 2 },
+    today: { spent_total: 0, due_bill_count: 0, maintenance_due_count: 1 },
+    home: { name: "Toronto Townhouse", city_region: "Toronto, ON" },
 };
+
+const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+];
 
 const defaultBillForm = { payee: "", amount: "", due_day: "", frequency: "monthly", notes: "" };
 const defaultReceiptForm = { vendor: "", date: todayIso(), total: "", category: "Home Supplies", notes: "" };
 const defaultPeriodForm = { title: "", period_type: "custom", start_date: "", end_date: "", notes: "" };
+
+function formatDayTitle(isoDate) {
+    if (!isoDate) return "Today";
+
+    const date = new Date(`${isoDate}T12:00:00`);
+    if (Number.isNaN(date.getTime())) return isoDate;
+
+    return date.toLocaleDateString("en-CA", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+    });
+}
+
+function commandTitle(viewMode, selectedYear, selectedMonth, selectedDay) {
+    if (viewMode === "day") return formatDayTitle(selectedDay);
+    if (viewMode === "year") return `${selectedYear} Year View`;
+    if (viewMode === "all-time") return "Ownership History";
+
+    return `${monthNames[selectedMonth - 1] || "Month"} ${selectedYear}`;
+}
+
+function commandKicker(viewMode) {
+    if (viewMode === "day") return "Daily Ops";
+    if (viewMode === "year") return "Annual Command";
+    if (viewMode === "all-time") return "All-Time Context";
+
+    return "Monthly Command";
+}
+
+function commandDescription(viewMode) {
+    if (viewMode === "day") return "Purchases by hour, bills due today, maintenance due and context for the selected day.";
+    if (viewMode === "year") return "Annual ownership health, obligations, abnormal months and major context.";
+    if (viewMode === "all-time") return "The long-term operating story of this property.";
+
+    return "Payables, cleared bills, marked spending and context for the selected month.";
+}
 
 function hasUsefulLiveData(json) {
     if (!json) return false;
@@ -87,13 +134,120 @@ function normalizeDashboardPayload(json) {
         unpaidBillCount: Number(json.unpaid_bill_count || 0),
         recentLedger: json.recent_ledger || [],
         categoryTotals: json.category_totals || [],
+        annual: json.annual || {},
+        today: json.today || {},
+        home: json.home || null,
     };
 }
 
+function blankDashboardData() {
+    return {
+        ...demoData,
+        metrics: {
+            expectedBills: 0,
+            paidThisMonth: 0,
+            stillDue: 0,
+            markedSpending: 0,
+        },
+        bills: [],
+        periods: [],
+        maintenance: [],
+        chartDays: [],
+        recentLedger: [],
+        paidBillCount: 0,
+        unpaidBillCount: 0,
+        annual: { status: "Loading", spend_total: 0, major_period_count: 0 },
+        today: { spent_total: 0, due_bill_count: 0, maintenance_due_count: 0 },
+    };
+}
+
+function readEntryAmount(entry) {
+    const amount = entry.amount ?? entry.total ?? entry.value ?? entry.line_total ?? entry.price ?? entry.debit ?? 0;
+    return Math.abs(Number(amount || 0));
+}
+
+function readEntryDateTime(entry) {
+    return entry.datetime ||
+        entry.date_time ||
+        entry.purchased_at ||
+        entry.transaction_at ||
+        entry.created_at ||
+        entry.entry_date ||
+        entry.date ||
+        entry.transaction_date ||
+        "";
+}
+
+function formatHourLabel(hour) {
+    if (hour === 0) return "12a";
+    if (hour < 12) return `${hour}a`;
+    if (hour === 12) return "12p";
+    return `${hour - 12}p`;
+}
+
+function buildHourlyActivity(recentLedger = [], selectedDay = todayIso()) {
+    const bars = Array.from({ length: 24 }, (_, hour) => ({
+        key: `hour-${hour}`,
+        day: formatHourLabel(hour),
+        label: formatHourLabel(hour),
+        hour,
+        amount: 0,
+        itemCount: 0,
+        marked: hour >= 18 && hour <= 22,
+    }));
+
+    recentLedger.forEach((entry) => {
+        const rawDate = String(readEntryDateTime(entry) || "");
+        if (!rawDate) return;
+
+        const datePart = rawDate.slice(0, 10);
+        if (datePart !== selectedDay) return;
+
+        const parsed = new Date(rawDate.includes("T") ? rawDate : rawDate.replace(" ", "T"));
+        const hour = Number.isNaN(parsed.getTime()) ? 12 : parsed.getHours();
+        const amount = readEntryAmount(entry);
+
+        bars[hour].amount += amount;
+        bars[hour].itemCount += amount > 0 ? 1 : 0;
+    });
+
+    return bars;
+}
+
+function selectBillsForView(data, demo, viewMode) {
+    const source = data.bills.length ? data.bills : demo.bills;
+
+    if (viewMode !== "day") return source;
+
+    return source.filter((bill) => {
+        const due = String(bill.due || bill.due_date || "").toLowerCase();
+        return due.includes("today") || due.match(/\b\d{1,2}\b/) || source.length <= 2;
+    });
+}
+
+function resolveChartDate(day, selectedYear, selectedMonth) {
+    const directDate = day?.date || day?.entry_date || day?.selected_day || day?.iso_date;
+    if (directDate && /^\d{4}-\d{2}-\d{2}/.test(String(directDate))) {
+        return String(directDate).slice(0, 10);
+    }
+
+    const rawDay = day?.date_day ?? day?.day ?? day?.label;
+    const match = String(rawDay ?? "").match(/\d{1,2}/);
+    const dayNumber = match ? Number(match[0]) : NaN;
+
+    if (!Number.isFinite(dayNumber) || dayNumber < 1 || dayNumber > 31) {
+        return "";
+    }
+
+    return `${selectedYear}-${String(selectedMonth).padStart(2, "0")}-${String(dayNumber).padStart(2, "0")}`;
+}
+
 export default function Dashboard({ refreshToken, refreshEverything, goToPage }) {
+    const { apiContext, selectedHome, viewMode, selectedYear, selectedMonth, selectedDay, setSelectedDay, setViewMode } = useHomeOps();
     const [activeModal, setActiveModal] = useState(null);
     const [data, setData] = useState(demoData);
     const [apiStatus, setApiStatus] = useState("demo");
+    const [dashboardLoading, setDashboardLoading] = useState(false);
     const [saving, setSaving] = useState(false);
     const [formError, setFormError] = useState("");
 
@@ -102,10 +256,14 @@ export default function Dashboard({ refreshToken, refreshEverything, goToPage })
     const [periodForm, setPeriodForm] = useState(defaultPeriodForm);
 
     const loadDashboard = useCallback(async () => {
+        setDashboardLoading(true);
+        setApiStatus("loading");
+
         try {
-            const json = await getDashboard(HOMEOPS_MONTH);
+            const json = await getDashboard(apiContext);
 
             if (!hasUsefulLiveData(json)) {
+                setData(demoData);
                 setApiStatus("demo");
                 return;
             }
@@ -113,9 +271,12 @@ export default function Dashboard({ refreshToken, refreshEverything, goToPage })
             setData(normalizeDashboardPayload(json));
             setApiStatus("live");
         } catch {
+            setData(demoData);
             setApiStatus("demo");
+        } finally {
+            setDashboardLoading(false);
         }
-    }, []);
+    }, [apiContext]);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -128,7 +289,7 @@ export default function Dashboard({ refreshToken, refreshEverything, goToPage })
         setFormError("");
 
         try {
-            await callback(payload);
+            await callback(payload, apiContext);
             resetForm();
             setActiveModal(null);
             refreshEverything?.();
@@ -140,112 +301,169 @@ export default function Dashboard({ refreshToken, refreshEverything, goToPage })
         }
     }
 
+    const title = commandTitle(viewMode, selectedYear, selectedMonth, selectedDay);
+    const kicker = commandKicker(viewMode);
+    const displayData = dashboardLoading ? blankDashboardData() : data;
+    const dailyChart = useMemo(() => buildHourlyActivity(displayData.recentLedger, selectedDay), [displayData.recentLedger, selectedDay]);
+    const chartData = viewMode === "day"
+        ? dailyChart
+        : (displayData.chartDays.length ? displayData.chartDays : demoData.chartDays);
+    const chartTitle = viewMode === "day" ? "Purchase Activity By Hour" : "Spending With Period Markups";
+    const chartButton = viewMode === "day" ? "selected day" : "Marked periods";
+    const chartLegend = viewMode === "day"
+        ? [
+            { className: "normal", label: "Purchase / ledger activity" },
+            { className: "marked", label: "Evening window" },
+        ]
+        : undefined;
+    const billsForView = selectBillsForView(displayData, demoData, viewMode);
+
+    function drillIntoDay(day) {
+        if (viewMode === "day" || viewMode === "all-time") return;
+
+        const isoDay = resolveChartDate(day, selectedYear, selectedMonth);
+        if (!isoDay) return;
+
+        setSelectedDay(isoDay);
+        setViewMode("day");
+    }
+
     return (
         <>
-            <header className="topbar">
+            <header className="topbar v0-command-header">
                 <div>
-                    <h1>{data.monthLabel}</h1>
-                    <p>What needs paying, what got paid, and why this month got weird.</p>
+                    <span className="v0-eyebrow">{kicker}</span>
+                    <h1>{title}</h1>
+                    <p>{commandDescription(viewMode)}</p>
                     <span className={`api-pill ${apiStatus}`}>
-                        {apiStatus === "live" ? "Live API data" : "Demo data fallback"}
+                        {apiStatus === "live" ? "Live API data" : apiStatus === "loading" ? "Loading context" : "Demo data fallback"}
                     </span>
                 </div>
 
-                <div className="top-actions">
-                    <button onClick={() => { setFormError(""); setActiveModal("period"); }}>Mark Period</button>
-                    <button onClick={() => { setFormError(""); setActiveModal("bill"); }}>Add Bill</button>
-                    <button className="cream" onClick={() => { setFormError(""); setActiveModal("receipt"); }}>+ Receipt</button>
-                </div>
+
             </header>
 
-            <section className="metric-grid">
-                <MetricCard label="Expected Bills" value={money(data.metrics.expectedBills)} note="This month" />
-                <MetricCard label="Paid This Month" value={money(data.metrics.paidThisMonth)} note={`${data.paidBillCount ?? 0} bills paid`} />
-                <MetricCard label="Still Due" value={money(data.metrics.stillDue)} note={`${data.unpaidBillCount ?? 0} unpaid`} />
-                <MetricCard label="Marked Spending" value={money(data.metrics.markedSpending)} note="Period-linked spending" />
+            <section className={`v0-dashboard-body ${dashboardLoading ? "is-loading" : ""}`} aria-busy={dashboardLoading ? "true" : "false"}>
+                <section className="v0-dashboard-hierarchy">
+                    <article className="v0-hierarchy-card">
+                        <span>Annual Health</span>
+                        <strong>{displayData.annual?.status || "Foundation"}</strong>
+                        <p>{selectedYear} · YTD spend {money(displayData.annual?.spend_total || 0)}</p>
+                    </article>
+                    <article className="v0-hierarchy-card">
+                        <span>{viewMode === "day" ? "Selected Day" : "Monthly Detail"}</span>
+                        <strong>{title}</strong>
+                        <p>{kicker} · {viewMode === "month" ? `Month ${selectedMonth}` : viewMode}</p>
+                    </article>
+                    <article className="v0-hierarchy-card">
+                        <span>Today Snapshot</span>
+                        <strong>{selectedDay}</strong>
+                        <p>{money(displayData.today?.spent_total || 0)} spent · {displayData.today?.maintenance_due_count || 0} maintenance due</p>
+                    </article>
+                    <article className="v0-hierarchy-card">
+                        <span>Home</span>
+                        <strong>{selectedHome?.name || displayData.home?.name || "Default Home"}</strong>
+                        <p>{displayData.home?.city_region || selectedHome?.city_region || "Home context active"}</p>
+                    </article>
+                </section>
+
+                <section className="metric-grid">
+                    <MetricCard label="Expected Bills" value={money(displayData.metrics.expectedBills)} note={viewMode === "day" ? "Selected context" : "This month"} />
+                    <MetricCard label="Paid This Month" value={money(displayData.metrics.paidThisMonth)} note={`${displayData.paidBillCount ?? 0} bills paid`} />
+                    <MetricCard label="Still Due" value={money(displayData.metrics.stillDue)} note={`${displayData.unpaidBillCount ?? 0} unpaid`} />
+                    <MetricCard label={viewMode === "day" ? "Spent Today" : "Marked Spending"} value={money(viewMode === "day" ? displayData.today?.spent_total || 0 : displayData.metrics.markedSpending)} note={viewMode === "day" ? "Day activity" : "Period-linked spending"} />
+                </section>
+
+                <main className="dashboard-grid dashboard-grid--balanced">
+                    <section className="panel chart-panel chart-panel--full">
+                        <div className="panel-header">
+                            <h2>{chartTitle}</h2>
+                            <span>{chartButton}</span>
+                        </div>
+
+                        <PeriodChart
+                            days={chartData}
+                            variant={viewMode === "day" ? "hourly" : "month"}
+                            ariaLabel={viewMode === "day" ? "Hourly purchase activity chart" : "Scrollable monthly spending chart"}
+                            emptyText={viewMode === "day" ? "No purchases logged for this day yet." : "No spending entered yet."}
+                            legend={chartLegend}
+                            hint={viewMode === "day" ? "Hourly view prevents month data from pretending it is daily data" : "Click a day to drill into that day view."}
+                            onBarClick={viewMode === "day" ? undefined : drillIntoDay}
+                        />
+                    </section>
+
+                    <section className="panel bills-panel bills-panel--full">
+                        <div className="panel-header">
+                            <h2>{viewMode === "day" ? "Bills In This Context" : "This Month’s Bills"}</h2>
+                            <button className="ghost-action" onClick={() => goToPage?.("bills")}>
+                                {billsForView.length} tracked
+                            </button>
+                        </div>
+
+                        <DashboardBillsList
+                            bills={billsForView}
+                            money={money}
+                            onOpenBills={() => goToPage?.("bills")}
+                        />
+                    </section>
+
+                    <section className="panel periods-panel">
+                        <div className="panel-header">
+                            <h2>{viewMode === "day" ? "Context Active Today" : "Active Periods"}</h2>
+                            <button className="ghost-action" onClick={() => goToPage?.("periods")}>
+                                visual filters
+                            </button>
+                        </div>
+
+                        <div className="period-list">
+                            {(displayData.periods.length ? displayData.periods : demoData.periods).map((period) => (
+                                <article className={`period-card ${period.tone || "red"}`} key={period.id}>
+                                    <strong>{period.name || period.title}</strong>
+                                    <p>
+                                        {period.dates}
+                                        {period.amount ? ` · ${money(period.amount)} linked` : ""}
+                                    </p>
+                                    {period.description && <small>{period.description}</small>}
+                                </article>
+                            ))}
+                        </div>
+                    </section>
+
+                    <section className="panel maintenance-panel">
+                        <div className="panel-header">
+                            <h2>{viewMode === "day" ? "Maintenance Today" : "Maintenance Coming Up"}</h2>
+                            <button className="ghost-action" onClick={() => goToPage?.("maintenance")}>
+                                {viewMode === "day" ? "selected day" : "next 30 days"}
+                            </button>
+                        </div>
+
+                        <div className="maintenance-list">
+                            {(displayData.maintenance.length ? displayData.maintenance : demoData.maintenance).map((item) => (
+                                <article className="maintenance-item" key={item.id}>
+                                    <div>
+                                        <strong>{item.name}</strong>
+                                        <p>{item.category}</p>
+                                    </div>
+
+                                    <div className="maintenance-side">
+                                        {item.amount ? <strong>{money(item.amount)}</strong> : null}
+                                        <span
+                                            className={
+                                                String(item.priority).toLowerCase() === "high" ||
+                                                String(item.priority).toLowerCase() === "urgent"
+                                                    ? "priority high"
+                                                    : "priority"
+                                            }
+                                        >
+                                            {item.priority}
+                                        </span>
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
+                    </section>
+                </main>
             </section>
-
-            <main className="dashboard-grid dashboard-grid--balanced">
-                <section className="panel chart-panel chart-panel--full">
-                    <div className="panel-header">
-                        <h2>Spending With Period Markups</h2>
-                        <span>Marked periods</span>
-                    </div>
-
-                    <PeriodChart days={data.chartDays.length ? data.chartDays : demoData.chartDays} />
-                </section>
-
-                <section className="panel bills-panel bills-panel--full">
-                    <div className="panel-header">
-                        <h2>This Month’s Bills</h2>
-                        <button className="ghost-action" onClick={() => goToPage?.("bills")}>
-                            {data.bills.length} tracked
-                        </button>
-                    </div>
-
-                    <DashboardBillsList
-                        bills={data.bills.length ? data.bills : demoData.bills}
-                        money={money}
-                        onOpenBills={() => goToPage?.("bills")}
-                    />
-                </section>
-
-                <section className="panel periods-panel">
-                    <div className="panel-header">
-                        <h2>Active Periods</h2>
-                        <button className="ghost-action" onClick={() => goToPage?.("periods")}>
-                            visual filters
-                        </button>
-                    </div>
-
-                    <div className="period-list">
-                        {(data.periods.length ? data.periods : demoData.periods).map((period) => (
-                            <article className={`period-card ${period.tone || "red"}`} key={period.id}>
-                                <strong>{period.name || period.title}</strong>
-                                <p>
-                                    {period.dates}
-                                    {period.amount ? ` · ${money(period.amount)} linked` : ""}
-                                </p>
-                                {period.description && <small>{period.description}</small>}
-                            </article>
-                        ))}
-                    </div>
-                </section>
-
-                <section className="panel maintenance-panel">
-                    <div className="panel-header">
-                        <h2>Maintenance Coming Up</h2>
-                        <button className="ghost-action" onClick={() => goToPage?.("maintenance")}>
-                            next 30 days
-                        </button>
-                    </div>
-
-                    <div className="maintenance-list">
-                        {(data.maintenance.length ? data.maintenance : demoData.maintenance).map((item) => (
-                            <article className="maintenance-item" key={item.id}>
-                                <div>
-                                    <strong>{item.name}</strong>
-                                    <p>{item.category}</p>
-                                </div>
-
-                                <div className="maintenance-side">
-                                    {item.amount ? <strong>{money(item.amount)}</strong> : null}
-                                    <span
-                                        className={
-                                            String(item.priority).toLowerCase() === "high" ||
-                                            String(item.priority).toLowerCase() === "urgent"
-                                                ? "priority high"
-                                                : "priority"
-                                        }
-                                    >
-                                        {item.priority}
-                                    </span>
-                                </div>
-                            </article>
-                        ))}
-                    </div>
-                </section>
-            </main>
 
             <Modal active={activeModal === "bill"} onClose={() => setActiveModal(null)} title="Add Bill">
                 <form

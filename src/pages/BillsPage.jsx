@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import BillsTable from "../components/BillsTable";
 import Modal from "../components/Modal";
+import { useHomeOps } from "../context/HomeOpsContext";
 import {
-    HOMEOPS_MONTH,
     createBill,
     deleteBill,
     getBills,
@@ -22,6 +22,7 @@ const defaultBillForm = {
 };
 
 export default function BillsPage({ refreshToken, refreshEverything }) {
+    const { apiContext } = useHomeOps();
     const [bills, setBills] = useState([]);
     const [loading, setLoading] = useState(true);
     const [savingId, setSavingId] = useState(null);
@@ -36,14 +37,14 @@ export default function BillsPage({ refreshToken, refreshEverything }) {
         setError("");
 
         try {
-            const json = await getBills(HOMEOPS_MONTH);
+            const json = await getBills(apiContext);
             setBills(json.bills || []);
         } catch (err) {
             setError(err.message || "Could not load bills.");
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [apiContext]);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -63,10 +64,10 @@ export default function BillsPage({ refreshToken, refreshEverything }) {
 
         try {
             await markBillPaid(bill.id, {
-                month: HOMEOPS_MONTH,
+                month: apiContext.monthStart,
                 amount: Number(amount || 0),
                 paid_at: todayIso(),
-            });
+            }, apiContext);
 
             refreshEverything?.();
             await loadBills();
@@ -128,9 +129,9 @@ export default function BillsPage({ refreshToken, refreshEverything }) {
 
         try {
             if (editingBill) {
-                await updateBill(editingBill.id, payload);
+                await updateBill(editingBill.id, payload, apiContext);
             } else {
-                await createBill(payload);
+                await createBill(payload, apiContext);
             }
 
             resetBillModal();
@@ -153,7 +154,7 @@ export default function BillsPage({ refreshToken, refreshEverything }) {
         setError("");
 
         try {
-            await deleteBill(bill.id);
+            await deleteBill(bill.id, apiContext);
             refreshEverything?.();
             await loadBills();
         } catch (err) {

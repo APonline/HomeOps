@@ -1,0 +1,294 @@
+/*
+  V0 light-mode lime/green refinement.
+  Loaded last so it can tame older blue/purple brand rules without fighting the base theme.
+*/
+
+:root[data-theme="light"] {
+    --ho-bg-1: rgba(174, 255, 48, 0.18);
+    --ho-bg-2: rgba(32, 185, 74, 0.16);
+    --ho-bg-3: rgba(127, 193, 49, 0.13);
+    --ho-cloud-1: rgba(174, 255, 48, 0.18);
+    --ho-cloud-2: rgba(32, 185, 74, 0.15);
+    --ho-cloud-3: rgba(115, 168, 49, 0.11);
+
+    --ho-border: rgba(91, 157, 50, 0.20);
+    --ho-border-strong: rgba(64, 149, 51, 0.34);
+    --ho-shadow: 0 18px 46px rgba(48, 79, 41, 0.10), 0 0 38px rgba(129, 210, 45, 0.10);
+
+    --metric-expected: #a6f233;
+    --metric-paid: #35b866;
+    --metric-due: #5fcf53;
+    --metric-marked: #7cae1d;
+    --metric-warning: #98b72b;
+}
+
+/* Theme-aware logo swap: keep blue/purple for dark, use lime/green for light. */
+.homeops-nav__logo--light,
+.homeops-nav__drawer-logo.homeops-nav__logo--light {
+    display: none;
+}
+
+:root[data-theme="light"] .homeops-nav__logo--default,
+:root[data-theme="light"] .homeops-nav__drawer-logo.homeops-nav__logo--default {
+    display: none;
+}
+
+:root[data-theme="light"] .homeops-nav__logo--light,
+:root[data-theme="light"] .homeops-nav__drawer-logo.homeops-nav__logo--light {
+    display: block;
+    filter: drop-shadow(0 0 18px rgba(80, 184, 49, .18));
+}
+
+:root[data-theme="light"] .homeops-theme-toggle__chip.active,
+:root[data-theme="light"] .theme-chip.active,
+:root[data-theme="light"] .theme-toggle__option.is-active,
+:root[data-theme="light"] .v0-clock-button,
+:root[data-theme="light"] .top-actions .cream,
+:root[data-theme="light"] .page-primary-action,
+:root[data-theme="light"] .primary-action,
+:root[data-theme="light"] .cream {
+    background: linear-gradient(135deg, #b9ff3f 0%, #24b861 100%) !important;
+    color: #07150b !important;
+    border-color: rgba(35, 150, 75, .36) !important;
+    box-shadow: 0 16px 36px rgba(53, 184, 102, .20) !important;
+}
+
+:root[data-theme="light"] .homeops-nav-item.is-active,
+:root[data-theme="light"] .side-nav button.active {
+    background: linear-gradient(90deg, rgba(185, 255, 63, .28), rgba(36, 184, 97, .18)) !important;
+    box-shadow: inset 3px 0 0 #68c83b, inset 0 0 0 1px rgba(75, 176, 68, .46), 0 14px 32px rgba(68, 158, 56, .12) !important;
+}
+
+:root[data-theme="light"] .homeops-nav-item:hover:not(:disabled) {
+    background: rgba(105, 190, 56, .10);
+}
+
+:root[data-theme="light"] .v0-context-step-button:hover:not(:disabled),
+:root[data-theme="light"] .v0-home-icon-button:hover,
+:root[data-theme="light"] .v0-clock-button:hover,
+:root[data-theme="light"] .ghost-action:hover:not(:disabled),
+:root[data-theme="light"] .mini-button:hover:not(:disabled) {
+    border-color: rgba(62, 171, 73, .62) !important;
+    box-shadow: 0 0 20px rgba(75, 186, 58, .16) !important;
+}
+
+/* Light mode should not leave dashboard hierarchy cards as heavy dark blocks. */
+:root[data-theme="light"] .v0-hierarchy-card,
+:root[data-theme="light"] .v0-dashboard-hierarchy .v0-hierarchy-card {
+    background: linear-gradient(145deg, rgba(255, 255, 255, .78), rgba(249, 250, 239, .62)) !important;
+    border-color: rgba(77, 165, 57, .20) !important;
+    box-shadow: 0 18px 44px rgba(52, 79, 42, .10) !important;
+    color: #142015;
+}
+
+:root[data-theme="light"] .v0-hierarchy-card span,
+:root[data-theme="light"] .v0-eyebrow,
+:root[data-theme="light"] .panel-header span {
+    color: #438f39;
+}
+
+:root[data-theme="light"] .v0-hierarchy-card strong,
+:root[data-theme="light"] .v0-hierarchy-card p {
+    color: #142015;
+}
+
+:root[data-theme="light"] .v0-hierarchy-card p {
+    color: #5e6b5d;
+}
+
+:root[data-theme="light"] .metric-card,
+:root[data-theme="light"] .panel,
+:root[data-theme="light"] .record-row,
+:root[data-theme="light"] .period-card,
+:root[data-theme="light"] .modal-card {
+    border-color: rgba(77, 165, 57, .18);
+}
+
+:root[data-theme="light"] .metric-card::before {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--metric-tone, #71cf3a) 88%, transparent), transparent 62%);
+}
+
+:root[data-theme="light"] .bar {
+    background: linear-gradient(180deg, #bcff4a, #42bc58) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.45), 0 0 18px rgba(66,188,88,.18) !important;
+}
+
+:root[data-theme="light"] .bar.marked {
+    background: linear-gradient(180deg, #8fd73a, #1f8f53) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.38), 0 0 18px rgba(31,143,83,.18) !important;
+}
+
+:root[data-theme="light"] .chart-scroller {
+    scrollbar-color: rgba(66,188,88,.58) rgba(255,255,255,.32);
+}
+
+:root[data-theme="light"] .chart-scroller::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, rgba(188,255,74,.90), rgba(42,174,91,.88));
+}
+
+/* Clickable chart bars for drilling month/year into day view. */
+button.bar-column {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    padding: 0;
+    margin: 0;
+    cursor: default;
+}
+
+button.bar-column:disabled {
+    opacity: 1;
+}
+
+.bar-column--clickable {
+    cursor: pointer;
+    border-radius: 14px 14px 4px 4px;
+    transition: background .18s ease, transform .18s ease;
+}
+
+.bar-column--clickable:hover,
+.bar-column--clickable:focus-visible {
+    background: rgba(123, 199, 255, .07);
+    outline: none;
+    transform: translateY(-2px);
+}
+
+.bar-column--clickable:hover .bar,
+.bar-column--clickable:focus-visible .bar {
+    filter: brightness(1.09);
+}
+
+:root[data-theme="light"] .bar-column--clickable:hover,
+:root[data-theme="light"] .bar-column--clickable:focus-visible {
+    background: rgba(91, 183, 57, .10);
+}
+
+/* Light-mode readability pass: keep the lime brand, but make operational text readable. */
+:root[data-theme="light"] .panel,
+:root[data-theme="light"] .metric-card,
+:root[data-theme="light"] .period-card,
+:root[data-theme="light"] .record-row,
+:root[data-theme="light"] .modal-card {
+    color: #101c12;
+}
+
+:root[data-theme="light"] .panel h2,
+:root[data-theme="light"] .panel strong,
+:root[data-theme="light"] .metric-card strong,
+:root[data-theme="light"] .period-card strong,
+:root[data-theme="light"] .maintenance-item strong,
+:root[data-theme="light"] .dashboard-bill-record__item strong,
+:root[data-theme="light"] .bill-amount {
+    color: #09130d !important;
+    text-shadow: none !important;
+}
+
+:root[data-theme="light"] .panel p,
+:root[data-theme="light"] .panel small,
+:root[data-theme="light"] .metric-card p,
+:root[data-theme="light"] .period-card p,
+:root[data-theme="light"] .period-card small,
+:root[data-theme="light"] .maintenance-item p,
+:root[data-theme="light"] .dashboard-bill-record__item span,
+:root[data-theme="light"] .dashboard-bills__footer span,
+:root[data-theme="light"] .chart-drag-hint,
+:root[data-theme="light"] .day-label {
+    color: #546756 !important;
+}
+
+:root[data-theme="light"] .panel-header h2 {
+    color: #09130d !important;
+}
+
+:root[data-theme="light"] .panel-header span,
+:root[data-theme="light"] .ghost-action,
+:root[data-theme="light"] .mini-button {
+    background: rgba(255, 255, 255, .72) !important;
+    border-color: rgba(83, 158, 58, .24) !important;
+    color: #285a2c !important;
+    box-shadow: 0 10px 26px rgba(53, 91, 42, .08) !important;
+}
+
+:root[data-theme="light"] .dashboard-bill-record {
+    background:
+        linear-gradient(135deg, rgba(255,255,255,.88), rgba(244, 250, 235, .70)),
+        rgba(255, 255, 255, .82) !important;
+    border-color: rgba(82, 165, 58, .22) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.85), 0 8px 22px rgba(50, 78, 40, .07);
+}
+
+:root[data-theme="light"] .bill-type.recurring,
+:root[data-theme="light"] .bill-type.monthly {
+    background: rgba(77, 184, 83, .18) !important;
+    color: #1d642e !important;
+    border-color: rgba(55, 154, 67, .32) !important;
+}
+
+:root[data-theme="light"] .bill-type.annual {
+    background: rgba(149, 217, 54, .22) !important;
+    color: #557010 !important;
+    border-color: rgba(132, 190, 39, .34) !important;
+}
+
+:root[data-theme="light"] .bill-due {
+    background: rgba(255,255,255,.72) !important;
+    color: #335038 !important;
+    border-color: rgba(70, 149, 61, .24) !important;
+}
+
+:root[data-theme="light"] .status.paid,
+:root[data-theme="light"] .priority {
+    background: rgba(55, 177, 83, .20) !important;
+    color: #176327 !important;
+}
+
+:root[data-theme="light"] .status.due,
+:root[data-theme="light"] .status.need {
+    background: rgba(224, 158, 42, .20) !important;
+    color: #75520a !important;
+}
+
+:root[data-theme="light"] .status.future {
+    background: rgba(84, 176, 69, .18) !important;
+    color: #24612d !important;
+}
+
+:root[data-theme="light"] .priority.high {
+    background: rgba(219, 75, 75, .20) !important;
+    color: #8a2020 !important;
+}
+
+:root[data-theme="light"] .period-card {
+    background:
+        linear-gradient(145deg, rgba(255,255,255,.84), rgba(245,250,235,.67)) !important;
+    border-color: rgba(88, 161, 55, .20) !important;
+    border-left-color: #78c641 !important;
+}
+
+:root[data-theme="light"] .period-card.tan {
+    border-left-color: #42b85d !important;
+}
+
+:root[data-theme="light"] .maintenance-item {
+    border-bottom-color: rgba(77, 165, 57, .16) !important;
+}
+
+:root[data-theme="light"] .dashboard-bills__footer {
+    border-top-color: rgba(77, 165, 57, .18) !important;
+}
+
+:root[data-theme="light"] .chart-drag-hint::before {
+    color: #3f9b3b;
+}
+
+:root[data-theme="light"] .bar-column--clickable {
+    cursor: pointer !important;
+}
+
+:root[data-theme="light"] .bar-column--clickable:hover .day-label,
+:root[data-theme="light"] .bar-column--clickable:focus-visible .day-label {
+    color: #1e6a29 !important;
+    font-weight: 900;
+}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import AppShell from "./components/AppShell";
+import { HomeOpsProvider } from "./context/HomeOpsContext";
 import WelcomeLoader from "./components/WelcomeLoader";
 import Dashboard from "./pages/Dashboard";
 import BillsPage from "./pages/BillsPage";
@@ -8,6 +9,7 @@ import SpendingPeriodsPage from "./pages/SpendingPeriodsPage";
 import MaintenancePage from "./pages/MaintenancePage";
 import WishlistPage from "./pages/WishlistPage";
 import ComingSoonPage from "./pages/ComingSoonPage";
+import HomeProfilePage from "./pages/HomeProfilePage";
 
 import "./styles/index.scss";
 
@@ -44,6 +46,7 @@ export default function App() {
 
     const pages = {
         dashboard: <Dashboard {...pageProps} />,
+        home: <HomeProfilePage {...pageProps} />,
         bills: <BillsPage {...pageProps} />,
         ledger: <LedgerPage {...pageProps} />,
         receipts: <LedgerPage {...pageProps} receiptMode />,
@@ -77,12 +80,12 @@ export default function App() {
     };
 
     return (
-        <>
+        <HomeOpsProvider>
             <AppShell activePage={activePage} onPageChange={setActivePage} setActivePage={setActivePage}>
                 {pages[activePage] || pages.dashboard}
             </AppShell>
 
             {showLoader && <WelcomeLoader exiting={loaderExiting} />}
-        </>
+        </HomeOpsProvider>
     );
 }

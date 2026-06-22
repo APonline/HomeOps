@@ -1,5 +1,4 @@
-import React from "react";
-
+/* eslint-disable react-refresh/only-export-components */
 const base = {
   width: 20,
   height: 20,

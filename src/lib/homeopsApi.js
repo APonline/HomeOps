@@ -1,4 +1,5 @@
 export const HOMEOPS_MONTH = "2026-06-01";
+export const HOMEOPS_DEFAULT_DAY = "2026-06-21";
 
 const API_BASE_URL = (import.meta.env.VITE_HOMEOPS_API_BASE_URL || "").replace(/\/$/, "");
 
@@ -26,10 +27,60 @@ export function nullableNumber(value) {
     return Number(value);
 }
 
+export function monthFromParts(year, month) {
+    const y = Number(year || 2026);
+    const m = String(Number(month || 6)).padStart(2, "0");
+    return `${y}-${m}-01`;
+}
+
+export function contextParams(context = {}) {
+    const selectedYear = context.selectedYear || context.year || 2026;
+    const selectedMonth = context.selectedMonth || context.month || 6;
+    const selectedDay = context.selectedDay || context.day || HOMEOPS_DEFAULT_DAY;
+    const viewMode = context.viewMode || context.view_mode || "month";
+
+    return {
+        home_id: context.homeId || context.home_id || context.selectedHome?.id || "",
+        view_mode: viewMode,
+        year: selectedYear,
+        selected_month: selectedMonth,
+        selected_day: selectedDay,
+        month: context.monthStart || monthFromParts(selectedYear, selectedMonth),
+        date_from: context.dateFrom || context.date_from || "",
+        date_to: context.dateTo || context.date_to || "",
+    };
+}
+
+export function withContextQuery(path, context = {}, extraParams = {}) {
+    const params = new URLSearchParams();
+
+    Object.entries({ ...contextParams(context), ...extraParams }).forEach(([key, value]) => {
+        if (value !== "" && value !== null && value !== undefined) {
+            params.set(key, value);
+        }
+    });
+
+    const separator = path.includes("?") ? "&" : "?";
+    const query = params.toString();
+
+    return query ? `${path}${separator}${query}` : path;
+}
+
+export function withHomePayload(payload = {}, context = {}) {
+    const homeId = context.homeId || context.home_id || context.selectedHome?.id;
+
+    if (!homeId) return payload;
+
+    return {
+        ...payload,
+        home_id: homeId,
+    };
+}
+
 async function parseResponse(response) {
     const raw = await response.text();
 
-    let json = null;
+    let json;
     try {
         json = raw ? JSON.parse(raw) : null;
     } catch {
@@ -81,24 +132,60 @@ export async function apiPatch(url, payload = {}) {
     return parseResponse(response);
 }
 
-export function getDashboard(month = HOMEOPS_MONTH) {
-    return apiGet(`/api/homeops/dashboard?month=${encodeURIComponent(month)}`);
+export function getHomes(context = {}) {
+    return apiGet(withContextQuery("/api/homeops/homes", context));
 }
 
-export function getBills(month = HOMEOPS_MONTH) {
-    return apiGet(`/api/homeops/bills?month=${encodeURIComponent(month)}`);
+export function createHome(payload) {
+    return apiPost("/api/homeops/homes", payload);
 }
 
-export function createBill(payload) {
-    return apiPost("/api/homeops/bills", payload);
+export function updateHome(homeId, payload) {
+    return apiPatch(`/api/homeops/homes/${homeId}`, payload);
 }
 
-export function updateBill(billId, payload = {}) {
-    return apiPatch(`/api/homeops/bills/${billId}`, payload);
+export function getHome(homeId) {
+    return apiGet(`/api/homeops/homes/${homeId}`);
 }
 
-export function deleteBill(billId) {
-    const response = fetch(apiUrl(`/api/homeops/bills/${billId}`), {
+export function addRoom(homeId, payload) {
+    return apiPost(`/api/homeops/homes/${homeId}/rooms`, payload);
+}
+
+export function addAsset(homeId, payload) {
+    return apiPost(`/api/homeops/homes/${homeId}/assets`, payload);
+}
+
+export function addTimelineEvent(homeId, payload) {
+    return apiPost(`/api/homeops/homes/${homeId}/timeline`, payload);
+}
+
+export function getDashboard(contextOrMonth = HOMEOPS_MONTH) {
+    if (typeof contextOrMonth === "string") {
+        return apiGet(`/api/homeops/dashboard?month=${encodeURIComponent(contextOrMonth)}`);
+    }
+
+    return apiGet(withContextQuery("/api/homeops/dashboard", contextOrMonth));
+}
+
+export function getBills(contextOrMonth = HOMEOPS_MONTH) {
+    if (typeof contextOrMonth === "string") {
+        return apiGet(`/api/homeops/bills?month=${encodeURIComponent(contextOrMonth)}`);
+    }
+
+    return apiGet(withContextQuery("/api/homeops/bills", contextOrMonth));
+}
+
+export function createBill(payload, context = {}) {
+    return apiPost("/api/homeops/bills", withHomePayload(payload, context));
+}
+
+export function updateBill(billId, payload = {}, context = {}) {
+    return apiPatch(`/api/homeops/bills/${billId}`, withHomePayload(payload, context));
+}
+
+export function deleteBill(billId, context = {}) {
+    const response = fetch(apiUrl(withContextQuery(`/api/homeops/bills/${billId}`, context)), {
         method: "DELETE",
         headers: { Accept: "application/json" },
     });
@@ -106,50 +193,58 @@ export function deleteBill(billId) {
     return response.then(parseResponse);
 }
 
-export function markBillPaid(billId, payload = {}) {
-    return apiPatch(`/api/homeops/bills/${billId}/mark-paid`, payload);
+export function markBillPaid(billId, payload = {}, context = {}) {
+    return apiPatch(`/api/homeops/bills/${billId}/mark-paid`, withHomePayload(payload, context));
 }
 
-export function getLedgerEntries(month = HOMEOPS_MONTH) {
-    return apiGet(`/api/homeops/ledger-entries?month=${encodeURIComponent(month)}`);
+export function getLedgerEntries(contextOrMonth = HOMEOPS_MONTH) {
+    if (typeof contextOrMonth === "string") {
+        return apiGet(`/api/homeops/ledger-entries?month=${encodeURIComponent(contextOrMonth)}`);
+    }
+
+    return apiGet(withContextQuery("/api/homeops/ledger-entries", contextOrMonth));
 }
 
-export function createLedgerEntry(payload) {
-    return apiPost("/api/homeops/ledger-entries", payload);
+export function createLedgerEntry(payload, context = {}) {
+    return apiPost("/api/homeops/ledger-entries", withHomePayload(payload, context));
 }
 
-export function createReceipt(payload) {
-    return apiPost("/api/homeops/receipts", payload);
+export function createReceipt(payload, context = {}) {
+    return apiPost("/api/homeops/receipts", withHomePayload(payload, context));
 }
 
-export function getSpendingPeriods(month = HOMEOPS_MONTH) {
-    return apiGet(`/api/homeops/spending-periods?month=${encodeURIComponent(month)}`);
+export function getSpendingPeriods(contextOrMonth = HOMEOPS_MONTH) {
+    if (typeof contextOrMonth === "string") {
+        return apiGet(`/api/homeops/spending-periods?month=${encodeURIComponent(contextOrMonth)}`);
+    }
+
+    return apiGet(withContextQuery("/api/homeops/spending-periods", contextOrMonth));
 }
 
-export function createSpendingPeriod(payload) {
-    return apiPost("/api/homeops/spending-periods", payload);
+export function createSpendingPeriod(payload, context = {}) {
+    return apiPost("/api/homeops/spending-periods", withHomePayload(payload, context));
 }
 
-export function getMaintenanceItems() {
-    return apiGet("/api/homeops/maintenance-items");
+export function getMaintenanceItems(context = {}) {
+    return apiGet(withContextQuery("/api/homeops/maintenance-items", context));
 }
 
-export function createMaintenanceItem(payload) {
-    return apiPost("/api/homeops/maintenance-items", payload);
+export function createMaintenanceItem(payload, context = {}) {
+    return apiPost("/api/homeops/maintenance-items", withHomePayload(payload, context));
 }
 
-export function completeMaintenanceItem(itemId, payload = {}) {
-    return apiPatch(`/api/homeops/maintenance-items/${itemId}/complete`, payload);
+export function completeMaintenanceItem(itemId, payload = {}, context = {}) {
+    return apiPatch(`/api/homeops/maintenance-items/${itemId}/complete`, withHomePayload(payload, context));
 }
 
-export function getWishlistItems() {
-    return apiGet("/api/homeops/wishlist-items");
+export function getWishlistItems(context = {}) {
+    return apiGet(withContextQuery("/api/homeops/wishlist-items", context));
 }
 
-export function createWishlistItem(payload) {
-    return apiPost("/api/homeops/wishlist-items", payload);
+export function createWishlistItem(payload, context = {}) {
+    return apiPost("/api/homeops/wishlist-items", withHomePayload(payload, context));
 }
 
-export function markWishlistPurchased(itemId, payload = {}) {
-    return apiPatch(`/api/homeops/wishlist-items/${itemId}/purchased`, payload);
+export function markWishlistPurchased(itemId, payload = {}, context = {}) {
+    return apiPatch(`/api/homeops/wishlist-items/${itemId}/purchased`, withHomePayload(payload, context));
 }

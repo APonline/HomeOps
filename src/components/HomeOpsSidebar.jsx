@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import HomeOpsThemeToggle from "./HomeOpsThemeToggle";
 import homeOpsLogo from "../assets/brand/homeops-logo-horizontal-master-transparent.png";
+import homeOpsLogoLime from "../assets/brand/homeops-logo-horizontal-lime-transparent.png";
 
 import {
     DashboardIcon,
@@ -19,6 +20,7 @@ import {
 
 const primaryNavItems = [
     { key: "dashboard", label: "Dashboard", Icon: DashboardIcon },
+    { key: "home", label: "Home Profile", Icon: DashboardIcon },
     { key: "bills", label: "Bills", Icon: BillsIcon },
     { key: "ledger", label: "Ledger", Icon: LedgerIcon },
     { key: "receipts", label: "Receipts", Icon: ReceiptsIcon },
@@ -92,7 +94,8 @@ export default function HomeOpsSidebar({ activePage, setActivePage }) {
             <aside className="sidebar homeops-nav">
                 <div className="homeops-nav__topbar">
                     <div className="homeops-nav__brand">
-                        <img src={homeOpsLogo} alt="HomeOps" className="homeops-nav__logo" />
+                        <img src={homeOpsLogo} alt="HomeOps" className="homeops-nav__logo homeops-nav__logo--default" />
+                        <img src={homeOpsLogoLime} alt="HomeOps" className="homeops-nav__logo homeops-nav__logo--light" />
                     </div>
 
                     <div className="homeops-nav__actions">
@@ -112,7 +115,8 @@ export default function HomeOpsSidebar({ activePage, setActivePage }) {
 
                 <div className={`homeops-nav__drawer ${mobileNavOpen ? "is-open" : ""}`}>
                     <div className="homeops-nav__drawer-head">
-                        <img src={homeOpsLogo} alt="HomeOps" className="homeops-nav__drawer-logo" />
+                        <img src={homeOpsLogo} alt="HomeOps" className="homeops-nav__drawer-logo homeops-nav__logo--default" />
+                        <img src={homeOpsLogoLime} alt="HomeOps" className="homeops-nav__drawer-logo homeops-nav__logo--light" />
 
                         <button
                             type="button"

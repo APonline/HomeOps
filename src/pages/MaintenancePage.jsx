@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import Modal from "../components/Modal";
+import { useHomeOps } from "../context/HomeOpsContext";
 import {
     completeMaintenanceItem,
     createMaintenanceItem,
@@ -22,6 +23,7 @@ const defaultForm = {
 };
 
 export default function MaintenancePage({ refreshToken, refreshEverything }) {
+    const { apiContext } = useHomeOps();
     const [items, setItems] = useState([]);
     const [form, setForm] = useState(defaultForm);
     const [saving, setSaving] = useState(false);
@@ -34,14 +36,14 @@ export default function MaintenancePage({ refreshToken, refreshEverything }) {
         setError("");
 
         try {
-            const json = await getMaintenanceItems();
+            const json = await getMaintenanceItems(apiContext);
             setItems(json.items || []);
         } catch (err) {
             setError(err.message || "Could not load maintenance.");
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [apiContext]);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -64,7 +66,7 @@ export default function MaintenancePage({ refreshToken, refreshEverything }) {
                 priority: form.priority,
                 instructions: form.instructions || null,
                 notes: form.notes || null,
-            });
+            }, apiContext);
 
             setForm(defaultForm);
             setActiveModal(null);
@@ -85,7 +87,7 @@ export default function MaintenancePage({ refreshToken, refreshEverything }) {
                 completed_date: todayIso(),
                 cost_amount: item.estimated_cost || null,
                 notes: "Completed from HomeOps MVP.",
-            });
+            }, apiContext);
 
             refreshEverything?.();
             await loadItems();

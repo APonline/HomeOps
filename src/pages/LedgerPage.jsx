@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Modal from "../components/Modal";
+import { useHomeOps } from "../context/HomeOpsContext";
 import {
-    HOMEOPS_MONTH,
     createLedgerEntry,
     createReceipt,
     getLedgerEntries,
@@ -21,6 +21,7 @@ const defaultForm = {
 };
 
 export default function LedgerPage({ refreshToken, refreshEverything, receiptMode = false }) {
+    const { apiContext } = useHomeOps();
     const [entries, setEntries] = useState([]);
     const [periods, setPeriods] = useState([]);
     const [form, setForm] = useState(defaultForm);
@@ -34,7 +35,7 @@ export default function LedgerPage({ refreshToken, refreshEverything, receiptMod
         setError("");
 
         try {
-            const json = await getLedgerEntries(HOMEOPS_MONTH);
+            const json = await getLedgerEntries(apiContext);
             setEntries(json.entries || []);
             setPeriods(json.periods || []);
         } catch (err) {
@@ -42,7 +43,7 @@ export default function LedgerPage({ refreshToken, refreshEverything, receiptMod
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [apiContext]);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -62,7 +63,7 @@ export default function LedgerPage({ refreshToken, refreshEverything, receiptMod
                     total: nullableNumber(form.total),
                     category: form.category || "Uncategorized Spending",
                     notes: form.notes || null,
-                });
+                }, apiContext);
             } else {
                 await createLedgerEntry({
                     title: form.title || form.vendor,
@@ -72,7 +73,7 @@ export default function LedgerPage({ refreshToken, refreshEverything, receiptMod
                     category: form.category || "Uncategorized Spending",
                     entry_type: form.entry_type,
                     notes: form.notes || null,
-                });
+                }, apiContext);
             }
 
             setForm(defaultForm);

@@ -487,3 +487,10 @@ td {
     border-color: rgba($danger, 0.76);
     box-shadow: 0 0 20px rgba($danger, 0.13);
 }
+
+.top-actions button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
