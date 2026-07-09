@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import MetricCard from "../components/MetricCard";
 import PeriodChart from "../components/PeriodChart";
 import DashboardBillsList from "../components/DashboardBillsList";
+import BudgetCompass from "../components/BudgetCompass";
+import V0FoundationStatus from "../components/V0FoundationStatus";
 import Modal from "../components/Modal";
 import { useHomeOps } from "../context/HomeOpsContext";
 import {
@@ -119,7 +121,7 @@ function hasUsefulLiveData(json) {
 
 function normalizeDashboardPayload(json) {
     return {
-        monthLabel: `${json.month_label || "June 2026"} Command Center`,
+        monthLabel: `${json.month_label || "Selected Period"} Command Center`,
         metrics: {
             expectedBills: Number(json.expected_bills_total || 0),
             paidThisMonth: Number(json.paid_total || 0),
@@ -142,7 +144,7 @@ function normalizeDashboardPayload(json) {
 
 function blankDashboardData() {
     return {
-        ...demoData,
+        monthLabel: "Selected Period Command Center",
         metrics: {
             expectedBills: 0,
             paidThisMonth: 0,
@@ -154,10 +156,12 @@ function blankDashboardData() {
         maintenance: [],
         chartDays: [],
         recentLedger: [],
+        categoryTotals: [],
         paidBillCount: 0,
         unpaidBillCount: 0,
-        annual: { status: "Loading", spend_total: 0, major_period_count: 0 },
+        annual: { status: "Live", spend_total: 0, major_period_count: 0 },
         today: { spent_total: 0, due_bill_count: 0, maintenance_due_count: 0 },
+        home: null,
     };
 }
 
@@ -214,8 +218,8 @@ function buildHourlyActivity(recentLedger = [], selectedDay = todayIso()) {
     return bars;
 }
 
-function selectBillsForView(data, demo, viewMode) {
-    const source = data.bills.length ? data.bills : demo.bills;
+function selectBillsForView(data, demo, viewMode, isDemoMode = false) {
+    const source = data.bills.length ? data.bills : (isDemoMode ? demo.bills : []);
 
     if (viewMode !== "day") return source;
 
@@ -245,8 +249,8 @@ function resolveChartDate(day, selectedYear, selectedMonth) {
 export default function Dashboard({ refreshToken, refreshEverything, goToPage }) {
     const { apiContext, selectedHome, viewMode, selectedYear, selectedMonth, selectedDay, setSelectedDay, setViewMode } = useHomeOps();
     const [activeModal, setActiveModal] = useState(null);
-    const [data, setData] = useState(demoData);
-    const [apiStatus, setApiStatus] = useState("demo");
+    const [data, setData] = useState(blankDashboardData);
+    const [apiStatus, setApiStatus] = useState("loading");
     const [dashboardLoading, setDashboardLoading] = useState(false);
     const [saving, setSaving] = useState(false);
     const [formError, setFormError] = useState("");
@@ -261,15 +265,10 @@ export default function Dashboard({ refreshToken, refreshEverything, goToPage })
 
         try {
             const json = await getDashboard(apiContext);
+            const normalized = normalizeDashboardPayload(json || {});
 
-            if (!hasUsefulLiveData(json)) {
-                setData(demoData);
-                setApiStatus("demo");
-                return;
-            }
-
-            setData(normalizeDashboardPayload(json));
-            setApiStatus("live");
+            setData(normalized);
+            setApiStatus(hasUsefulLiveData(json) ? "live" : "empty");
         } catch {
             setData(demoData);
             setApiStatus("demo");
@@ -305,9 +304,10 @@ export default function Dashboard({ refreshToken, refreshEverything, goToPage })
     const kicker = commandKicker(viewMode);
     const displayData = dashboardLoading ? blankDashboardData() : data;
     const dailyChart = useMemo(() => buildHourlyActivity(displayData.recentLedger, selectedDay), [displayData.recentLedger, selectedDay]);
+    const isDemoMode = apiStatus === "demo";
     const chartData = viewMode === "day"
         ? dailyChart
-        : (displayData.chartDays.length ? displayData.chartDays : demoData.chartDays);
+        : (displayData.chartDays.length ? displayData.chartDays : (isDemoMode ? demoData.chartDays : []));
     const chartTitle = viewMode === "day" ? "Purchase Activity By Hour" : "Spending With Period Markups";
     const chartButton = viewMode === "day" ? "selected day" : "Marked periods";
     const chartLegend = viewMode === "day"
@@ -316,7 +316,7 @@ export default function Dashboard({ refreshToken, refreshEverything, goToPage })
             { className: "marked", label: "Evening window" },
         ]
         : undefined;
-    const billsForView = selectBillsForView(displayData, demoData, viewMode);
+    const billsForView = selectBillsForView(displayData, demoData, viewMode, isDemoMode);
 
     function drillIntoDay(day) {
         if (viewMode === "day" || viewMode === "all-time") return;
@@ -336,7 +336,7 @@ export default function Dashboard({ refreshToken, refreshEverything, goToPage })
                     <h1>{title}</h1>
                     <p>{commandDescription(viewMode)}</p>
                     <span className={`api-pill ${apiStatus}`}>
-                        {apiStatus === "live" ? "Live API data" : apiStatus === "loading" ? "Loading context" : "Demo data fallback"}
+                        {apiStatus === "live" ? "Live API data" : apiStatus === "empty" ? "Live API empty" : apiStatus === "loading" ? "Loading context" : "Demo data fallback"}
                     </span>
                 </div>
 
@@ -373,6 +373,19 @@ export default function Dashboard({ refreshToken, refreshEverything, goToPage })
                     <MetricCard label="Still Due" value={money(displayData.metrics.stillDue)} note={`${displayData.unpaidBillCount ?? 0} unpaid`} />
                     <MetricCard label={viewMode === "day" ? "Spent Today" : "Marked Spending"} value={money(viewMode === "day" ? displayData.today?.spent_total || 0 : displayData.metrics.markedSpending)} note={viewMode === "day" ? "Day activity" : "Period-linked spending"} />
                 </section>
+
+                <BudgetCompass
+                    data={displayData}
+                    selectedYear={selectedYear}
+                    selectedMonth={selectedMonth}
+                    selectedDay={selectedDay}
+                    viewMode={viewMode}
+                    money={money}
+                    goToPage={goToPage}
+                    apiContext={apiContext}
+                />
+
+                <V0FoundationStatus apiContext={apiContext} goToPage={goToPage} />
 
                 <main className="dashboard-grid dashboard-grid--balanced">
                     <section className="panel chart-panel chart-panel--full">
@@ -416,7 +429,7 @@ export default function Dashboard({ refreshToken, refreshEverything, goToPage })
                         </div>
 
                         <div className="period-list">
-                            {(displayData.periods.length ? displayData.periods : demoData.periods).map((period) => (
+                            {(displayData.periods.length ? displayData.periods : (isDemoMode ? demoData.periods : [])).map((period) => (
                                 <article className={`period-card ${period.tone || "red"}`} key={period.id}>
                                     <strong>{period.name || period.title}</strong>
                                     <p>
@@ -438,7 +451,7 @@ export default function Dashboard({ refreshToken, refreshEverything, goToPage })
                         </div>
 
                         <div className="maintenance-list">
-                            {(displayData.maintenance.length ? displayData.maintenance : demoData.maintenance).map((item) => (
+                            {(displayData.maintenance.length ? displayData.maintenance : (isDemoMode ? demoData.maintenance : [])).map((item) => (
                                 <article className="maintenance-item" key={item.id}>
                                     <div>
                                         <strong>{item.name}</strong>

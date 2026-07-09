@@ -1,0 +1,193 @@
+.homeops-login-page {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: clamp(1.25rem, 4vw, 4rem);
+    position: relative;
+    z-index: 2;
+}
+
+.homeops-login-card {
+    width: min(100%, 31rem);
+    padding: clamp(2rem, 4.4vw, 3rem) clamp(1.4rem, 4vw, 2.65rem) clamp(1.7rem, 3.6vw, 2.4rem);
+    border-radius: 2rem;
+    display: grid;
+    gap: clamp(1.15rem, 2.2vw, 1.65rem);
+    text-align: center;
+    box-shadow: 0 1.8rem 6rem rgba(0, 0, 0, 0.32);
+}
+
+.homeops-login-card__brand {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 0.15rem;
+}
+
+.homeops-login-card__logo {
+    display: block;
+    width: min(12.25rem, 64vw);
+    height: auto;
+    object-fit: contain;
+}
+
+.homeops-login-card__intro {
+    display: grid;
+    justify-items: center;
+    gap: 0.52rem;
+}
+
+.homeops-login-card__intro .eyebrow {
+    margin: 0;
+    color: rgba(182, 191, 255, 0.88);
+}
+
+.homeops-login-card__intro h1 {
+    margin: 0;
+    font-size: clamp(2.05rem, 4.6vw, 3rem);
+    line-height: 0.98;
+    letter-spacing: -0.058em;
+}
+
+.homeops-login-card__intro p:not(.eyebrow) {
+    max-width: 25rem;
+    margin: 0.16rem auto 0;
+    color: var(--text-muted, rgba(226, 232, 255, 0.72));
+    line-height: 1.5;
+}
+
+.homeops-login-form {
+    display: grid;
+    gap: 1.08rem;
+    margin-top: 0.2rem;
+}
+
+.homeops-login-form label:not(.homeops-login-check) {
+    display: grid;
+    gap: 0.55rem;
+    text-align: left;
+}
+
+.homeops-login-form label:not(.homeops-login-check) span {
+    text-align: center;
+    font-weight: 800;
+    font-size: 0.84rem;
+    color: rgba(240, 244, 255, 0.88);
+}
+
+.homeops-login-form input[type="email"],
+.homeops-login-form input[type="password"] {
+    width: 100%;
+    min-height: 3.05rem;
+    padding-inline: 1rem;
+    border-radius: 0.85rem;
+}
+
+.homeops-login-form .primary-action {
+    min-height: 3.15rem;
+    margin-top: 0.08rem;
+    border-radius: 0.95rem;
+    box-shadow: 0 1rem 2.2rem rgba(105, 92, 255, 0.34);
+}
+
+.form-error {
+    border: 1px solid rgba(248, 113, 113, 0.5);
+    background: rgba(127, 29, 29, 0.18);
+    border-radius: 1rem;
+    padding: 0.8rem 0.95rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    text-align: left;
+}
+
+.homeops-nav__account-button {
+    width: 2.35rem;
+    height: 2.35rem;
+    border-radius: 999px;
+    border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.14));
+    display: inline-grid;
+    place-items: center;
+    font-weight: 900;
+    cursor: pointer;
+    background: color-mix(in srgb, var(--panel-bg, #111827) 82%, transparent);
+    color: inherit;
+}
+
+.homeops-nav__session {
+    margin: 1rem;
+    padding: 0.85rem;
+    border-radius: 1rem;
+    border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.12));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: 0.84rem;
+}
+
+.homeops-nav__session span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.homeops-nav__session button {
+    border: 0;
+    background: transparent;
+    color: inherit;
+    opacity: 0.74;
+    cursor: pointer;
+    font-weight: 800;
+}
+
+.v0-context-strip__property-select {
+    min-width: min(14rem, 42vw);
+    display: grid;
+    gap: 0.15rem;
+    margin-left: 0.75rem;
+}
+
+.v0-context-strip__property-select span {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.11em;
+    opacity: 0.62;
+}
+
+.v0-context-strip__property-select select {
+    width: 100%;
+    min-height: 2.2rem;
+    border-radius: 999px;
+    padding-inline: 0.85rem;
+    border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.12));
+    background: color-mix(in srgb, var(--panel-bg, #111827) 84%, transparent);
+    color: inherit;
+    font-weight: 800;
+}
+
+@media (max-width: 720px) {
+    .homeops-login-page {
+        padding: 1rem;
+        place-items: start center;
+        padding-top: 2rem;
+    }
+
+    .homeops-login-card {
+        border-radius: 1.45rem;
+        gap: 1.15rem;
+    }
+
+    .homeops-login-card__logo {
+        width: min(11.25rem, 66vw);
+    }
+
+    .homeops-login-card__intro h1 {
+        font-size: clamp(1.85rem, 10vw, 2.3rem);
+    }
+
+    .v0-context-strip__property-select {
+        grid-column: 1 / -1;
+        width: 100%;
+        margin-left: 0;
+    }
+}

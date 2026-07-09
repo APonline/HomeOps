@@ -1,16 +1,17 @@
-/* eslint-disable react-hooks/preserve-manual-memoization, react-hooks/set-state-in-effect, react-refresh/only-export-components */
+/* eslint-disable react-hooks/set-state-in-effect, react-refresh/only-export-components */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { getHomes, monthFromParts, todayIso } from "../lib/homeopsApi";
+import { HOMEOPS_DEFAULT_DAY, getHomes, monthFromParts, todayIso } from "../lib/homeopsApi";
 
 const STORAGE_KEY = "homeops.v0.context";
+const DEMO_CONTEXT_RESET_KEY = "homeops.v0.context.demoDateResetAt";
 
 const defaultContext = {
     homeId: null,
     selectedHome: null,
     homes: [],
-    selectedYear: 2026,
-    selectedMonth: 6,
-    selectedDay: "2026-06-21",
+    selectedYear: Number(HOMEOPS_DEFAULT_DAY.slice(0, 4)),
+    selectedMonth: Number(HOMEOPS_DEFAULT_DAY.slice(5, 7)),
+    selectedDay: HOMEOPS_DEFAULT_DAY,
     viewMode: "month",
     loadingHomes: true,
     homesError: "",
@@ -20,7 +21,26 @@ const HomeOpsContext = createContext(null);
 
 function readStoredContext() {
     try {
-        return JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "{}") || {};
+        const stored = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "{}") || {};
+        const hasStaleDemoDate = /^2026-06-\d{2}$/.test(String(stored.selectedDay || ""));
+        const alreadyReset = window.localStorage.getItem(DEMO_CONTEXT_RESET_KEY);
+
+        if (hasStaleDemoDate && !alreadyReset) {
+            const today = todayIso();
+            const nextStored = {
+                ...stored,
+                selectedYear: Number(today.slice(0, 4)),
+                selectedMonth: Number(today.slice(5, 7)),
+                selectedDay: today,
+            };
+
+            window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextStored));
+            window.localStorage.setItem(DEMO_CONTEXT_RESET_KEY, today);
+
+            return nextStored;
+        }
+
+        return stored;
     } catch {
         return {};
     }
@@ -37,25 +57,30 @@ function writeStoredContext(value) {
 export function HomeOpsProvider({ children }) {
     const stored = typeof window !== "undefined" ? readStoredContext() : {};
     const initialDay = stored.selectedDay || todayIso();
+    const initialYear = Number(stored.selectedYear || initialDay.slice(0, 4));
+    const initialMonth = Number(stored.selectedMonth || initialDay.slice(5, 7));
 
     const [homes, setHomes] = useState([]);
     const [selectedHome, setSelectedHome] = useState(null);
-    const [selectedYear, setSelectedYear] = useState(Number(stored.selectedYear || initialDay.slice(0, 4) || 2026));
-    const [selectedMonth, setSelectedMonth] = useState(Number(stored.selectedMonth || initialDay.slice(5, 7) || 6));
+    const [requestedHomeId, setRequestedHomeId] = useState(stored.homeId || null);
+    const [selectedYear, setSelectedYear] = useState(initialYear);
+    const [selectedMonth, setSelectedMonth] = useState(initialMonth);
     const [selectedDay, setSelectedDay] = useState(stored.selectedDay || initialDay);
     const [viewMode, setViewMode] = useState(stored.viewMode || "month");
     const [loadingHomes, setLoadingHomes] = useState(true);
     const [homesError, setHomesError] = useState("");
 
-    const homeId = selectedHome?.id || stored.homeId || null;
+    const homeId = selectedHome?.id || null;
 
-    const reloadHomes = useCallback(async () => {
+    const reloadHomes = useCallback(async (preferredHomeId = null) => {
         setLoadingHomes(true);
         setHomesError("");
 
+        const nextRequestedHomeId = preferredHomeId || selectedHome?.id || requestedHomeId || null;
+
         try {
             const json = await getHomes({
-                homeId,
+                homeId: nextRequestedHomeId,
                 selectedYear,
                 selectedMonth,
                 selectedDay,
@@ -63,16 +88,23 @@ export function HomeOpsProvider({ children }) {
             });
 
             const loadedHomes = json.homes || [];
-            const selected = json.selected_home?.home || loadedHomes.find((home) => home.id === homeId) || loadedHomes[0] || null;
+            const selected = json.selected_home?.home
+                || loadedHomes.find((home) => String(home.id) === String(nextRequestedHomeId))
+                || loadedHomes[0]
+                || null;
 
             setHomes(loadedHomes);
             setSelectedHome(selected);
+            setRequestedHomeId(selected?.id || null);
         } catch (error) {
+            setHomes([]);
+            setSelectedHome(null);
+            setRequestedHomeId(null);
             setHomesError(error.message || "Home Identity is not available yet.");
         } finally {
             setLoadingHomes(false);
         }
-    }, [homeId, selectedDay, selectedMonth, selectedYear, viewMode]);
+    }, [requestedHomeId, selectedDay, selectedHome?.id, selectedMonth, selectedYear, viewMode]);
 
     useEffect(() => {
         reloadHomes();
@@ -81,17 +113,18 @@ export function HomeOpsProvider({ children }) {
 
     useEffect(() => {
         writeStoredContext({
-            homeId: selectedHome?.id || homeId,
+            homeId: selectedHome?.id || null,
             selectedYear,
             selectedMonth,
             selectedDay,
             viewMode,
         });
-    }, [homeId, selectedDay, selectedHome?.id, selectedMonth, selectedYear, viewMode]);
+    }, [selectedDay, selectedHome?.id, selectedMonth, selectedYear, viewMode]);
 
     const chooseHome = useCallback((nextHomeId) => {
         const nextHome = homes.find((home) => String(home.id) === String(nextHomeId)) || null;
         setSelectedHome(nextHome);
+        setRequestedHomeId(nextHome?.id || null);
     }, [homes]);
 
     const updateSelectedMonth = useCallback((nextMonth) => {
@@ -120,7 +153,7 @@ export function HomeOpsProvider({ children }) {
     }, []);
 
     const apiContext = useMemo(() => ({
-        homeId: selectedHome?.id || homeId,
+        homeId,
         selectedHome,
         selectedYear,
         selectedMonth,
@@ -133,7 +166,7 @@ export function HomeOpsProvider({ children }) {
         ...defaultContext,
         homes,
         selectedHome,
-        homeId: selectedHome?.id || homeId,
+        homeId,
         selectedYear,
         selectedMonth,
         selectedDay,

@@ -25,6 +25,7 @@ const defaultForm = {
 export default function MaintenancePage({ refreshToken, refreshEverything }) {
     const { apiContext } = useHomeOps();
     const [items, setItems] = useState([]);
+    const [contextSummary, setContextSummary] = useState(null);
     const [form, setForm] = useState(defaultForm);
     const [saving, setSaving] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -38,6 +39,7 @@ export default function MaintenancePage({ refreshToken, refreshEverything }) {
         try {
             const json = await getMaintenanceItems(apiContext);
             setItems(json.items || []);
+            setContextSummary(json.context || null);
         } catch (err) {
             setError(err.message || "Could not load maintenance.");
         } finally {
@@ -125,6 +127,15 @@ export default function MaintenancePage({ refreshToken, refreshEverything }) {
                 </div>
 
                 {error && <div className="form-error">{error}</div>}
+
+                {contextSummary && (
+                    <div className="v0-context-strip">
+                        <span>{contextSummary.due_in_period || 0} due in selected context</span>
+                        <span>{contextSummary.overdue || 0} overdue</span>
+                        <span>{contextSummary.tracked || 0} tracked total</span>
+                    </div>
+                )}
+
                 {loading && <div className="empty-box">Loading maintenance...</div>}
                 {!loading && items.length === 0 && <div className="empty-box">No maintenance items yet. Add one with + Maintenance.</div>}
 
@@ -135,6 +146,7 @@ export default function MaintenancePage({ refreshToken, refreshEverything }) {
                                 <strong>{item.name}</strong>
                                 <p>{item.location_label || "Maintenance"} · next due {item.next_due_date || "TBD"}</p>
                                 <small className={item.priority === "high" || item.priority === "urgent" ? "priority high" : "priority"}>{item.priority}</small>
+                                {item.timing_label && <small className="v0-record-context">{item.timing_label}</small>}
                             </div>
                             <div className="list-actions">
                                 {item.estimated_cost ? <b>{money(item.estimated_cost)}</b> : null}

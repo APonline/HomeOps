@@ -23,6 +23,7 @@ const defaultForm = {
 export default function WishlistPage({ refreshToken, refreshEverything }) {
     const { apiContext } = useHomeOps();
     const [items, setItems] = useState([]);
+    const [contextSummary, setContextSummary] = useState(null);
     const [form, setForm] = useState(defaultForm);
     const [saving, setSaving] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -36,6 +37,7 @@ export default function WishlistPage({ refreshToken, refreshEverything }) {
         try {
             const json = await getWishlistItems(apiContext);
             setItems(json.items || []);
+            setContextSummary(json.context || null);
         } catch (err) {
             setError(err.message || "Could not load needs/wants.");
         } finally {
@@ -117,6 +119,15 @@ export default function WishlistPage({ refreshToken, refreshEverything }) {
                 </div>
 
                 {error && <div className="form-error">{error}</div>}
+
+                {contextSummary && (
+                    <div className="v0-context-strip">
+                        <span>{contextSummary.targeted_in_period || 0} targeted in selected context</span>
+                        <span>{contextSummary.past_target || 0} past target</span>
+                        <span>{contextSummary.tracked || 0} tracked total</span>
+                    </div>
+                )}
+
                 {loading && <div className="empty-box">Loading needs/wants...</div>}
                 {!loading && items.length === 0 && <div className="empty-box">No needs/wants yet. Add one with + Item.</div>}
 
@@ -127,6 +138,7 @@ export default function WishlistPage({ refreshToken, refreshEverything }) {
                                 <strong>{item.title}</strong>
                                 <p>{item.item_type} · {item.room_label || "No room"} · {item.status}</p>
                                 {item.product_url && <small className="url-text">{item.product_url}</small>}
+                                {item.timing_label && <small className="v0-record-context">{item.timing_label}</small>}
                             </div>
                             <div className="list-actions">
                                 <span className={item.priority === "high" || item.priority === "urgent" ? "priority high" : "priority"}>{item.priority}</span>

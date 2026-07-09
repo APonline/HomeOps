@@ -10,6 +10,7 @@
 @use "chart-scroll-fix";
 @use "responsive-tables";
 @use "dashboard-bills";
+@use "budget-compass";
 @use "dashboard-bills-sticky-header";
 @use "compact-records";
 @use "locked-nav";
@@ -22,3 +23,7 @@
 @use "theme-scenes-and-toggle-fix";
 @use "side-scene-backgrounds";
 @use "v0-light-lime-refinement";
+@use "v0-wrapup";
+
+@use "auth-account";
+@use "account-access";

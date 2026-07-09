@@ -121,7 +121,7 @@ export default function DashboardBillsList({ bills = [], money, onOpenBills }) {
                                 >
                                     <div className="dashboard-bill-record__item">
                                         <strong>{bill.payee || bill.name}</strong>
-                                        <span>{bill.notes || "Tracked bill"}</span>
+                                        <span>{bill.is_core_bill ? "Core ownership bill" : bill.notes || "Tracked bill"}</span>
                                     </div>
 
                                     <span className={`bill-type bill-type-col ${typeClass(billType)}`}>

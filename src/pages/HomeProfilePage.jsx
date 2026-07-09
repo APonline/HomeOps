@@ -7,9 +7,11 @@ import {
     addRoom,
     addTimelineEvent,
     createHome,
+    getCoreBills,
     getHome,
     money,
     nullableNumber,
+    syncCoreBills,
     todayIso,
     updateHome,
 } from "../lib/homeopsApi";
@@ -91,6 +93,10 @@ function homePayload(form) {
     };
 }
 
+function responseHomeId(json) {
+    return json?.home?.home?.id || json?.home?.id || json?.id || null;
+}
+
 function DetailItem({ label, value }) {
     return (
         <div className="v0-detail-item">
@@ -152,7 +158,7 @@ const hubInfo = {
         title: "Property Hub",
         intro: "This is the one place that defines the home itself. The dashboard and modules should feel like they belong to this property, not just to random app records.",
         bullets: [
-            "Home identity gives every bill, receipt, repair and period a property anchor.",
+            "Property identity gives every bill, receipt, repair and period a property anchor.",
             "Monthly baseline costs create the normal ownership cost floor.",
             "Rooms, assets and timeline events are optional context you can add later.",
         ],
@@ -205,7 +211,7 @@ function HubAccordion({ id, title, subtitle, open, onToggle, onInfo, children })
 }
 
 export default function HomeProfilePage({ refreshEverything }) {
-    const { selectedHome, homeId, reloadHomes } = useHomeOps();
+    const { selectedHome, homeId, reloadHomes, apiContext } = useHomeOps();
     const [profile, setProfile] = useState({ home: selectedHome, rooms: [], assets: [], timeline: [] });
     const [form, setForm] = useState(formFromHome(selectedHome));
     const [roomForm, setRoomForm] = useState(defaultRoomForm);
@@ -214,6 +220,9 @@ export default function HomeProfilePage({ refreshEverything }) {
     const [activeModal, setActiveModal] = useState(null);
     const [infoModal, setInfoModal] = useState(null);
     const [openSections, setOpenSections] = useState({ costs: true, snapshot: false, structure: false });
+    const [coreBills, setCoreBills] = useState([]);
+    const [coreBillsError, setCoreBillsError] = useState("");
+    const [syncingCoreBills, setSyncingCoreBills] = useState(false);
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
@@ -233,22 +242,45 @@ export default function HomeProfilePage({ refreshEverything }) {
             setProfile(json);
             setForm(formFromHome(json.home));
         } catch (err) {
-            setError(err.message || "Could not load Property Hub.");
+            setProfile({ home: null, rooms: [], assets: [], timeline: [] });
+            setForm(defaultHomeForm);
+            setError(err.message === "Home not found." ? "This browser had an old property selected. Create or select a valid property to continue." : (err.message || "Could not load Property Hub."));
         } finally {
             setLoading(false);
         }
     }, [homeId]);
 
+    const loadCoreBills = useCallback(async () => {
+        if (!homeId) {
+            setCoreBills([]);
+            setCoreBillsError("");
+            return;
+        }
+
+        try {
+            const json = await getCoreBills(homeId, apiContext);
+            setCoreBills(json.items || []);
+            setCoreBillsError("");
+        } catch (err) {
+            setCoreBills([]);
+            setCoreBillsError(err.message || "Core bill sync is not available yet.");
+        }
+    }, [apiContext, homeId]);
+
     useEffect(() => {
         loadProfile();
     }, [loadProfile]);
+
+    useEffect(() => {
+        loadCoreBills();
+    }, [loadCoreBills]);
 
     const home = profile.home || selectedHome;
     const baseline = Number(home?.baseline_monthly_cost ?? 0);
     const rooms = profile.rooms || [];
     const assets = profile.assets || [];
     const timeline = profile.timeline || [];
-    const hasHome = Boolean(home?.id || homeId);
+    const hasHome = Boolean(home?.id);
 
     const monthlyItems = useMemo(() => ([
         ["Mortgage", home?.mortgage_payment],
@@ -258,6 +290,9 @@ export default function HomeProfilePage({ refreshEverything }) {
         ["Utilities", home?.utilities],
         ["Internet", home?.internet],
     ]), [home]);
+
+    const missingCoreBillCount = coreBills.filter((item) => item.action === "create").length;
+    const linkedCoreBillCount = coreBills.filter((item) => item.linked).length;
 
     const currentInfo = infoModal ? hubInfo[infoModal] : null;
 
@@ -277,20 +312,48 @@ export default function HomeProfilePage({ refreshEverything }) {
         setError("");
 
         try {
-            if (homeId) {
-                await updateHome(homeId, homePayload(form));
-                await loadProfile();
+            const existingHomeId = home?.id || null;
+            let nextHomeId = existingHomeId;
+
+            if (existingHomeId) {
+                const json = await updateHome(existingHomeId, homePayload(form));
+                nextHomeId = responseHomeId(json) || existingHomeId;
             } else {
-                await createHome(homePayload(form));
+                const json = await createHome(homePayload(form));
+                nextHomeId = responseHomeId(json);
             }
 
-            await reloadHomes();
+            await reloadHomes(nextHomeId);
+            if (nextHomeId) {
+                const json = await getHome(nextHomeId);
+                setProfile(json);
+                setForm(formFromHome(json.home));
+            }
+
             setActiveModal(null);
             refreshEverything?.();
         } catch (err) {
             setError(err.message || "Could not save home.");
         } finally {
             setSaving(false);
+        }
+    }
+
+    async function syncBaselineBills() {
+        if (!homeId) return;
+
+        setSyncingCoreBills(true);
+        setCoreBillsError("");
+        setError("");
+
+        try {
+            await syncCoreBills(homeId, apiContext);
+            await loadCoreBills();
+            refreshEverything?.();
+        } catch (err) {
+            setCoreBillsError(err.message || "Could not sync core bills from baseline.");
+        } finally {
+            setSyncingCoreBills(false);
         }
     }
 
@@ -371,10 +434,10 @@ export default function HomeProfilePage({ refreshEverything }) {
                 <section className="v0-create-home-card panel">
                     <div>
                         <span className="v0-eyebrow">Start here</span>
-                        <strong>Create your first home</strong>
+                        <strong>Create your first property</strong>
                         <p>HomeOps needs one property anchor before bills, ledger entries, receipts, maintenance and periods can feel like they belong somewhere.</p>
                     </div>
-                    <button type="button" onClick={openHomeModal}>Create Home</button>
+                    <button type="button" onClick={openHomeModal}>Create Property</button>
                 </section>
             )}
 
@@ -420,6 +483,34 @@ export default function HomeProfilePage({ refreshEverything }) {
                                         <strong>{value ? money(value) : "—"}</strong>
                                     </div>
                                 ))}
+                            </div>
+
+                            <div className="v0-core-bill-sync">
+                                <div className="v0-core-bill-sync__header">
+                                    <div>
+                                        <h3>Core ownership bills</h3>
+                                        <p>Turn baseline costs into recurring bill records so each selected month gets its own paid/unpaid state.</p>
+                                    </div>
+                                    <button className="primary-action" type="button" onClick={syncBaselineBills} disabled={syncingCoreBills || !hasHome}>
+                                        {syncingCoreBills ? "Syncing..." : missingCoreBillCount > 0 ? `Create ${missingCoreBillCount} missing` : "Sync core bills"}
+                                    </button>
+                                </div>
+
+                                {coreBillsError && <div className="form-error">{coreBillsError}</div>}
+
+                                <div className="v0-core-bill-list">
+                                    {(coreBills.length ? coreBills : monthlyItems.map(([label, value]) => ({ label, amount: value, action: value ? "create" : "empty" }))).map((item) => (
+                                        <div className={`v0-core-bill-row is-${item.action}`} key={item.key || item.label}>
+                                            <span>{item.label}</span>
+                                            <strong>{item.amount ? money(item.amount) : "—"}</strong>
+                                            <em>{item.linked ? "Linked to Bills" : item.action === "create" ? "Ready to create" : "No baseline amount"}</em>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <p className="v0-core-bill-sync__note">
+                                    Linked: {linkedCoreBillCount} · Missing: {missingCoreBillCount}. Editing paid state still happens on the Bills page.
+                                </p>
                             </div>
                         </HubAccordion>
 
@@ -523,7 +614,7 @@ export default function HomeProfilePage({ refreshEverything }) {
             <Modal
                 active={activeModal === "home"}
                 onClose={() => setActiveModal(null)}
-                title={homeId ? "Edit Home" : "Create Home"}
+                title={hasHome ? "Edit Property" : "Create Property"}
                 intro="Keep this light. V0 only needs enough property identity and baseline cost context to make every module feel grounded."
                 size="wide"
             >
@@ -551,7 +642,7 @@ export default function HomeProfilePage({ refreshEverything }) {
                     <label className="span-12"><span>Service / condo notes</span><textarea value={form.service_notes} onChange={(event) => setForm({ ...form, service_notes: event.target.value })} placeholder="Rules, service switches, HVAC notes, parking/locker quirks..." /></label>
 
                     {error && <div className="form-error span-12">{error}</div>}
-                    <button className="primary-action span-12" disabled={saving}>{saving ? "Saving..." : homeId ? "Save Home" : "Create Home"}</button>
+                    <button className="primary-action span-12" disabled={saving}>{saving ? "Saving..." : hasHome ? "Save Property" : "Create Property"}</button>
                 </form>
             </Modal>
 

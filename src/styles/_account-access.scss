@@ -1,0 +1,185 @@
+.account-access-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.account-access-card {
+    display: grid;
+    gap: 0.45rem;
+    align-content: start;
+    padding: 1.1rem;
+}
+
+.account-access-card strong {
+    font-size: clamp(1.35rem, 3vw, 2rem);
+    line-height: 1.05;
+    color: var(--text);
+}
+
+.account-access-card p {
+    margin: 0 0 0.55rem;
+    color: var(--muted);
+}
+
+.account-access-properties {
+    display: grid;
+    gap: 1rem;
+    padding: 1.1rem;
+}
+
+.account-access-properties__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.account-access-properties__head h2 {
+    margin: 0.2rem 0 0.35rem;
+    font-size: clamp(1.35rem, 3vw, 2rem);
+}
+
+.account-access-properties__head p {
+    max-width: 42rem;
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.5;
+}
+
+.account-access-list {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.account-access-property {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid rgba(108, 188, 255, 0.28);
+    border-radius: 1.1rem;
+    background: rgba(4, 12, 26, 0.45);
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+}
+
+.account-access-property:hover,
+.account-access-property.is-active {
+    transform: translateY(-1px);
+    border-color: rgba(108, 188, 255, 0.76);
+    background: rgba(18, 35, 76, 0.62);
+}
+
+.account-access-property span {
+    display: grid;
+    gap: 0.25rem;
+}
+
+.account-access-property strong,
+.account-access-property b {
+    font-size: 1rem;
+    color: var(--text);
+}
+
+.account-access-property small {
+    color: var(--muted);
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.account-access-empty {
+    display: grid;
+    gap: 0.7rem;
+    justify-items: center;
+    text-align: center;
+}
+
+.account-access-empty p {
+    max-width: 38rem;
+    margin: 0;
+    color: var(--muted);
+}
+
+@media (max-width: 760px) {
+    .account-access-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .account-access-property {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+
+.account-access-card__actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+    margin-top: 0.4rem;
+}
+
+.account-settings-modal {
+    display: grid;
+    gap: 1rem;
+}
+
+.account-settings-panel {
+    display: grid;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid rgba(108, 188, 255, 0.22);
+    border-radius: 1.15rem;
+    background: rgba(4, 12, 26, 0.4);
+}
+
+.account-settings-panel__head {
+    display: grid;
+    gap: 0.3rem;
+}
+
+.account-settings-panel__head h3 {
+    margin: 0;
+    font-size: clamp(1.15rem, 2vw, 1.45rem);
+    color: var(--text);
+}
+
+.account-settings-panel__head p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.45;
+}
+
+.account-settings-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.account-settings-actions .primary-action {
+    min-width: 11rem;
+}
+
+.form-success {
+    padding: 0.75rem 0.9rem;
+    border: 1px solid rgba(117, 255, 178, 0.22);
+    border-radius: 0.9rem;
+    background: rgba(69, 203, 130, 0.1);
+    color: rgba(207, 255, 226, 0.96);
+    font-size: 0.92rem;
+}
+
+@media (max-width: 760px) {
+    .account-access-card__actions {
+        grid-template-columns: 1fr;
+    }
+
+    .account-settings-actions {
+        display: grid;
+    }
+}

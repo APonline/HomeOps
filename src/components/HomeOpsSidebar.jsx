@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import HomeOpsThemeToggle from "./HomeOpsThemeToggle";
+import { useAuth } from "../context/AuthContext";
 import homeOpsLogo from "../assets/brand/homeops-logo-horizontal-master-transparent.png";
 import homeOpsLogoLime from "../assets/brand/homeops-logo-horizontal-lime-transparent.png";
 
@@ -20,7 +21,7 @@ import {
 
 const primaryNavItems = [
     { key: "dashboard", label: "Dashboard", Icon: DashboardIcon },
-    { key: "home", label: "Home Profile", Icon: DashboardIcon },
+    { key: "home", label: "Property Profile", Icon: DashboardIcon },
     { key: "bills", label: "Bills", Icon: BillsIcon },
     { key: "ledger", label: "Ledger", Icon: LedgerIcon },
     { key: "receipts", label: "Receipts", Icon: ReceiptsIcon },
@@ -31,7 +32,6 @@ const primaryNavItems = [
 
 const lockedNavItems = [
     { key: "financing", label: "Financing", Icon: FinancingIcon, badge: "V1" },
-    { key: "accounts", label: "Accounts", Icon: AccountsIcon, badge: "V1" },
     { key: "documents", label: "Documents", Icon: DocumentsIcon, badge: "V1" },
     { key: "reports", label: "Reports", Icon: ReportsIcon, badge: "V2" },
 ];
@@ -70,6 +70,7 @@ function NavButton({ item, activePage, setActivePage, locked = false, onDone }) 
 }
 
 export default function HomeOpsSidebar({ activePage, setActivePage }) {
+    const { user, logout } = useAuth();
     const [mobileNavOpen, setMobileNavOpen] = useState(false);
     const closeMobileNav = () => setMobileNavOpen(false);
 
@@ -100,6 +101,15 @@ export default function HomeOpsSidebar({ activePage, setActivePage }) {
 
                     <div className="homeops-nav__actions">
                         <HomeOpsThemeToggle />
+
+                        <button
+                            type="button"
+                            className="homeops-nav__account-button"
+                            onClick={() => setActivePage("accounts")}
+                            title={user?.email || "Account"}
+                        >
+                            {user?.name?.slice(0, 1) || "A"}
+                        </button>
 
                         <button
                             type="button"
@@ -141,6 +151,13 @@ export default function HomeOpsSidebar({ activePage, setActivePage }) {
 
                         <div className="homeops-nav-divider" />
 
+                        <NavButton
+                            item={{ key: "accounts", label: "Account & Access", Icon: AccountsIcon }}
+                            activePage={activePage}
+                            setActivePage={setActivePage}
+                            onDone={closeMobileNav}
+                        />
+
                         {lockedNavItems.map((item) => (
                             <NavButton
                                 key={item.key}
@@ -151,6 +168,11 @@ export default function HomeOpsSidebar({ activePage, setActivePage }) {
                             />
                         ))}
                     </nav>
+
+                    <div className="homeops-nav__session">
+                        <span>{user?.name || "Signed in"}</span>
+                        <button type="button" onClick={logout}>Logout</button>
+                    </div>
                 </div>
             </aside>
 

@@ -1,7 +1,37 @@
-export const HOMEOPS_MONTH = "2026-06-01";
-export const HOMEOPS_DEFAULT_DAY = "2026-06-21";
-
 const API_BASE_URL = (import.meta.env.VITE_HOMEOPS_API_BASE_URL || "").replace(/\/$/, "");
+
+export const HOMEOPS_AUTH_STORAGE_KEY = "homeops.v1.authToken";
+
+export function getStoredAuthToken() {
+    try {
+        return window.localStorage.getItem(HOMEOPS_AUTH_STORAGE_KEY) || "";
+    } catch {
+        return "";
+    }
+}
+
+export function setStoredAuthToken(token) {
+    try {
+        if (token) {
+            window.localStorage.setItem(HOMEOPS_AUTH_STORAGE_KEY, token);
+        } else {
+            window.localStorage.removeItem(HOMEOPS_AUTH_STORAGE_KEY);
+        }
+    } catch {
+        // Locked-down browsers can reject localStorage. Auth still works for the current render pass.
+    }
+}
+
+function authHeaders(extra = {}) {
+    const token = getStoredAuthToken();
+
+    return {
+        ...extra,
+        Accept: "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+}
+
 
 function apiUrl(path) {
     const cleanPath = path.startsWith("/") ? path : `/${path}`;
@@ -19,8 +49,22 @@ export function money(value) {
 }
 
 export function todayIso() {
-    return new Date().toISOString().slice(0, 10);
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
 }
+
+export function monthStartIso(dateIso = todayIso()) {
+    const value = /^\d{4}-\d{2}-\d{2}$/.test(String(dateIso)) ? String(dateIso) : todayIso();
+
+    return `${value.slice(0, 7)}-01`;
+}
+
+export const HOMEOPS_DEFAULT_DAY = todayIso();
+export const HOMEOPS_MONTH = monthStartIso(HOMEOPS_DEFAULT_DAY);
 
 export function nullableNumber(value) {
     if (value === "" || value === null || value === undefined) return null;
@@ -28,15 +72,16 @@ export function nullableNumber(value) {
 }
 
 export function monthFromParts(year, month) {
-    const y = Number(year || 2026);
-    const m = String(Number(month || 6)).padStart(2, "0");
+    const fallbackToday = todayIso();
+    const y = Number(year || fallbackToday.slice(0, 4));
+    const m = String(Number(month || fallbackToday.slice(5, 7))).padStart(2, "0");
     return `${y}-${m}-01`;
 }
 
 export function contextParams(context = {}) {
-    const selectedYear = context.selectedYear || context.year || 2026;
-    const selectedMonth = context.selectedMonth || context.month || 6;
     const selectedDay = context.selectedDay || context.day || HOMEOPS_DEFAULT_DAY;
+    const selectedYear = context.selectedYear || context.year || Number(selectedDay.slice(0, 4));
+    const selectedMonth = context.selectedMonth || context.month || Number(selectedDay.slice(5, 7));
     const viewMode = context.viewMode || context.view_mode || "month";
 
     return {
@@ -87,6 +132,13 @@ async function parseResponse(response) {
         json = { message: raw || "Invalid API response." };
     }
 
+    if (response.status === 401) {
+        setStoredAuthToken("");
+        if (typeof window !== "undefined") {
+            window.dispatchEvent(new CustomEvent("homeops:unauthorized"));
+        }
+    }
+
     if (!response.ok) {
         const validationMessage = json?.errors
             ? Object.values(json.errors).flat().join(" ")
@@ -100,7 +152,7 @@ async function parseResponse(response) {
 
 export async function apiGet(url) {
     const response = await fetch(apiUrl(url), {
-        headers: { Accept: "application/json" },
+        headers: authHeaders(),
     });
 
     return parseResponse(response);
@@ -109,10 +161,9 @@ export async function apiGet(url) {
 export async function apiPost(url, payload = {}) {
     const response = await fetch(apiUrl(url), {
         method: "POST",
-        headers: {
+        headers: authHeaders({
             "Content-Type": "application/json",
-            Accept: "application/json",
-        },
+        }),
         body: JSON.stringify(payload),
     });
 
@@ -122,10 +173,9 @@ export async function apiPost(url, payload = {}) {
 export async function apiPatch(url, payload = {}) {
     const response = await fetch(apiUrl(url), {
         method: "PATCH",
-        headers: {
+        headers: authHeaders({
             "Content-Type": "application/json",
-            Accept: "application/json",
-        },
+        }),
         body: JSON.stringify(payload),
     });
 
@@ -160,6 +210,14 @@ export function addTimelineEvent(homeId, payload) {
     return apiPost(`/api/homeops/homes/${homeId}/timeline`, payload);
 }
 
+export function getCoreBills(homeId, context = {}) {
+    return apiGet(withContextQuery(`/api/homeops/homes/${homeId}/core-bills`, context));
+}
+
+export function syncCoreBills(homeId, context = {}) {
+    return apiPost(withContextQuery(`/api/homeops/homes/${homeId}/core-bills/sync`, context), withHomePayload({}, context));
+}
+
 export function getDashboard(contextOrMonth = HOMEOPS_MONTH) {
     if (typeof contextOrMonth === "string") {
         return apiGet(`/api/homeops/dashboard?month=${encodeURIComponent(contextOrMonth)}`);
@@ -177,17 +235,23 @@ export function getBills(contextOrMonth = HOMEOPS_MONTH) {
 }
 
 export function createBill(payload, context = {}) {
-    return apiPost("/api/homeops/bills", withHomePayload(payload, context));
+    return apiPost("/api/homeops/bills", withHomePayload({
+        ...payload,
+        month: context.monthStart || payload.month,
+    }, context));
 }
 
 export function updateBill(billId, payload = {}, context = {}) {
-    return apiPatch(`/api/homeops/bills/${billId}`, withHomePayload(payload, context));
+    return apiPatch(`/api/homeops/bills/${billId}`, withHomePayload({
+        ...payload,
+        month: context.monthStart || payload.month,
+    }, context));
 }
 
 export function deleteBill(billId, context = {}) {
     const response = fetch(apiUrl(withContextQuery(`/api/homeops/bills/${billId}`, context)), {
         method: "DELETE",
-        headers: { Accept: "application/json" },
+        headers: authHeaders(),
     });
 
     return response.then(parseResponse);
@@ -195,6 +259,18 @@ export function deleteBill(billId, context = {}) {
 
 export function markBillPaid(billId, payload = {}, context = {}) {
     return apiPatch(`/api/homeops/bills/${billId}/mark-paid`, withHomePayload(payload, context));
+}
+
+export function markBillUnpaid(billId, payload = {}, context = {}) {
+    return apiPatch(`/api/homeops/bills/${billId}/mark-unpaid`, withHomePayload(payload, context));
+}
+
+export function skipBillForMonth(billId, payload = {}, context = {}) {
+    return apiPatch(`/api/homeops/bills/${billId}/skip-month`, withHomePayload(payload, context));
+}
+
+export function updateBillInstance(instanceId, payload = {}, context = {}) {
+    return apiPatch(`/api/homeops/bill-instances/${instanceId}`, withHomePayload(payload, context));
 }
 
 export function getLedgerEntries(contextOrMonth = HOMEOPS_MONTH) {
@@ -247,4 +323,42 @@ export function createWishlistItem(payload, context = {}) {
 
 export function markWishlistPurchased(itemId, payload = {}, context = {}) {
     return apiPatch(`/api/homeops/wishlist-items/${itemId}/purchased`, withHomePayload(payload, context));
+}
+
+export function getV0Status(context = {}) {
+    return apiGet(withContextQuery("/api/homeops/v0/status", context));
+}
+
+export function getBudgetProfile(context = {}) {
+    return apiGet(withContextQuery("/api/homeops/budget-profile", context));
+}
+
+export function updateBudgetProfile(payload = {}, context = {}) {
+    return apiPatch(withContextQuery("/api/homeops/budget-profile", context), withHomePayload(payload, context));
+}
+
+
+export async function loginHomeOps(payload) {
+    return apiPost("/api/homeops/auth/login", payload);
+}
+
+export async function registerHomeOps(payload) {
+    return apiPost("/api/homeops/auth/register", payload);
+}
+
+export async function getCurrentUser() {
+    return apiGet("/api/homeops/auth/me");
+}
+
+
+export async function updateCurrentUser(payload) {
+    return apiPatch("/api/homeops/auth/profile", payload);
+}
+
+export async function changeCurrentPassword(payload) {
+    return apiPatch("/api/homeops/auth/password", payload);
+}
+
+export async function logoutHomeOps() {
+    return apiPost("/api/homeops/auth/logout", {});
 }

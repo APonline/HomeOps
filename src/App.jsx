@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import AppShell from "./components/AppShell";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { HomeOpsProvider } from "./context/HomeOpsContext";
 import WelcomeLoader from "./components/WelcomeLoader";
 import Dashboard from "./pages/Dashboard";
@@ -9,11 +10,14 @@ import SpendingPeriodsPage from "./pages/SpendingPeriodsPage";
 import MaintenancePage from "./pages/MaintenancePage";
 import WishlistPage from "./pages/WishlistPage";
 import ComingSoonPage from "./pages/ComingSoonPage";
+import AccountAccessPage from "./pages/AccountAccessPage";
 import HomeProfilePage from "./pages/HomeProfilePage";
+import LoginPage from "./pages/LoginPage";
 
 import "./styles/index.scss";
 
-export default function App() {
+function HomeOpsApp() {
+    const { loading, isAuthenticated } = useAuth();
     const [activePage, setActivePage] = useState("dashboard");
     const [refreshToken, setRefreshToken] = useState(0);
     const [showLoader, setShowLoader] = useState(true);
@@ -38,6 +42,14 @@ export default function App() {
         setRefreshToken((value) => value + 1);
     }
 
+    if (loading && !isAuthenticated) {
+        return <WelcomeLoader exiting={false} />;
+    }
+
+    if (!isAuthenticated) {
+        return <LoginPage />;
+    }
+
     const pageProps = {
         refreshToken,
         refreshEverything,
@@ -59,12 +71,7 @@ export default function App() {
                 note="Mortgage, LOC, credit cards, payoff experiments. This is V1/V2 so MVP stays clean."
             />
         ),
-        accounts: (
-            <ComingSoonPage
-                title="Accounts"
-                note="Login URLs, account numbers, password-vault references. No raw password storage."
-            />
-        ),
+        accounts: <AccountAccessPage {...pageProps} />,
         documents: (
             <ComingSoonPage
                 title="Documents"
@@ -87,5 +94,13 @@ export default function App() {
 
             {showLoader && <WelcomeLoader exiting={loaderExiting} />}
         </HomeOpsProvider>
+    );
+}
+
+export default function App() {
+    return (
+        <AuthProvider>
+            <HomeOpsApp />
+        </AuthProvider>
     );
 }

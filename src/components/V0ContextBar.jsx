@@ -151,9 +151,24 @@ export default function V0ContextBar({ onOpenHome }) {
     return (
         <>
             <section className="v0-context-strip" aria-label="HomeOps context">
-                <button className="v0-context-strip__home" type="button" onClick={onOpenHome} title="Open Home Settings">
-                    <strong>{selectedHome?.name || (loadingHomes ? "Loading home…" : "Create your first home")}</strong>
-                </button>
+                {/* <button className="v0-context-strip__home" type="button" onClick={onOpenHome} title="Open Property Settings">
+                    <strong>{selectedHome?.name || (loadingHomes ? "Loading property…" : "Create your first property")}</strong>
+                </button> */}
+
+                {homes.length > 1 && (
+                    <label className="v0-context-strip__property-select" aria-label="Selected property">
+                        <span>Property</span>
+                        <select
+                            value={selectedHome?.id || ""}
+                            onChange={(event) => chooseHome(event.target.value)}
+                            disabled={loadingHomes}
+                        >
+                            {homes.map((home) => (
+                                <option value={home.id} key={home.id}>{home.name}</option>
+                            ))}
+                        </select>
+                    </label>
+                )}
 
                 <div className="v0-context-strip__right">
                     <div className={`v0-context-period-controls ${viewMode === "all-time" ? "is-static" : ""}`}>
@@ -185,7 +200,7 @@ export default function V0ContextBar({ onOpenHome }) {
                     <button className="v0-clock-button" type="button" onClick={() => setTimeLensOpen(true)} aria-label="Open Time Lens" title="Open Time Lens">
                         <ClockIcon />
                     </button>
-                    <button className="v0-home-icon-button" type="button" onClick={onOpenHome} aria-label="Open Home Settings" title="Open Home Settings">
+                    <button className="v0-home-icon-button" type="button" onClick={onOpenHome} aria-label="Open Property Settings" title="Open Property Settings">
                         <HomeIcon />
                     </button>
                 </div>
@@ -224,7 +239,7 @@ export default function V0ContextBar({ onOpenHome }) {
                     <div className="v0-context-bar__jump">
                         {homes.length > 1 && (
                             <label>
-                                <span>Home</span>
+                                <span>Property</span>
                                 <select
                                     value={selectedHome?.id || ""}
                                     onChange={(event) => chooseHome(event.target.value)}
@@ -270,7 +285,7 @@ export default function V0ContextBar({ onOpenHome }) {
 
                         <button className="v0-home-settings" type="button" onClick={onOpenHome}>
                             <HomeIcon />
-                            Home Settings
+                            Property Settings
                         </button>
                     </div>
 

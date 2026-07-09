@@ -1,0 +1,303 @@
+@use "tokens" as *;
+@use "mixins" as *;
+
+.budget-compass {
+    margin: 0 0 16px;
+    overflow: hidden;
+}
+
+.budget-compass__header {
+    align-items: flex-start;
+
+    h2 {
+        margin: 5px 0 0;
+    }
+
+    p {
+        margin: 7px 0 0;
+        color: $text-muted;
+        font-size: 13px;
+        line-height: 1.35;
+    }
+}
+
+.budget-compass__body {
+    display: grid;
+    grid-template-columns: minmax(220px, .72fr) minmax(0, 1.35fr);
+    gap: 14px;
+    align-items: stretch;
+}
+
+.budget-compass__status,
+.budget-compass__cards article {
+    border: 1px solid rgba($cyan-primary, .15);
+    background:
+        linear-gradient(135deg, rgba($cyan-primary, .08), rgba($violet-accent, .055)),
+        rgba(8, 13, 22, .68);
+    border-radius: 18px;
+    padding: 15px;
+}
+
+.budget-compass__status {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 134px;
+
+    span {
+        color: $cyan-soft;
+        font-size: 10px;
+        font-weight: 950;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+    }
+
+    strong {
+        display: block;
+        margin-top: 8px;
+        font-family: $font-display;
+        font-size: clamp(28px, 3vw, 42px);
+        line-height: .95;
+        letter-spacing: -.06em;
+    }
+
+    p {
+        margin: 11px 0 0;
+        color: $text-muted;
+        font-size: 13px;
+        line-height: 1.35;
+    }
+
+    &.good {
+        border-color: rgba($success, .35);
+        box-shadow: inset 0 0 0 1px rgba($success, .06), 0 0 28px rgba($success, .08);
+    }
+
+    &.warning {
+        border-color: rgba($warning, .38);
+        box-shadow: inset 0 0 0 1px rgba($warning, .06), 0 0 28px rgba($warning, .08);
+    }
+
+    &.danger {
+        border-color: rgba($danger, .38);
+        box-shadow: inset 0 0 0 1px rgba($danger, .06), 0 0 28px rgba($danger, .08);
+    }
+}
+
+.budget-compass__cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+
+    article {
+        min-height: 134px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    span {
+        color: $text-muted;
+        font-size: 10px;
+        font-weight: 950;
+        letter-spacing: .13em;
+        text-transform: uppercase;
+    }
+
+    strong {
+        display: block;
+        margin-top: 12px;
+        font-family: $font-display;
+        font-size: clamp(22px, 2.2vw, 31px);
+        line-height: .98;
+        letter-spacing: -.055em;
+        white-space: nowrap;
+    }
+
+    small {
+        display: block;
+        margin-top: 10px;
+        color: $text-muted;
+        line-height: 1.25;
+    }
+}
+
+.budget-compass__bars {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+
+    > div {
+        border: 1px solid rgba($line-strong, .5);
+        border-radius: 15px;
+        padding: 12px;
+        background: rgba(5, 8, 15, .42);
+    }
+
+    span,
+    strong {
+        display: block;
+    }
+
+    span {
+        color: $text-muted;
+        font-size: 10px;
+        font-weight: 950;
+        letter-spacing: .13em;
+        text-transform: uppercase;
+    }
+
+    strong {
+        margin-top: 5px;
+        font-family: $font-display;
+        font-size: 18px;
+        letter-spacing: -.04em;
+    }
+
+    i {
+        display: block;
+        height: 8px;
+        margin-top: 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, .065);
+        overflow: hidden;
+    }
+
+    b {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: $gradient-brand;
+        transition: width .28s ease;
+    }
+}
+
+.budget-compass__settings {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+    padding: 12px;
+    border: 1px solid rgba($cyan-primary, .18);
+    border-radius: 18px;
+    background: rgba(4, 7, 13, .45);
+
+    label {
+        display: grid;
+        gap: 6px;
+    }
+
+    span {
+        color: $text-muted;
+        font-size: 10px;
+        font-weight: 950;
+        letter-spacing: .13em;
+        text-transform: uppercase;
+    }
+
+    input {
+        min-height: 42px;
+        border-radius: 13px;
+        border: 1px solid rgba($line-strong, .74);
+        background: rgba(9, 14, 24, .72);
+        color: $text;
+        padding: 0 12px;
+        outline: none;
+        font-weight: 850;
+
+        &:focus {
+            border-color: rgba($cyan-primary, .66);
+            box-shadow: 0 0 0 4px rgba($cyan-primary, .09);
+        }
+    }
+}
+
+.budget-compass__notes {
+    grid-column: 1 / -1;
+}
+
+.budget-compass__settings-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    grid-column: 1 / -1;
+
+    .primary-action,
+    .secondary-action {
+        min-height: 40px;
+        border-radius: 13px;
+        padding: 0 14px;
+        font-weight: 950;
+        cursor: pointer;
+    }
+
+    .secondary-action {
+        border: 1px solid rgba($line-strong, .74);
+        background: rgba(255, 255, 255, .04);
+        color: $text-soft;
+    }
+}
+
+.budget-compass__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+
+    button {
+        min-height: 36px;
+        border-radius: 999px;
+        border: 1px solid rgba($cyan-primary, .20);
+        background: rgba($cyan-primary, .075);
+        color: $text-soft;
+        padding: 0 13px;
+        font-size: 12px;
+        font-weight: 950;
+        cursor: pointer;
+        transition: transform .18s ease, border-color .18s ease, color .18s ease, background .18s ease;
+
+        &:hover {
+            transform: translateY(-1px);
+            border-color: rgba($cyan-primary, .52);
+            background: rgba($cyan-primary, .12);
+            color: white;
+        }
+    }
+}
+
+@media (max-width: 1180px) {
+    .budget-compass__body {
+        grid-template-columns: 1fr;
+    }
+
+    .budget-compass__cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .budget-compass__cards,
+    .budget-compass__bars,
+    .budget-compass__settings {
+        grid-template-columns: 1fr;
+    }
+
+    .budget-compass__status,
+    .budget-compass__cards article {
+        min-height: auto;
+    }
+
+    .budget-compass__cards strong {
+        white-space: normal;
+    }
+
+    .budget-compass__settings-actions {
+        flex-direction: column-reverse;
+
+        .primary-action,
+        .secondary-action {
+            width: 100%;
+        }
+    }
+}
