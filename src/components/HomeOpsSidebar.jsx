@@ -6,6 +6,7 @@ import homeOpsLogoLime from "../assets/brand/homeops-logo-horizontal-lime-transp
 
 import {
     DashboardIcon,
+    PropertyIcon,
     BillsIcon,
     LedgerIcon,
     ReceiptsIcon,
@@ -16,41 +17,56 @@ import {
     AccountsIcon,
     DocumentsIcon,
     ReportsIcon,
-    LockIcon,
 } from "./HomeOpsNavIcons";
 
-const primaryNavItems = [
-    { key: "dashboard", label: "Dashboard", Icon: DashboardIcon },
-    { key: "home", label: "Property Profile", Icon: DashboardIcon },
-    { key: "bills", label: "Bills", Icon: BillsIcon },
-    { key: "ledger", label: "Ledger", Icon: LedgerIcon },
-    { key: "receipts", label: "Receipts", Icon: ReceiptsIcon },
-    { key: "maintenance", label: "Maintenance", Icon: MaintenanceIcon },
-    { key: "wishlist", label: "Needs & Wants", Icon: NeedsWantsIcon },
-    { key: "periods", label: "Spending Periods", Icon: SpendingPeriodsIcon },
+const navGroups = [
+    {
+        label: "Home",
+        items: [
+            { key: "dashboard", label: "Dashboard", Icon: DashboardIcon },
+            { key: "home", label: "Property Profile", Icon: PropertyIcon },
+            { key: "documents", label: "Documents", Icon: DocumentsIcon },
+        ],
+    },
+    {
+        label: "Money",
+        items: [
+            { key: "bills", label: "Bills", Icon: BillsIcon },
+            { key: "ledger", label: "Ledger", Icon: LedgerIcon },
+            { key: "receipts", label: "Receipts", Icon: ReceiptsIcon },
+            { key: "financing", label: "Financing", Icon: FinancingIcon },
+            { key: "reports", label: "Reports", Icon: ReportsIcon },
+        ],
+    },
+    {
+        label: "Planning",
+        items: [
+            { key: "maintenance", label: "Maintenance", Icon: MaintenanceIcon },
+            { key: "wishlist", label: "Needs & Wants", Icon: NeedsWantsIcon },
+            { key: "periods", label: "Spending Periods", Icon: SpendingPeriodsIcon },
+        ],
+    },
+    {
+        label: "Account",
+        items: [
+            { key: "accounts", label: "Account & Access", Icon: AccountsIcon },
+        ],
+    },
 ];
 
-const lockedNavItems = [
-    { key: "financing", label: "Financing", Icon: FinancingIcon, badge: "V1" },
-    { key: "documents", label: "Documents", Icon: DocumentsIcon, badge: "V1" },
-    { key: "reports", label: "Reports", Icon: ReportsIcon, badge: "V2" },
-];
-
-function NavButton({ item, activePage, setActivePage, locked = false, onDone }) {
+function NavButton({ item, activePage, setActivePage, onDone }) {
     const { Icon } = item;
     const isActive = activePage === item.key;
 
     return (
         <button
             type="button"
-            className={`homeops-nav-item ${isActive ? "is-active" : ""} ${locked ? "is-locked" : ""}`}
+            className={`homeops-nav-item ${isActive ? "is-active" : ""}`}
             onClick={() => {
-                if (locked) return;
                 setActivePage(item.key);
                 onDone?.();
             }}
-            disabled={locked}
-            title={locked ? `${item.label} is locked until ${item.badge}` : item.label}
+            title={item.label}
         >
             <span className="homeops-nav-item__main">
                 <span className="homeops-nav-item__icon">
@@ -58,13 +74,6 @@ function NavButton({ item, activePage, setActivePage, locked = false, onDone }) 
                 </span>
                 <span className="homeops-nav-item__label">{item.label}</span>
             </span>
-
-            {locked && (
-                <span className="homeops-nav-item__meta">
-                    <span className="homeops-nav-badge">{item.badge}</span>
-                    <LockIcon className="homeops-nav-lock" />
-                </span>
-            )}
         </button>
     );
 }
@@ -123,6 +132,15 @@ export default function HomeOpsSidebar({ activePage, setActivePage }) {
                     </div>
                 </div>
 
+                {mobileNavOpen && (
+                    <button
+                        type="button"
+                        className="homeops-nav-backdrop"
+                        onClick={closeMobileNav}
+                        aria-label="Close navigation menu"
+                    />
+                )}
+
                 <div className={`homeops-nav__drawer ${mobileNavOpen ? "is-open" : ""}`}>
                     <div className="homeops-nav__drawer-head">
                         <img src={homeOpsLogo} alt="HomeOps" className="homeops-nav__drawer-logo homeops-nav__logo--default" />
@@ -139,33 +157,21 @@ export default function HomeOpsSidebar({ activePage, setActivePage }) {
                     </div>
 
                     <nav className="homeops-nav-list" aria-label="HomeOps navigation">
-                        {primaryNavItems.map((item) => (
-                            <NavButton
-                                key={item.key}
-                                item={item}
-                                activePage={activePage}
-                                setActivePage={setActivePage}
-                                onDone={closeMobileNav}
-                            />
-                        ))}
-
-                        <div className="homeops-nav-divider" />
-
-                        <NavButton
-                            item={{ key: "accounts", label: "Account & Access", Icon: AccountsIcon }}
-                            activePage={activePage}
-                            setActivePage={setActivePage}
-                            onDone={closeMobileNav}
-                        />
-
-                        {lockedNavItems.map((item) => (
-                            <NavButton
-                                key={item.key}
-                                item={item}
-                                activePage={activePage}
-                                setActivePage={setActivePage}
-                                locked
-                            />
+                        {navGroups.map((group) => (
+                            <section className="homeops-nav-group" key={group.label} aria-label={group.label}>
+                                <h2 className="homeops-nav-group__label">{group.label}</h2>
+                                <div className="homeops-nav-group__items">
+                                    {group.items.map((item) => (
+                                        <NavButton
+                                            key={item.key}
+                                            item={item}
+                                            activePage={activePage}
+                                            setActivePage={setActivePage}
+                                            onDone={closeMobileNav}
+                                        />
+                                    ))}
+                                </div>
+                            </section>
                         ))}
                     </nav>
 
@@ -175,15 +181,6 @@ export default function HomeOpsSidebar({ activePage, setActivePage }) {
                     </div>
                 </div>
             </aside>
-
-            {mobileNavOpen && (
-                <button
-                    type="button"
-                    className="homeops-nav-backdrop"
-                    onClick={closeMobileNav}
-                    aria-label="Close navigation menu"
-                />
-            )}
         </>
     );
 }

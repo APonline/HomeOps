@@ -9,8 +9,8 @@ export const primaryNavItems = [
 ];
 
 export const lockedNavItems = [
-  { key: "financing", label: "Financing", icon: "financing", badge: "V1", locked: true },
-  { key: "accounts", label: "Accounts", icon: "accounts", badge: "V1", locked: true, note: "Accounts is locked until V1" },
-  { key: "documents", label: "Documents", icon: "documents", badge: "V1", locked: true },
-  { key: "reports", label: "Reports", icon: "reports", badge: "V2", locked: true },
+  { key: "financing", label: "Financing", icon: "financing" },
+  { key: "accounts", label: "Accounts", icon: "accounts" },
+  { key: "documents", label: "Documents", icon: "documents" },
+  { key: "reports", label: "Reports", icon: "reports" },
 ];

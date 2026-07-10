@@ -10,10 +10,10 @@ const navItems = [
     { key: "wishlist", label: "Needs & Wants", enabled: true },
     { key: "periods", label: "Spending Periods", enabled: true },
 
-    { key: "financing", label: "Financing", enabled: false, badge: "V1" },
-    { key: "accounts", label: "Accounts", enabled: false, badge: "V1" },
-    { key: "documents", label: "Documents", enabled: false, badge: "V1" },
-    { key: "reports", label: "Reports", enabled: false, badge: "V2" },
+    { key: "financing", label: "Financing", enabled: true },
+    { key: "accounts", label: "Accounts", enabled: true },
+    { key: "documents", label: "Documents", enabled: true },
+    { key: "reports", label: "Reports", enabled: true },
 ];
 
 export default function Sidebar({ activePage, onPageChange }) {

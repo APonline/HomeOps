@@ -19,7 +19,7 @@ export default function AccountAccessPage({ goToPage }) {
             <header className="page-header">
                 <div>
                     <h1>Account & Access</h1>
-                    <p>V1 foundation is active: login is required, properties are scoped, and HomeOps is ready for owner/editor/viewer roles.</p>
+                    <p>Manage your sign-in, properties, and who can access each property.</p>
                 </div>
                 <div className="page-actions">
                     <button className="ghost-action" type="button" onClick={() => reloadHomes()}>Refresh access</button>

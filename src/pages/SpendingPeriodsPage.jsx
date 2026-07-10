@@ -79,7 +79,7 @@ export default function SpendingPeriodsPage({ refreshToken, refreshEverything })
                     <h2>Tracked Periods</h2>
 
                     <div className="panel-header__actions">
-                        <span>{loading ? "loading" : `${periods.length} active`}</span>
+                        <span>{loading ? "Loading…" : `${periods.length} ${periods.length === 1 ? "period" : "periods"}`}</span>
                         <button
                             className="page-primary-action page-primary-action--compact"
                             type="button"
@@ -95,13 +95,13 @@ export default function SpendingPeriodsPage({ refreshToken, refreshEverything })
 
                 {error && <div className="form-error">{error}</div>}
                 {loading && <div className="empty-box">Loading periods...</div>}
-                {!loading && periods.length === 0 && <div className="empty-box">No periods yet. Add one with + Period.</div>}
+                {!loading && periods.length === 0 && <div className="empty-box">No spending periods yet. Add one with + Period.</div>}
 
                 <div className="period-list wide">
                     {periods.map((period) => (
                         <article className={`period-card ${period.tone || "red"}`} key={period.id}>
                             <strong>{period.name || period.title}</strong>
-                            <p>{period.dates} · {money(period.amount)} linked · {period.entry_count || 0} entries</p>
+                            <p>{period.dates} · {money(period.amount)} linked · {period.entry_count || 0} entries{period.timing_label ? ` · ${period.timing_label}` : ""}</p>
                             {period.description && <small>{period.description}</small>}
                         </article>
                     ))}

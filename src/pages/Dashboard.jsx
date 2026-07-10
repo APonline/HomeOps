@@ -3,7 +3,6 @@ import MetricCard from "../components/MetricCard";
 import PeriodChart from "../components/PeriodChart";
 import DashboardBillsList from "../components/DashboardBillsList";
 import BudgetCompass from "../components/BudgetCompass";
-import V0FoundationStatus from "../components/V0FoundationStatus";
 import Modal from "../components/Modal";
 import { useHomeOps } from "../context/HomeOpsContext";
 import {
@@ -385,7 +384,6 @@ export default function Dashboard({ refreshToken, refreshEverything, goToPage })
                     apiContext={apiContext}
                 />
 
-                <V0FoundationStatus apiContext={apiContext} goToPage={goToPage} />
 
                 <main className="dashboard-grid dashboard-grid--balanced">
                     <section className="panel chart-panel chart-panel--full">

@@ -552,45 +552,65 @@ export default function HomeProfilePage({ refreshEverything }) {
                             onToggle={toggleSection}
                             onInfo={setInfoModal}
                         >
-                            <div className="v0-structure-grid">
-                                <article className="v0-structure-card">
+                            <div className="v0-structure-grid v0-structure-grid--rows">
+                                <article className="v0-structure-card v0-structure-row">
                                     <button className="v0-structure-add" type="button" onClick={() => setActiveModal("room")} aria-label="Add room" title="Add room"><PlusIcon /></button>
-                                    <span>{rooms.length} saved</span>
-                                    <h3>Rooms</h3>
-                                    <p>Simple locations for spending and projects: living room, kitchen, studio, bedroom, bathroom, balcony.</p>
-                                    {rooms.length > 0 && <div className="v0-chip-list">{rooms.map((room) => <span key={room.id}>{room.name}</span>)}</div>}
+                                    <div className="v0-structure-row__heading">
+                                        <span>{rooms.length} saved</span>
+                                        <h3>Rooms</h3>
+                                    </div>
+                                    <p className="v0-structure-row__description">Simple locations for spending and projects: living room, kitchen, studio, bedroom, bathroom, balcony.</p>
+                                    <div className="v0-structure-row__content">
+                                        {rooms.length > 0 ? (
+                                            <div className="v0-chip-list">{rooms.map((room) => <span key={room.id}>{room.name}</span>)}</div>
+                                        ) : (
+                                            <span className="v0-structure-row__empty">No rooms saved yet.</span>
+                                        )}
+                                    </div>
                                 </article>
 
-                                <article className="v0-structure-card">
+                                <article className="v0-structure-card v0-structure-row">
                                     <button className="v0-structure-add" type="button" onClick={() => setActiveModal("asset")} aria-label="Add asset" title="Add asset"><PlusIcon /></button>
-                                    <span>{assets.length} saved</span>
-                                    <h3>Assets</h3>
-                                    <p>Track systems or items with repair, warranty, document or receipt history.</p>
-                                    {assets.length > 0 && (
-                                        <div className="record-list compact-record-list">
-                                            {assets.slice(0, 4).map((asset) => (
-                                                <article className="record-row" key={asset.id}>
-                                                    <div><strong>{asset.name}</strong><p>{asset.asset_type || "asset"}{asset.room?.name ? ` · ${asset.room.name}` : ""}</p></div>
-                                                </article>
-                                            ))}
-                                        </div>
-                                    )}
+                                    <div className="v0-structure-row__heading">
+                                        <span>{assets.length} saved</span>
+                                        <h3>Assets</h3>
+                                    </div>
+                                    <p className="v0-structure-row__description">Track systems or items with repair, warranty, document or receipt history.</p>
+                                    <div className="v0-structure-row__content">
+                                        {assets.length > 0 ? (
+                                            <div className="record-list compact-record-list v0-structure-row__records">
+                                                {assets.slice(0, 4).map((asset) => (
+                                                    <article className="record-row" key={asset.id}>
+                                                        <div><strong>{asset.name}</strong><p>{asset.asset_type || "asset"}{asset.room?.name ? ` · ${asset.room.name}` : ""}</p></div>
+                                                    </article>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <span className="v0-structure-row__empty">No assets saved yet.</span>
+                                        )}
+                                    </div>
                                 </article>
 
-                                <article className="v0-structure-card">
+                                <article className="v0-structure-card v0-structure-row">
                                     <button className="v0-structure-add" type="button" onClick={() => setActiveModal("event")} aria-label="Add timeline event" title="Add timeline event"><PlusIcon /></button>
-                                    <span>{timeline.length} saved</span>
-                                    <h3>Timeline</h3>
-                                    <p>Explain abnormal months with closing, move-in, paint weekend, AC repair, setup or upgrade events.</p>
-                                    {timeline.length > 0 && (
-                                        <div className="record-list compact-record-list">
-                                            {timeline.slice(0, 4).map((event) => (
-                                                <article className="record-row" key={event.id}>
-                                                    <div><strong>{event.title}</strong><p>{event.event_date} · {event.event_type}</p></div>
-                                                </article>
-                                            ))}
-                                        </div>
-                                    )}
+                                    <div className="v0-structure-row__heading">
+                                        <span>{timeline.length} saved</span>
+                                        <h3>Timeline</h3>
+                                    </div>
+                                    <p className="v0-structure-row__description">Explain abnormal months with closing, move-in, paint weekend, AC repair, setup or upgrade events.</p>
+                                    <div className="v0-structure-row__content">
+                                        {timeline.length > 0 ? (
+                                            <div className="record-list compact-record-list v0-structure-row__records">
+                                                {timeline.slice(0, 4).map((event) => (
+                                                    <article className="record-row" key={event.id}>
+                                                        <div><strong>{event.title}</strong><p>{event.event_date} · {event.event_type}</p></div>
+                                                    </article>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <span className="v0-structure-row__empty">No timeline events saved yet.</span>
+                                        )}
+                                    </div>
                                 </article>
                             </div>
                         </HubAccordion>
@@ -615,7 +635,7 @@ export default function HomeProfilePage({ refreshEverything }) {
                 active={activeModal === "home"}
                 onClose={() => setActiveModal(null)}
                 title={hasHome ? "Edit Property" : "Create Property"}
-                intro="Keep this light. V0 only needs enough property identity and baseline cost context to make every module feel grounded."
+                intro="Add the property details and baseline monthly costs HomeOps uses across bills, reports, and planning."
                 size="wide"
             >
                 <form className="form-grid" onSubmit={saveHome}>

@@ -162,6 +162,7 @@ export default function V0ContextBar({ onOpenHome }) {
                             value={selectedHome?.id || ""}
                             onChange={(event) => chooseHome(event.target.value)}
                             disabled={loadingHomes}
+                            title="Switch property"
                         >
                             {homes.map((home) => (
                                 <option value={home.id} key={home.id}>{home.name}</option>

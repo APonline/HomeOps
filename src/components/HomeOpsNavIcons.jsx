@@ -15,6 +15,11 @@ export const DashboardIcon = (props) => (
   <svg {...base} {...props}><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
 );
 
+
+export const PropertyIcon = (props) => (
+  <svg {...base} {...props}><path d="M3.5 11.2 12 4l8.5 7.2"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M9.5 20v-5h5v5"/></svg>
+);
+
 export const BillsIcon = (props) => (
   <svg {...base} {...props}><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6"/><path d="M10 17h6"/><path d="M10 9h1"/></svg>
 );
@@ -61,6 +66,7 @@ export const LockIcon = (props) => (
 
 export const iconMap = {
   dashboard: DashboardIcon,
+  property: PropertyIcon,
   bills: BillsIcon,
   ledger: LedgerIcon,
   receipts: ReceiptsIcon,

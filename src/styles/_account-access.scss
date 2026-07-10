@@ -183,3 +183,63 @@
         display: grid;
     }
 }
+
+/* Account settings form repair: the generic 12-column form grid made each
+   label occupy a single column, producing tiny inputs and wrapped labels. */
+.account-settings-modal {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+}
+
+.account-settings-panel {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.15rem;
+}
+
+.account-settings-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.85rem;
+    min-width: 0;
+}
+
+.account-settings-fields label {
+    display: grid;
+    min-width: 0;
+    gap: 0.45rem;
+    color: var(--muted);
+    font-size: 0.64rem;
+    font-weight: 800;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+}
+
+.account-settings-fields label > span {
+    display: block;
+    white-space: nowrap;
+}
+
+.account-settings-fields input {
+    width: 100%;
+    min-width: 0;
+}
+
+.account-settings-actions {
+    width: 100%;
+    margin-top: auto;
+}
+
+.account-settings-actions .primary-action {
+    width: 100%;
+    min-width: 0;
+}
+
+@media (max-width: 820px) {
+    .account-settings-modal {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

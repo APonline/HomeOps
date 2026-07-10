@@ -2,9 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { getV0Status } from "../lib/homeopsApi";
 
 const statusLabels = {
-    ready: "Ready",
-    warning: "Review",
-    blocked: "Blocked",
+    ready: "Complete",
+    warning: "Optional",
+    blocked: "Needs attention",
 };
 
 const groupLabels = {
@@ -34,7 +34,7 @@ export default function V0FoundationStatus({ apiContext, goToPage }) {
             const json = await getV0Status(apiContext);
             setStatus(json || null);
         } catch (err) {
-            setError(err.message || "Could not load V0 status.");
+            setError(err.message || "Could not load setup status.");
         } finally {
             setLoading(false);
         }
@@ -49,21 +49,21 @@ export default function V0FoundationStatus({ apiContext, goToPage }) {
     const total = status?.total_count || 0;
     const ready = status?.ready_count || 0;
     const percent = total ? Math.round((ready / total) * 100) : 0;
-    const headline = status?.guidance?.headline || "Checking V0 foundation...";
-    const body = status?.guidance?.body || "HomeOps is checking home identity, time lens, core bills, records, rooms/assets and module context.";
+    const headline = status?.guidance?.headline || "Checking home setup...";
+    const body = status?.guidance?.body || "HomeOps is checking your property details, bills, records, rooms, and assets.";
 
     return (
         <section className="v0-foundation-status panel">
             <div className="v0-foundation-status__header">
                 <div>
-                    <span className="v0-foundation-status__eyebrow">V0 Wrap-Up</span>
-                    <h2>Foundation Status</h2>
+                    <span className="v0-foundation-status__eyebrow">Home setup</span>
+                    <h2>Setup Status</h2>
                     <p>{headline}</p>
                 </div>
 
                 <div className={`v0-foundation-status__score ${status?.v1_ready ? "is-ready" : ""}`}>
                     <strong>{loading ? "…" : `${percent}%`}</strong>
-                    <span>{status?.v1_ready ? "V1-ready" : "V0 check"}</span>
+                    <span>{loading ? "Checking" : "complete"}</span>
                 </div>
             </div>
 

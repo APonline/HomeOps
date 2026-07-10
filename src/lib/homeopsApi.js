@@ -143,8 +143,20 @@ async function parseResponse(response) {
         const validationMessage = json?.errors
             ? Object.values(json.errors).flat().join(" ")
             : json?.message;
+        const containsDatabaseDetails = /SQLSTATE\[|Connection:\s|Database:\s|\bselect\s+.+\s+from\s+/i.test(validationMessage || "");
 
-        throw new Error(validationMessage || "HomeOps API request failed.");
+        if (containsDatabaseDetails && typeof console !== "undefined") {
+            console.error("HomeOps API database error", {
+                status: response.status,
+                detail: validationMessage,
+            });
+        }
+
+        throw new Error(
+            containsDatabaseDetails
+                ? "This section could not be loaded. Please try again."
+                : (validationMessage || "HomeOps API request failed.")
+        );
     }
 
     return json;
@@ -182,6 +194,16 @@ export async function apiPatch(url, payload = {}) {
     return parseResponse(response);
 }
 
+
+export async function apiDelete(url) {
+    const response = await fetch(apiUrl(url), {
+        method: "DELETE",
+        headers: authHeaders(),
+    });
+
+    return parseResponse(response);
+}
+
 export function getHomes(context = {}) {
     return apiGet(withContextQuery("/api/homeops/homes", context));
 }
@@ -196,6 +218,10 @@ export function updateHome(homeId, payload) {
 
 export function getHome(homeId) {
     return apiGet(`/api/homeops/homes/${homeId}`);
+}
+
+export function getHomeRooms(homeId) {
+    return apiGet(`/api/homeops/homes/${homeId}/rooms`);
 }
 
 export function addRoom(homeId, payload) {
@@ -249,12 +275,7 @@ export function updateBill(billId, payload = {}, context = {}) {
 }
 
 export function deleteBill(billId, context = {}) {
-    const response = fetch(apiUrl(withContextQuery(`/api/homeops/bills/${billId}`, context)), {
-        method: "DELETE",
-        headers: authHeaders(),
-    });
-
-    return response.then(parseResponse);
+    return apiDelete(withContextQuery(`/api/homeops/bills/${billId}`, context));
 }
 
 export function markBillPaid(billId, payload = {}, context = {}) {
@@ -289,6 +310,26 @@ export function createReceipt(payload, context = {}) {
     return apiPost("/api/homeops/receipts", withHomePayload(payload, context));
 }
 
+export function getReceipts(context = {}) {
+    return apiGet(withContextQuery("/api/homeops/receipts", context));
+}
+
+export function updateReceipt(receiptId, payload, context = {}) {
+    return apiPatch(`/api/homeops/receipts/${receiptId}`, withHomePayload(payload, context));
+}
+
+export function deleteReceipt(receiptId, context = {}) {
+    return apiDelete(withContextQuery(`/api/homeops/receipts/${receiptId}`, context));
+}
+
+export function updateLedgerEntry(entryId, payload, context = {}) {
+    return apiPatch(`/api/homeops/ledger-entries/${entryId}`, withHomePayload(payload, context));
+}
+
+export function deleteLedgerEntry(entryId, context = {}) {
+    return apiDelete(withContextQuery(`/api/homeops/ledger-entries/${entryId}`, context));
+}
+
 export function getSpendingPeriods(contextOrMonth = HOMEOPS_MONTH) {
     if (typeof contextOrMonth === "string") {
         return apiGet(`/api/homeops/spending-periods?month=${encodeURIComponent(contextOrMonth)}`);
@@ -299,6 +340,14 @@ export function getSpendingPeriods(contextOrMonth = HOMEOPS_MONTH) {
 
 export function createSpendingPeriod(payload, context = {}) {
     return apiPost("/api/homeops/spending-periods", withHomePayload(payload, context));
+}
+
+export function updateSpendingPeriod(periodId, payload, context = {}) {
+    return apiPatch(`/api/homeops/spending-periods/${periodId}`, withHomePayload(payload, context));
+}
+
+export function deleteSpendingPeriod(periodId, context = {}) {
+    return apiDelete(withContextQuery(`/api/homeops/spending-periods/${periodId}`, context));
 }
 
 export function getMaintenanceItems(context = {}) {
@@ -313,6 +362,22 @@ export function completeMaintenanceItem(itemId, payload = {}, context = {}) {
     return apiPatch(`/api/homeops/maintenance-items/${itemId}/complete`, withHomePayload(payload, context));
 }
 
+export function restockMaintenanceItem(itemId, payload = {}, context = {}) {
+    return apiPatch(`/api/homeops/maintenance-items/${itemId}/restock`, withHomePayload(payload, context));
+}
+
+export function updateMaintenanceItem(itemId, payload, context = {}) {
+    return apiPatch(`/api/homeops/maintenance-items/${itemId}`, withHomePayload(payload, context));
+}
+
+export function deleteMaintenanceItem(itemId, context = {}) {
+    return apiDelete(withContextQuery(`/api/homeops/maintenance-items/${itemId}`, context));
+}
+
+export function getMaintenanceLogs(itemId, context = {}) {
+    return apiGet(withContextQuery(`/api/homeops/maintenance-items/${itemId}/logs`, context));
+}
+
 export function getWishlistItems(context = {}) {
     return apiGet(withContextQuery("/api/homeops/wishlist-items", context));
 }
@@ -323,6 +388,50 @@ export function createWishlistItem(payload, context = {}) {
 
 export function markWishlistPurchased(itemId, payload = {}, context = {}) {
     return apiPatch(`/api/homeops/wishlist-items/${itemId}/purchased`, withHomePayload(payload, context));
+}
+
+export function updateWishlistItem(itemId, payload, context = {}) {
+    return apiPatch(`/api/homeops/wishlist-items/${itemId}`, withHomePayload(payload, context));
+}
+
+export function deleteWishlistItem(itemId, context = {}) {
+    return apiDelete(withContextQuery(`/api/homeops/wishlist-items/${itemId}`, context));
+}
+
+export function getFinancialAccounts(context = {}) {
+    return apiGet(withContextQuery("/api/homeops/financial-accounts", context));
+}
+
+export function createFinancialAccount(payload, context = {}) {
+    return apiPost("/api/homeops/financial-accounts", withHomePayload(payload, context));
+}
+
+export function updateFinancialAccount(accountId, payload, context = {}) {
+    return apiPatch(`/api/homeops/financial-accounts/${accountId}`, withHomePayload(payload, context));
+}
+
+export function deleteFinancialAccount(accountId, context = {}) {
+    return apiDelete(withContextQuery(`/api/homeops/financial-accounts/${accountId}`, context));
+}
+
+export function getDocuments(context = {}) {
+    return apiGet(withContextQuery("/api/homeops/documents", context));
+}
+
+export function createDocument(payload, context = {}) {
+    return apiPost("/api/homeops/documents", withHomePayload(payload, context));
+}
+
+export function updateDocument(documentId, payload, context = {}) {
+    return apiPatch(`/api/homeops/documents/${documentId}`, withHomePayload(payload, context));
+}
+
+export function deleteDocument(documentId, context = {}) {
+    return apiDelete(withContextQuery(`/api/homeops/documents/${documentId}`, context));
+}
+
+export function getReports(context = {}) {
+    return apiGet(withContextQuery("/api/homeops/reports", context));
 }
 
 export function getV0Status(context = {}) {

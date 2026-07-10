@@ -72,7 +72,7 @@ export default function AccountSettingsModal({ active, onClose }) {
             active={active}
             onClose={onClose}
             title="Account settings"
-            intro="Keep this lightweight. Your profile and password live here without turning Account & Access into another heavy section."
+            intro="Manage your profile and sign-in security."
             size="wide"
         >
             <div className="account-settings-modal">
@@ -83,7 +83,7 @@ export default function AccountSettingsModal({ active, onClose }) {
                         <p>This is the account attached to your property access.</p>
                     </div>
 
-                    <div className="form-grid two-columns">
+                    <div className="account-settings-fields">
                         <label>
                             <span>Name</span>
                             <input
@@ -122,7 +122,7 @@ export default function AccountSettingsModal({ active, onClose }) {
                         <p>Use a strong password because this account protects real property records.</p>
                     </div>
 
-                    <div className="form-grid">
+                    <div className="account-settings-fields">
                         <label>
                             <span>Current password</span>
                             <input
@@ -134,7 +134,7 @@ export default function AccountSettingsModal({ active, onClose }) {
                         </label>
                     </div>
 
-                    <div className="form-grid two-columns">
+                    <div className="account-settings-fields">
                         <label>
                             <span>New password</span>
                             <input

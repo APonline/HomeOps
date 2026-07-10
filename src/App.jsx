@@ -9,10 +9,13 @@ import LedgerPage from "./pages/LedgerPage";
 import SpendingPeriodsPage from "./pages/SpendingPeriodsPage";
 import MaintenancePage from "./pages/MaintenancePage";
 import WishlistPage from "./pages/WishlistPage";
-import ComingSoonPage from "./pages/ComingSoonPage";
 import AccountAccessPage from "./pages/AccountAccessPage";
 import HomeProfilePage from "./pages/HomeProfilePage";
 import LoginPage from "./pages/LoginPage";
+import ReceiptsPage from "./pages/ReceiptsPage";
+import FinancingPage from "./pages/FinancingPage";
+import DocumentsPage from "./pages/DocumentsPage";
+import ReportsPage from "./pages/ReportsPage";
 
 import "./styles/index.scss";
 
@@ -61,29 +64,14 @@ function HomeOpsApp() {
         home: <HomeProfilePage {...pageProps} />,
         bills: <BillsPage {...pageProps} />,
         ledger: <LedgerPage {...pageProps} />,
-        receipts: <LedgerPage {...pageProps} receiptMode />,
+        receipts: <ReceiptsPage {...pageProps} />,
         maintenance: <MaintenancePage {...pageProps} />,
         wishlist: <WishlistPage {...pageProps} />,
         periods: <SpendingPeriodsPage {...pageProps} />,
-        financing: (
-            <ComingSoonPage
-                title="Financing"
-                note="Mortgage, LOC, credit cards, payoff experiments. This is V1/V2 so MVP stays clean."
-            />
-        ),
+        financing: <FinancingPage {...pageProps} />,
         accounts: <AccountAccessPage {...pageProps} />,
-        documents: (
-            <ComingSoonPage
-                title="Documents"
-                note="Mortgage docs, condo rules, warranties, manuals, proof of residency."
-            />
-        ),
-        reports: (
-            <ComingSoonPage
-                title="Reports"
-                note="Historical spend, month-over-month, fixed vs chaos, category breakdowns."
-            />
-        ),
+        documents: <DocumentsPage {...pageProps} />,
+        reports: <ReportsPage {...pageProps} />,
     };
 
     return (
