@@ -177,3 +177,37 @@
 .modal-card--wide {
     max-height: calc(100dvh - 40px);
 }
+
+.form-error {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.financing-generated-name {
+    display: grid;
+    gap: 5px;
+    padding: 13px 15px;
+    border: 1px solid $line;
+    border-radius: 13px;
+    background: rgba(5, 8, 15, .48);
+
+    > span {
+        color: $text-muted;
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+
+    > strong {
+        color: $text;
+        font-family: $font-display;
+        font-size: 17px;
+    }
+
+    > small {
+        color: $text-muted;
+        font-size: 12px;
+    }
+}

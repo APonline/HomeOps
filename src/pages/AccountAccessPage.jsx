@@ -7,7 +7,7 @@ import AccountSettingsModal from "../components/AccountSettingsModal";
 export default function AccountAccessPage({ goToPage }) {
     const { user, logout } = useAuth();
     const [accountSettingsOpen, setAccountSettingsOpen] = useState(false);
-    const { homes, selectedHome, homeId, chooseHome, loadingHomes, homesError, reloadHomes } = useHomeOps();
+    const { homes, selectedHome, homeId, chooseHome, loadingHomes, homesError, reloadHomes, openPropertySetup } = useHomeOps();
 
     function handleChooseProperty(propertyId) {
         chooseHome(propertyId);
@@ -23,7 +23,7 @@ export default function AccountAccessPage({ goToPage }) {
                 </div>
                 <div className="page-actions">
                     <button className="ghost-action" type="button" onClick={() => reloadHomes()}>Refresh access</button>
-                    <button className="primary-action" type="button" onClick={() => goToPage?.("home")}>Create / edit property</button>
+                    <button className="primary-action" type="button" onClick={openPropertySetup}>Set up new property</button>
                 </div>
             </header>
 
@@ -63,7 +63,7 @@ export default function AccountAccessPage({ goToPage }) {
                     <div className="empty-box account-access-empty">
                         <strong>No properties attached yet.</strong>
                         <p>This is why you are seeing “Create your first property.” Create one property anchor first, then the rest of HomeOps can attach records correctly.</p>
-                        <button className="primary-action" type="button" onClick={() => goToPage?.("home")}>Create first property</button>
+                        <button className="primary-action" type="button" onClick={openPropertySetup}>Set up first property</button>
                     </div>
                 )}
 

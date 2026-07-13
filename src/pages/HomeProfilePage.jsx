@@ -211,7 +211,7 @@ function HubAccordion({ id, title, subtitle, open, onToggle, onInfo, children })
 }
 
 export default function HomeProfilePage({ refreshEverything }) {
-    const { selectedHome, homeId, reloadHomes, apiContext } = useHomeOps();
+    const { selectedHome, homeId, reloadHomes, apiContext, openPropertySetup } = useHomeOps();
     const [profile, setProfile] = useState({ home: selectedHome, rooms: [], assets: [], timeline: [] });
     const [form, setForm] = useState(formFromHome(selectedHome));
     const [roomForm, setRoomForm] = useState(defaultRoomForm);
@@ -283,7 +283,7 @@ export default function HomeProfilePage({ refreshEverything }) {
     const hasHome = Boolean(home?.id);
 
     const monthlyItems = useMemo(() => ([
-        ["Mortgage", home?.mortgage_payment],
+        [home?.occupancy_status === "tenant" ? "Rent" : "Mortgage", home?.mortgage_payment],
         ["HOA / Condo", home?.hoa_fee],
         ["Property Tax", home?.property_tax],
         ["Insurance", home?.insurance],
@@ -428,6 +428,7 @@ export default function HomeProfilePage({ refreshEverything }) {
                     <p>{home?.name ? `${home.name} is the property anchor for the rest of HomeOps.` : "Create the property anchor first."}</p>
                     {error && <div className="form-error">{error}</div>}
                 </div>
+                {hasHome && <button className="page-primary-action page-primary-action--compact" type="button" onClick={openPropertySetup}>+ New property</button>}
             </header>
 
             {!hasHome && (
@@ -437,7 +438,7 @@ export default function HomeProfilePage({ refreshEverything }) {
                         <strong>Create your first property</strong>
                         <p>HomeOps needs one property anchor before bills, ledger entries, receipts, maintenance and periods can feel like they belong somewhere.</p>
                     </div>
-                    <button type="button" onClick={openHomeModal}>Create Property</button>
+                    <button type="button" onClick={openPropertySetup}>Set up Property</button>
                 </section>
             )}
 

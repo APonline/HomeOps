@@ -3,9 +3,10 @@ import HomeOpsSidebar from "./HomeOpsSidebar";
 import V0ContextBar from "./V0ContextBar";
 import HomeOpsDataLoader from "./HomeOpsDataLoader";
 import { useHomeOps } from "../context/HomeOpsContext";
+import PropertySetupWizard from "./PropertySetupWizard";
 
 export default function AppShell({ activePage, children, setActivePage }) {
-    const { homeId, viewMode, selectedYear, selectedMonth, selectedDay } = useHomeOps();
+    const { homeId, viewMode, selectedYear, selectedMonth, selectedDay, propertySetupOpen } = useHomeOps();
     const contentKey = `${activePage}-${homeId || "no-home"}-${viewMode}-${selectedYear}-${selectedMonth}-${selectedDay}`;
     const firstRender = useRef(true);
     const [transitioning, setTransitioning] = useState(false);
@@ -32,6 +33,7 @@ export default function AppShell({ activePage, children, setActivePage }) {
                     {children}
                 </main>
             </div>
+            <PropertySetupWizard active={propertySetupOpen} onDone={setActivePage} />
         </div>
     );
 }

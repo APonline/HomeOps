@@ -1,0 +1,197 @@
+/*
+ * Light-mode visual polish.
+ * Loaded last so the green/lime identity wins over older dark-first rules.
+ */
+
+/* The dashboard no longer exposes transport/debug status as a visible badge. */
+.api-pill {
+    display: none !important;
+}
+
+/* Keep paired loader marks theme-aware. */
+.v0-data-loader__logo--light {
+    display: none;
+}
+
+:root[data-theme="light"] .v0-data-loader__logo--dark {
+    display: none;
+}
+
+:root[data-theme="light"] .v0-data-loader__logo--light {
+    display: block;
+}
+
+:root[data-theme="light"] .v0-data-loader__mark img {
+    filter:
+        drop-shadow(0 0 18px rgba(121, 211, 56, .30))
+        drop-shadow(0 0 24px rgba(38, 172, 91, .22));
+}
+
+:root[data-theme="light"] .v0-data-loader__gear {
+    background:
+        repeating-conic-gradient(
+            from 0deg,
+            rgba(174, 255, 48, .96) 0deg 10deg,
+            transparent 10deg 22deg,
+            rgba(36, 184, 97, .92) 22deg 32deg,
+            transparent 32deg 46deg
+        );
+}
+
+/* Page-title accents use the light-mode brand rather than night cyan/violet. */
+:root[data-theme="light"] .topbar h1::after,
+:root[data-theme="light"] .page-header h1::after,
+:root[data-theme="light"] .topbar.v0-command-header h1::after,
+:root[data-theme="light"] .page-header.v0-property-header h1::after {
+    background: linear-gradient(90deg, #b9ff3f 0%, #24b861 100%) !important;
+    box-shadow: 0 0 18px rgba(66, 184, 81, .24) !important;
+}
+
+/* Green-to-lime glass outlines for light-mode surfaces using brand-border. */
+:root[data-theme="light"] .panel::before,
+:root[data-theme="light"] .v0-context-strip::before,
+:root[data-theme="light"] .v0-context-bar::before,
+:root[data-theme="light"] .modal-card::before {
+    background: linear-gradient(
+        135deg,
+        rgba(185, 255, 63, .92),
+        rgba(36, 184, 97, .68),
+        transparent 64%
+    ) !important;
+}
+
+/* Make the sticky context rail actually obscure and blur scrolling content. */
+:root[data-theme="light"] .v0-context-strip {
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, .92), rgba(242, 249, 235, .88)),
+        rgba(249, 252, 244, .90) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(.88) !important;
+    backdrop-filter: blur(24px) saturate(.88) !important;
+    box-shadow:
+        0 14px 36px rgba(49, 83, 43, .13),
+        inset 0 1px 0 rgba(255, 255, 255, .94) !important;
+}
+
+/* Property Hub still had several dark-first cards nested inside light panels. */
+:root[data-theme="light"] .v0-mini-metric {
+    border-color: rgba(76, 170, 72, .26) !important;
+    background:
+        radial-gradient(circle at 12% 0%, rgba(190, 255, 71, .18), transparent 48%),
+        linear-gradient(145deg, rgba(255, 255, 255, .94), rgba(242, 249, 235, .82)) !important;
+    color: #142119 !important;
+    box-shadow:
+        0 14px 32px rgba(56, 92, 48, .08),
+        inset 0 1px 0 rgba(255, 255, 255, .96) !important;
+}
+
+:root[data-theme="light"] .v0-mini-metric span {
+    color: #4e7855 !important;
+}
+
+:root[data-theme="light"] .v0-mini-metric strong {
+    color: #132018 !important;
+}
+
+:root[data-theme="light"] .v0-mini-metric small {
+    color: #607064 !important;
+}
+
+:root[data-theme="light"] .v0-structure-card,
+:root[data-theme="light"] .v0-structure-row {
+    border-color: rgba(66, 160, 71, .24) !important;
+    background:
+        radial-gradient(circle at 0% 0%, rgba(181, 255, 58, .12), transparent 44%),
+        linear-gradient(145deg, rgba(255, 255, 255, .92), rgba(241, 248, 235, .78)) !important;
+    color: #142119 !important;
+    box-shadow:
+        0 14px 34px rgba(52, 88, 47, .08),
+        inset 0 1px 0 rgba(255, 255, 255, .94) !important;
+}
+
+:root[data-theme="light"] .v0-structure-card h3,
+:root[data-theme="light"] .v0-structure-row__heading h3 {
+    color: #17231a !important;
+}
+
+:root[data-theme="light"] .v0-structure-card > span,
+:root[data-theme="light"] .v0-structure-row__heading > span {
+    color: #23833e !important;
+}
+
+:root[data-theme="light"] .v0-structure-card p,
+:root[data-theme="light"] .v0-structure-row__description,
+:root[data-theme="light"] .v0-structure-row__empty {
+    color: #5c6d60 !important;
+}
+
+:root[data-theme="light"] .v0-structure-card .v0-structure-add {
+    border-color: rgba(47, 163, 72, .34) !important;
+    background: rgba(255, 255, 255, .84) !important;
+    color: #28783a !important;
+    box-shadow: 0 8px 20px rgba(51, 96, 47, .08) !important;
+}
+
+:root[data-theme="light"] .v0-structure-card .v0-structure-add:hover {
+    border-color: rgba(72, 189, 69, .58) !important;
+    background: rgba(226, 250, 207, .94) !important;
+}
+
+:root[data-theme="light"] .v0-core-bill-sync {
+    border-color: rgba(64, 163, 71, .27) !important;
+    background:
+        radial-gradient(circle at 0% 0%, rgba(184, 255, 58, .14), transparent 44%),
+        linear-gradient(145deg, rgba(255, 255, 255, .93), rgba(239, 247, 232, .84)) !important;
+    color: #142119 !important;
+    box-shadow:
+        0 16px 38px rgba(53, 87, 46, .09),
+        inset 0 1px 0 rgba(255, 255, 255, .96) !important;
+}
+
+:root[data-theme="light"] .v0-core-bill-sync__header h3 {
+    color: #17231a !important;
+}
+
+:root[data-theme="light"] .v0-core-bill-sync__header p,
+:root[data-theme="light"] .v0-core-bill-sync__note {
+    color: #5c6d60 !important;
+}
+
+:root[data-theme="light"] .v0-core-bill-row {
+    border-color: rgba(62, 145, 69, .20) !important;
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, .95), rgba(247, 251, 243, .87)) !important;
+    box-shadow:
+        0 8px 18px rgba(56, 86, 52, .05),
+        inset 0 1px 0 rgba(255, 255, 255, .98) !important;
+}
+
+:root[data-theme="light"] .v0-core-bill-row span {
+    color: #26382b !important;
+}
+
+:root[data-theme="light"] .v0-core-bill-row strong {
+    color: #132018 !important;
+}
+
+:root[data-theme="light"] .v0-core-bill-row em {
+    border: 1px solid rgba(77, 129, 82, .12);
+    background: rgba(93, 123, 96, .09) !important;
+    color: #66756a !important;
+}
+
+:root[data-theme="light"] .v0-core-bill-row.is-linked em {
+    border-color: rgba(39, 157, 75, .18);
+    background: rgba(57, 185, 86, .13) !important;
+    color: #22723a !important;
+}
+
+:root[data-theme="light"] .v0-core-bill-row.is-create em {
+    border-color: rgba(66, 167, 80, .18);
+    background: rgba(177, 245, 74, .18) !important;
+    color: #34752e !important;
+}
+
+/* Ensure nested dark-theme text declarations cannot mute the light Property Hub. */
+:root[data-theme="light"] .v0-hub-accordion__body {
+    color: #142119;
+}

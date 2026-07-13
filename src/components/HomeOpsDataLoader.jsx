@@ -1,4 +1,5 @@
 import iconLogo from "../assets/brand/homeops-icon-256.png";
+import iconLogoLight from "../assets/brand/homeops-icon-lime-master-transparent.png";
 
 export default function HomeOpsDataLoader({ active = false, label = "Updating HomeOps" }) {
     if (!active) return null;
@@ -9,7 +10,8 @@ export default function HomeOpsDataLoader({ active = false, label = "Updating Ho
                 <div className="v0-data-loader__mark" aria-hidden="true">
                     <span className="v0-data-loader__gear v0-data-loader__gear--one" />
                     <span className="v0-data-loader__gear v0-data-loader__gear--two" />
-                    <img src={iconLogo} alt="" />
+                    <img className="v0-data-loader__logo v0-data-loader__logo--dark" src={iconLogo} alt="" />
+                    <img className="v0-data-loader__logo v0-data-loader__logo--light" src={iconLogoLight} alt="" />
                 </div>
                 <div className="v0-data-loader__copy">
                     <span>HomeOps</span>

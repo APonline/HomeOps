@@ -144,17 +144,19 @@ async function parseResponse(response) {
             ? Object.values(json.errors).flat().join(" ")
             : json?.message;
         const containsDatabaseDetails = /SQLSTATE\[|Connection:\s|Database:\s|\bselect\s+.+\s+from\s+/i.test(validationMessage || "");
+        const containsInternalDetails = /Call to undefined method|Stack trace|vendor[\\/]laravel|App\\Http\\Controllers|Illuminate\\/i.test(validationMessage || "");
+        const shouldHideServerDetail = response.status >= 500 && response.status !== 503 && (containsDatabaseDetails || containsInternalDetails);
 
-        if (containsDatabaseDetails && typeof console !== "undefined") {
-            console.error("HomeOps API database error", {
+        if (shouldHideServerDetail && typeof console !== "undefined") {
+            console.error("HomeOps API server error", {
                 status: response.status,
                 detail: validationMessage,
             });
         }
 
         throw new Error(
-            containsDatabaseDetails
-                ? "This section could not be loaded. Please try again."
+            shouldHideServerDetail
+                ? "This action could not be completed. Please try again."
                 : (validationMessage || "HomeOps API request failed.")
         );
     }
@@ -162,46 +164,58 @@ async function parseResponse(response) {
     return json;
 }
 
-export async function apiGet(url) {
-    const response = await fetch(apiUrl(url), {
-        headers: authHeaders(),
-    });
+async function apiRequest(url, options = {}) {
+    let response;
+
+    try {
+        response = await fetch(apiUrl(url), options);
+    } catch (error) {
+        if (typeof console !== "undefined") {
+            console.error("HomeOps API network error", error);
+        }
+
+        throw new Error(
+            import.meta.env.DEV
+                ? "HomeOps API is not running. Start homeops-api with php artisan serve, then try again."
+                : "Could not reach the HomeOps API. Please try again.",
+            { cause: error },
+        );
+    }
 
     return parseResponse(response);
 }
 
-export async function apiPost(url, payload = {}) {
-    const response = await fetch(apiUrl(url), {
+export function apiGet(url) {
+    return apiRequest(url, {
+        headers: authHeaders(),
+    });
+}
+
+export function apiPost(url, payload = {}) {
+    return apiRequest(url, {
         method: "POST",
         headers: authHeaders({
             "Content-Type": "application/json",
         }),
         body: JSON.stringify(payload),
     });
-
-    return parseResponse(response);
 }
 
-export async function apiPatch(url, payload = {}) {
-    const response = await fetch(apiUrl(url), {
+export function apiPatch(url, payload = {}) {
+    return apiRequest(url, {
         method: "PATCH",
         headers: authHeaders({
             "Content-Type": "application/json",
         }),
         body: JSON.stringify(payload),
     });
-
-    return parseResponse(response);
 }
 
-
-export async function apiDelete(url) {
-    const response = await fetch(apiUrl(url), {
+export function apiDelete(url) {
+    return apiRequest(url, {
         method: "DELETE",
         headers: authHeaders(),
     });
-
-    return parseResponse(response);
 }
 
 export function getHomes(context = {}) {
@@ -210,6 +224,10 @@ export function getHomes(context = {}) {
 
 export function createHome(payload) {
     return apiPost("/api/homeops/homes", payload);
+}
+
+export function createPropertySetup(payload) {
+    return apiPost("/api/homeops/property-setup", payload);
 }
 
 export function updateHome(homeId, payload) {

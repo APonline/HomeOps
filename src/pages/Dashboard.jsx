@@ -334,9 +334,6 @@ export default function Dashboard({ refreshToken, refreshEverything, goToPage })
                     <span className="v0-eyebrow">{kicker}</span>
                     <h1>{title}</h1>
                     <p>{commandDescription(viewMode)}</p>
-                    <span className={`api-pill ${apiStatus}`}>
-                        {apiStatus === "live" ? "Live API data" : apiStatus === "empty" ? "Live API empty" : apiStatus === "loading" ? "Loading context" : "Demo data fallback"}
-                    </span>
                 </div>
 
 

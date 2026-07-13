@@ -69,6 +69,8 @@ export function HomeOpsProvider({ children }) {
     const [viewMode, setViewMode] = useState(stored.viewMode || "month");
     const [loadingHomes, setLoadingHomes] = useState(true);
     const [homesError, setHomesError] = useState("");
+    const [propertySetupOpen, setPropertySetupOpen] = useState(false);
+    const [propertySetupForced, setPropertySetupForced] = useState(false);
 
     const homeId = selectedHome?.id || null;
 
@@ -112,6 +114,13 @@ export function HomeOpsProvider({ children }) {
     }, []);
 
     useEffect(() => {
+        if (!loadingHomes && !homesError && homes.length === 0) {
+            setPropertySetupForced(true);
+            setPropertySetupOpen(true);
+        }
+    }, [homes.length, homesError, loadingHomes]);
+
+    useEffect(() => {
         writeStoredContext({
             homeId: selectedHome?.id || null,
             selectedYear,
@@ -152,6 +161,21 @@ export function HomeOpsProvider({ children }) {
         setSelectedMonth(Number(nextDay.slice(5, 7)));
     }, []);
 
+    const openPropertySetup = useCallback(() => {
+        setPropertySetupForced(homes.length === 0);
+        setPropertySetupOpen(true);
+    }, [homes.length]);
+
+    const closePropertySetup = useCallback(() => {
+        if (propertySetupForced) return;
+        setPropertySetupOpen(false);
+    }, [propertySetupForced]);
+
+    const completePropertySetup = useCallback(async (newHomeId) => {
+        await reloadHomes(newHomeId);
+        setPropertySetupForced(false);
+    }, [reloadHomes]);
+
     const apiContext = useMemo(() => ({
         homeId,
         selectedHome,
@@ -173,14 +197,19 @@ export function HomeOpsProvider({ children }) {
         viewMode,
         loadingHomes,
         homesError,
+        propertySetupOpen,
+        propertySetupForced,
         apiContext,
         reloadHomes,
+        openPropertySetup,
+        closePropertySetup,
+        completePropertySetup,
         chooseHome,
         setViewMode,
         setSelectedYear: updateSelectedYear,
         setSelectedMonth: updateSelectedMonth,
         setSelectedDay: updateSelectedDay,
-    }), [apiContext, chooseHome, homeId, homes, homesError, loadingHomes, reloadHomes, selectedDay, selectedHome, selectedMonth, selectedYear, updateSelectedDay, updateSelectedMonth, updateSelectedYear, viewMode]);
+    }), [apiContext, chooseHome, closePropertySetup, completePropertySetup, homeId, homes, homesError, loadingHomes, openPropertySetup, propertySetupForced, propertySetupOpen, reloadHomes, selectedDay, selectedHome, selectedMonth, selectedYear, updateSelectedDay, updateSelectedMonth, updateSelectedYear, viewMode]);
 
     return (
         <HomeOpsContext.Provider value={value}>
