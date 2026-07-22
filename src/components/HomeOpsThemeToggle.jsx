@@ -15,7 +15,10 @@ const SunIcon = () => (
 
 export default function HomeOpsThemeToggle({ className = "" }) {
     const [theme, setTheme] = useState(() => {
-        return localStorage.getItem("homeops-theme") || "dark";
+        const savedTheme = localStorage.getItem("homeops-theme");
+        const initialTheme = savedTheme || document.documentElement.dataset.theme || "dark";
+
+        return initialTheme === "light" ? "light" : "dark";
     });
 
     useEffect(() => {

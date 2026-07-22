@@ -1,18 +1,91 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useHomeOps } from "../context/HomeOpsContext";
-import { money } from "../lib/homeopsApi";
+import { deleteHome, money } from "../lib/homeopsApi";
 import AccountSettingsModal from "../components/AccountSettingsModal";
+import Modal from "../components/Modal";
+import HomeOpsLoadingSkeleton from "../components/HomeOpsLoadingSkeleton";
+
+function TrashIcon() {
+    return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 7h16" />
+            <path d="M9 7V4h6v3" />
+            <path d="m7 7 1 13h8l1-13" />
+            <path d="M10 11v5M14 11v5" />
+        </svg>
+    );
+}
 
 export default function AccountAccessPage({ goToPage }) {
     const { user, logout } = useAuth();
     const [accountSettingsOpen, setAccountSettingsOpen] = useState(false);
-    const { homes, selectedHome, homeId, chooseHome, loadingHomes, homesError, reloadHomes, openPropertySetup } = useHomeOps();
+    const [deleteTarget, setDeleteTarget] = useState(null);
+    const [deleting, setDeleting] = useState(false);
+    const [deleteError, setDeleteError] = useState("");
+    const {
+        homes,
+        selectedHome,
+        homeId,
+        chooseHome,
+        loadingHomes,
+        homesError,
+        reloadHomes,
+        openPropertySetup,
+    } = useHomeOps();
 
     function handleChooseProperty(propertyId) {
         chooseHome(propertyId);
         goToPage?.("dashboard");
     }
+
+    function requestPropertyRemoval(property) {
+        setDeleteError("");
+        setDeleteTarget(property);
+    }
+
+    function closeRemovalModal() {
+        if (deleting) return;
+
+        setDeleteError("");
+        setDeleteTarget(null);
+    }
+
+    async function confirmPropertyRemoval() {
+        if (!deleteTarget?.id || deleting) return;
+
+        const removedId = String(deleteTarget.id);
+        const wasActive = removedId === String(homeId);
+        const remainingProperties = homes.filter((property) => String(property.id) !== removedId);
+        const nextPropertyId = wasActive
+            ? remainingProperties[0]?.id
+            : (selectedHome?.id || remainingProperties[0]?.id);
+
+        setDeleting(true);
+        setDeleteError("");
+
+        try {
+            await deleteHome(deleteTarget.id);
+            setDeleteTarget(null);
+
+            if (nextPropertyId) {
+                chooseHome(nextPropertyId);
+                await reloadHomes(nextPropertyId);
+            } else {
+                await reloadHomes();
+            }
+        } catch (error) {
+            setDeleteError(error.message || "Could not remove this property.");
+        } finally {
+            setDeleting(false);
+        }
+    }
+
+    const deleteTargetIsOwner = deleteTarget?.access_role === "owner";
+    const removalTitle = deleteTargetIsOwner ? "Delete property?" : "Remove property access?";
+    const removalIntro = deleteTargetIsOwner
+        ? "This permanently removes the property and everything attached to it."
+        : "This removes the property from your account. The owner's records stay intact.";
 
     return (
         <>
@@ -23,7 +96,7 @@ export default function AccountAccessPage({ goToPage }) {
                 </div>
                 <div className="page-actions">
                     <button className="ghost-action" type="button" onClick={() => reloadHomes()}>Refresh access</button>
-                    <button className="primary-action" type="button" onClick={openPropertySetup}>Set up new property</button>
+                    <button className="page-primary-action" type="button" onClick={openPropertySetup}>+ Property</button>
                 </div>
             </header>
 
@@ -53,11 +126,12 @@ export default function AccountAccessPage({ goToPage }) {
                         <h2>Property access</h2>
                         <p>These are the homes this account can load. Bills, receipts, maintenance, periods, and dashboard data should stay scoped to the selected property.</p>
                     </div>
+                    <button className="page-primary-action page-primary-action--compact page-primary-action--icon" type="button" onClick={openPropertySetup} aria-label="Add property" title="Add property">+</button>
                 </div>
 
                 {homesError && <div className="form-error">{homesError}</div>}
 
-                {loadingHomes && <div className="empty-box">Loading property access…</div>}
+                {loadingHomes && <HomeOpsLoadingSkeleton rows={3} label="Loading property access" />}
 
                 {!loadingHomes && homes.length === 0 && (
                     <div className="empty-box account-access-empty">
@@ -71,31 +145,91 @@ export default function AccountAccessPage({ goToPage }) {
                     <div className="account-access-list">
                         {homes.map((property) => {
                             const isActive = String(property.id) === String(homeId);
+                            const isOwner = property.access_role === "owner";
+                            const removalLabel = isOwner ? `Delete ${property.name}` : `Remove access to ${property.name}`;
+
                             return (
-                                <button
+                                <article
                                     key={property.id}
                                     className={`account-access-property ${isActive ? "is-active" : ""}`}
-                                    type="button"
-                                    onClick={() => handleChooseProperty(property.id)}
                                 >
-                                    <span>
-                                        <strong>{property.name}</strong>
-                                        <small>{property.property_type || "property"} · {property.city_region || "location TBD"}</small>
-                                    </span>
-                                    <span>
-                                        <b>{money(property.baseline_monthly_cost || 0)}/mo</b>
-                                        <small>{property.access_role ? `${property.access_role}${property.is_primary ? " · Primary" : ""}` : (property.is_primary ? "Primary" : "Property")}</small>
-                                    </span>
-                                </button>
+                                    <button
+                                        className="account-access-property__select"
+                                        type="button"
+                                        onClick={() => handleChooseProperty(property.id)}
+                                        aria-current={isActive ? "true" : undefined}
+                                    >
+                                        <span>
+                                            <strong>{property.name}</strong>
+                                            <small>{property.property_type || "property"} · {property.city_region || "location TBD"}</small>
+                                        </span>
+                                        <span>
+                                            <b>{money(property.baseline_monthly_cost || 0)}/mo</b>
+                                            <small>{property.access_role ? `${property.access_role}${property.is_primary ? " · Primary" : ""}` : (property.is_primary ? "Primary" : "Property")}</small>
+                                        </span>
+                                    </button>
+                                    <button
+                                        className="account-access-property__remove"
+                                        type="button"
+                                        onClick={() => requestPropertyRemoval(property)}
+                                        aria-label={removalLabel}
+                                        title={removalLabel}
+                                    >
+                                        <TrashIcon />
+                                    </button>
+                                </article>
                             );
                         })}
                     </div>
                 )}
             </section>
+
             <AccountSettingsModal
                 active={accountSettingsOpen}
                 onClose={() => setAccountSettingsOpen(false)}
             />
+
+            <Modal
+                active={Boolean(deleteTarget)}
+                onClose={closeRemovalModal}
+                title={removalTitle}
+                intro={removalIntro}
+                size="compact"
+            >
+                <div className="bill-action-confirmation">
+                    <div className="bill-action-summary">
+                        <span>{deleteTarget?.name || "Selected property"}</span>
+                        <small>
+                            {deleteTargetIsOwner
+                                ? "Bills, receipts, documents, maintenance, rooms, assets, and history will be deleted. This cannot be undone."
+                                : "Only your access is removed. This cannot be undone from your account."}
+                        </small>
+                    </div>
+
+                    {deleteError && <div className="form-error">{deleteError}</div>}
+
+                    <div className="bill-action-modal__actions">
+                        <button
+                            className="bill-action-button bill-action-button--secondary"
+                            type="button"
+                            onClick={closeRemovalModal}
+                            disabled={deleting}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            className="bill-action-button bill-action-button--danger"
+                            type="button"
+                            onClick={confirmPropertyRemoval}
+                            disabled={deleting}
+                        >
+                            {deleting
+                                ? "Removing..."
+                                : (deleteTargetIsOwner ? "Delete property" : "Remove access")}
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </>
     );
 }

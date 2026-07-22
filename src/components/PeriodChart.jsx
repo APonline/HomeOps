@@ -1,4 +1,6 @@
 import { useRef, useState } from "react";
+import { resolveSpendingPeriodTone } from "../lib/spendingPeriodTones";
+import "../styles/spending-period-tones.css";
 
 export default function PeriodChart({
     days = [],
@@ -112,6 +114,14 @@ export default function PeriodChart({
                         const label = day.label ?? day.day;
                         const key = day.key ?? `${label}-${index}`;
                         const itemCount = Number(day.itemCount || day.count || 0);
+                        const periodTone = day.marked
+                            ? resolveSpendingPeriodTone({
+                                ...day,
+                                tone: day.tone || day.period_tone || day.period?.tone,
+                                period_type: day.period_type || day.period?.period_type,
+                                period_id: day.period_id || day.period?.id,
+                            }, index)
+                            : null;
                         const title = variant === "hourly"
                             ? `${label}: $${amount}${itemCount ? ` across ${itemCount} entries` : ""}`
                             : `Day ${label}: $${amount}`;
@@ -128,8 +138,13 @@ export default function PeriodChart({
                             >
                                 <span className="day-label">{label}</span>
                                 <span
-                                    className={day.marked ? "bar marked" : "bar"}
+                                    className={[
+                                        "bar",
+                                        day.marked ? "marked" : "",
+                                        periodTone ? `tone-${periodTone}` : "",
+                                    ].filter(Boolean).join(" ")}
                                     style={{ height: `${height}px` }}
+                                    data-period-tone={periodTone || undefined}
                                     aria-hidden="true"
                                 />
                             </button>

@@ -1,0 +1,276 @@
+/*
+ * Bills page sticky command bar.
+ *
+ * The normal summary cards remain the detailed at-a-glance view. Once the
+ * user scrolls into the bill schedules, this toolbar stays below the global
+ * context header, keeps + Bill reachable, and reveals a compact four-metric
+ * summary.
+ */
+
+.bills-page-panel {
+    position: relative;
+}
+
+.bills-sticky-sentinel {
+    width: 100%;
+    height: 1px;
+    margin-top: -1px;
+    pointer-events: none;
+}
+
+.bills-sticky-toolbar {
+    position: sticky;
+    top: 76px;
+    z-index: 68;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 16px;
+    min-height: 60px;
+    margin: -10px -10px 20px;
+    padding: 10px 10px 16px;
+    border-bottom: 1px solid var(--platform-border);
+    background: transparent;
+    transition:
+        margin 180ms ease,
+        padding 180ms ease,
+        border-color 180ms ease,
+        border-radius 180ms ease,
+        background 180ms ease,
+        box-shadow 180ms ease;
+}
+
+.bills-sticky-toolbar.is-stuck {
+    margin-inline: -12px;
+    padding: 10px 12px;
+    border: 1px solid color-mix(in srgb, var(--platform-blue) 24%, var(--platform-border));
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--platform-surface) 92%, transparent);
+    box-shadow:
+        0 14px 34px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 color-mix(in srgb, white 5%, transparent);
+    backdrop-filter: blur(18px) saturate(132%);
+    -webkit-backdrop-filter: blur(18px) saturate(132%);
+}
+
+.bills-sticky-toolbar__heading {
+    display: grid;
+    gap: 2px;
+    min-width: 110px;
+}
+
+.bills-sticky-toolbar__heading h2 {
+    margin: 0;
+    color: var(--platform-text-strong);
+    font-size: 17px;
+    font-weight: 720;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+}
+
+.bills-sticky-toolbar__heading small {
+    color: var(--platform-subtle);
+    font-size: 9px;
+    font-weight: 720;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+}
+
+.bills-sticky-toolbar__summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(90px, 1fr));
+    gap: 7px;
+    width: 100%;
+    max-width: 0;
+    min-width: 0;
+    margin-inline: auto;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition:
+        max-width 190ms ease,
+        opacity 150ms ease,
+        transform 190ms ease,
+        visibility 0s linear 190ms;
+}
+
+.bills-sticky-toolbar.is-stuck .bills-sticky-toolbar__summary {
+    max-width: 620px;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition-delay: 0s;
+}
+
+.bills-sticky-toolbar__summary > span {
+    --sticky-metric: var(--platform-blue);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    min-height: 38px;
+    padding: 7px 9px;
+    border: 1px solid color-mix(in srgb, var(--sticky-metric) 44%, var(--platform-border));
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--sticky-metric) 6%, var(--platform-surface));
+}
+
+.bills-sticky-toolbar__summary > span.is-paid {
+    --sticky-metric: var(--platform-green, #42cf91);
+}
+
+.bills-sticky-toolbar__summary > span.is-due {
+    --sticky-metric: var(--platform-amber, #e7a54b);
+}
+
+.bills-sticky-toolbar__summary > span.is-open {
+    --sticky-metric: var(--platform-purple, #9a78ff);
+}
+
+.bills-sticky-toolbar__summary small {
+    min-width: 0;
+    overflow: hidden;
+    color: color-mix(in srgb, var(--sticky-metric) 78%, var(--platform-text));
+    font-size: 8px;
+    font-weight: 820;
+    letter-spacing: 0.045em;
+    line-height: 1;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.bills-sticky-toolbar__summary strong {
+    color: var(--platform-text-strong);
+    font-size: 11px;
+    font-weight: 820;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.bills-sticky-toolbar__actions {
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    margin: 0;
+}
+
+.bills-sticky-toolbar__actions > span:not(.bill-tracked-skeleton) {
+    white-space: nowrap;
+}
+
+@media (max-width: 1240px) {
+    .bills-sticky-toolbar__summary {
+        grid-template-columns: repeat(4, minmax(76px, 1fr));
+    }
+
+    .bills-sticky-toolbar__summary > span {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 4px;
+        padding-inline: 7px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 1024px) {
+    .bills-sticky-toolbar {
+        top: 138px;
+    }
+}
+
+@media (max-width: 720px) {
+    .bills-page-panel {
+        padding-inline: 14px !important;
+    }
+
+    .bills-sticky-toolbar {
+        top: 116px;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas:
+            "heading actions"
+            "summary summary";
+        gap: 8px 10px;
+        min-height: 54px;
+        margin: -6px -4px 16px;
+        padding: 8px 4px 12px;
+    }
+
+    .bills-sticky-toolbar.is-stuck {
+        margin-inline: -6px;
+        padding: 9px 8px;
+        border-radius: 12px;
+    }
+
+    .bills-sticky-toolbar__heading {
+        grid-area: heading;
+        min-width: 0;
+    }
+
+    .bills-sticky-toolbar__heading h2 {
+        font-size: 15px;
+    }
+
+    .bills-sticky-toolbar__heading small {
+        font-size: 8px;
+    }
+
+    .bills-sticky-toolbar__actions {
+        grid-area: actions;
+    }
+
+    .bills-sticky-toolbar__summary {
+        grid-area: summary;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 5px;
+        max-width: none;
+        max-height: 0;
+    }
+
+    .bills-sticky-toolbar.is-stuck .bills-sticky-toolbar__summary {
+        max-width: none;
+        max-height: 52px;
+    }
+
+    .bills-sticky-toolbar__summary > span {
+        min-height: 40px;
+        padding: 6px 4px;
+        border-radius: 8px;
+    }
+
+    .bills-sticky-toolbar__summary small {
+        font-size: 6.5px;
+        letter-spacing: 0.03em;
+    }
+
+    .bills-sticky-toolbar__summary strong {
+        max-width: 100%;
+        overflow: hidden;
+        font-size: 9px;
+        text-overflow: ellipsis;
+    }
+}
+
+@media (max-width: 420px) {
+    .bills-sticky-toolbar__actions > span:not(.bill-tracked-skeleton) {
+        display: none;
+    }
+
+    .bills-sticky-toolbar__actions .page-primary-action {
+        min-height: 36px;
+        padding-inline: 12px;
+    }
+
+    .bills-sticky-toolbar__heading small {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bills-sticky-toolbar,
+    .bills-sticky-toolbar__summary {
+        transition: none;
+    }
+}

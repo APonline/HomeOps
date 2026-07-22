@@ -1,0 +1,62 @@
+/*
+ * Login polish loaded after the platform layers.
+ * Keeps first paint/theme/logo pairing consistent and balances intro copy.
+ */
+.homeops-login-card__brand {
+    position: relative;
+    display: flex !important;
+    align-items: center;
+    justify-content: center !important;
+    min-height: 42px;
+}
+
+.homeops-login-card__logo {
+    display: block;
+    width: 170px !important;
+    height: auto;
+    object-fit: contain;
+}
+
+.homeops-login-card__logo--light {
+    display: none !important;
+}
+
+:root[data-theme="light"] .homeops-login-card__logo--default {
+    display: none !important;
+}
+
+:root[data-theme="light"] .homeops-login-card__logo--light {
+    display: block !important;
+    filter: drop-shadow(0 0 18px rgba(80, 184, 49, 0.14));
+}
+
+:root[data-theme="dark"] .homeops-login-card__logo--default {
+    display: block !important;
+}
+
+:root[data-theme="dark"] .homeops-login-card__logo--light {
+    display: none !important;
+}
+
+.homeops-login-card__intro {
+    justify-items: center !important;
+    text-align: center !important;
+}
+
+.homeops-login-card__intro h1,
+.homeops-login-card__intro p {
+    text-align: center !important;
+}
+
+.homeops-login-card__subtitle {
+    width: min(100%, 25rem);
+    margin: 0.16rem auto 0 !important;
+    line-height: 1.48 !important;
+    text-wrap: balance;
+}
+
+@media (max-width: 520px) {
+    .homeops-login-card__subtitle {
+        width: min(100%, 22rem);
+    }
+}

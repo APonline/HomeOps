@@ -108,7 +108,7 @@ export default function ReceiptsPage({ refreshToken, refreshEverything }) {
     }
 
     async function remove(receipt) {
-        if (!window.confirm(`Delete the ${receipt.vendor} receipt and its linked ledger entry?`)) return;
+        if (!window.confirm(`Delete the ${receipt.vendor} receipt and its linked transaction?`)) return;
         try {
             await deleteReceipt(receipt.id, apiContext);
             refreshEverything?.();
@@ -121,7 +121,7 @@ export default function ReceiptsPage({ refreshToken, refreshEverything }) {
     return (
         <>
             <header className="page-header">
-                <div><h1>Receipts</h1><p>A searchable proof-of-purchase register tied directly to the ledger.</p></div>
+                <div><h1>Receipts</h1><p>A searchable proof-of-purchase register tied directly to transactions.</p></div>
                 <button className="page-primary-action" type="button" onClick={openCreate}>+ Receipt</button>
             </header>
 
@@ -134,7 +134,11 @@ export default function ReceiptsPage({ refreshToken, refreshEverything }) {
             <section className="panel full-panel">
                 <div className="panel-header">
                     <h2>Receipt Register</h2>
-                    <input className="compact-search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search vendor, category, notes" />
+                    <div className="panel-header__actions panel-header__actions--with-search">
+                        <span>{loading ? "loading" : `${filtered.length} shown`}</span>
+                        <input className="compact-search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search vendor, category, notes" />
+                        <button className="page-primary-action page-primary-action--compact page-primary-action--icon" type="button" onClick={openCreate} aria-label="Add receipt" title="Add receipt">+</button>
+                    </div>
                 </div>
                 {error && <div className="form-error">{error}</div>}
                 {loading && <div className="empty-box">Loading receipts...</div>}

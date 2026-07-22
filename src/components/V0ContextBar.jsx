@@ -40,7 +40,6 @@ function modeLabel(viewMode) {
     return "Month";
 }
 
-
 function ClockIcon(props) {
     return (
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" {...props}>
@@ -59,6 +58,7 @@ function HomeIcon(props) {
         </svg>
     );
 }
+
 
 export default function V0ContextBar({ onOpenHome }) {
     const [timeLensOpen, setTimeLensOpen] = useState(false);
@@ -148,28 +148,35 @@ export default function V0ContextBar({ onOpenHome }) {
                 ? ""
                 : `${shortMonthNames[(selectedMonth % 12)]} ${selectedMonth === 12 ? Number(selectedYear) + 1 : selectedYear}`;
 
+    const propertyName = selectedHome?.name || (loadingHomes ? "Loading property…" : "Create property");
+    const propertyMeta = selectedHome?.city_region || selectedHome?.property_type || "Property workspace";
+
     return (
         <>
-            <section className="v0-context-strip" aria-label="HomeOps context">
-                {/* <button className="v0-context-strip__home" type="button" onClick={onOpenHome} title="Open Property Settings">
-                    <strong>{selectedHome?.name || (loadingHomes ? "Loading property…" : "Create your first property")}</strong>
-                </button> */}
-
-                {homes.length > 1 && (
-                    <label className="v0-context-strip__property-select" aria-label="Selected property">
-                        <span>Property</span>
-                        <select
-                            value={selectedHome?.id || ""}
-                            onChange={(event) => chooseHome(event.target.value)}
-                            disabled={loadingHomes}
-                            title="Switch property"
-                        >
-                            {homes.map((home) => (
-                                <option value={home.id} key={home.id}>{home.name}</option>
-                            ))}
-                        </select>
-                    </label>
-                )}
+            <section className="v0-context-strip platform-context-bar" aria-label="HomeOps context">
+                <div className="platform-property-context">
+                    {homes.length > 1 ? (
+                        <label className="v0-context-strip__property-select" aria-label="Selected property">
+                            <span>Property</span>
+                            <select
+                                value={selectedHome?.id || ""}
+                                onChange={(event) => chooseHome(event.target.value)}
+                                disabled={loadingHomes}
+                                title="Switch property"
+                            >
+                                {homes.map((home) => (
+                                    <option value={home.id} key={home.id}>{home.name}</option>
+                                ))}
+                            </select>
+                        </label>
+                    ) : (
+                        <button className="platform-property-context__button" type="button" onClick={onOpenHome}>
+                            <span>Property</span>
+                            <strong>{propertyName}</strong>
+                            <small>{propertyMeta}</small>
+                        </button>
+                    )}
+                </div>
 
                 <div className="v0-context-strip__right">
                     <div className={`v0-context-period-controls ${viewMode === "all-time" ? "is-static" : ""}`}>
@@ -198,10 +205,10 @@ export default function V0ContextBar({ onOpenHome }) {
                             ›
                         </button>
                     </div>
-                    <button className="v0-clock-button" type="button" onClick={() => setTimeLensOpen(true)} aria-label="Open Time Lens" title="Open Time Lens">
+                    <button className="v0-clock-button" type="button" onClick={goToday} aria-label="Jump to today" title="Jump to today">
                         <ClockIcon />
                     </button>
-                    <button className="v0-home-icon-button" type="button" onClick={onOpenHome} aria-label="Open Property Settings" title="Open Property Settings">
+                    <button className="v0-home-icon-button" type="button" onClick={onOpenHome} aria-label="Open property settings" title="Open property settings">
                         <HomeIcon />
                     </button>
                 </div>
@@ -210,8 +217,8 @@ export default function V0ContextBar({ onOpenHome }) {
             <Modal
                 active={timeLensOpen}
                 onClose={() => setTimeLensOpen(false)}
-                title="Time Lens"
-                intro="Choose whether the app should show today, the current month, the year, or the full property history. Every module inherits this context."
+                title="Time range"
+                intro="Set the property and time range used across every HomeOps module."
                 size="wide"
             >
                 <div className="v0-time-lens-modal">
@@ -219,7 +226,7 @@ export default function V0ContextBar({ onOpenHome }) {
                         <button type="button" className={viewMode === "day" ? "active" : ""} onClick={goToday}>Today</button>
                         <button type="button" className={viewMode === "month" ? "active" : ""} onClick={() => switchView("month")}>Month</button>
                         <button type="button" className={viewMode === "year" ? "active" : ""} onClick={() => switchView("year")}>Year</button>
-                        <button type="button" className={viewMode === "all-time" ? "active" : ""} onClick={() => switchView("all-time")}>All Time</button>
+                        <button type="button" className={viewMode === "all-time" ? "active" : ""} onClick={() => switchView("all-time")}>All time</button>
                     </div>
 
                     <div className={`v0-period-stepper ${viewMode === "all-time" ? "is-static" : ""}`}>
@@ -286,12 +293,12 @@ export default function V0ContextBar({ onOpenHome }) {
 
                         <button className="v0-home-settings" type="button" onClick={onOpenHome}>
                             <HomeIcon />
-                            Property Settings
+                            Property settings
                         </button>
                     </div>
 
                     <button className="primary-action" type="button" onClick={() => setTimeLensOpen(false)}>
-                        Apply Context
+                        Apply range
                     </button>
                 </div>
             </Modal>

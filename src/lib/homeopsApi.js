@@ -44,7 +44,8 @@ export function money(value) {
     return Number(value).toLocaleString("en-CA", {
         style: "currency",
         currency: "CAD",
-        maximumFractionDigits: 0,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
     });
 }
 
@@ -201,6 +202,14 @@ export function apiPost(url, payload = {}) {
     });
 }
 
+export function apiPostForm(url, payload) {
+    return apiRequest(url, {
+        method: "POST",
+        headers: authHeaders(),
+        body: payload,
+    });
+}
+
 export function apiPatch(url, payload = {}) {
     return apiRequest(url, {
         method: "PATCH",
@@ -208,6 +217,16 @@ export function apiPatch(url, payload = {}) {
             "Content-Type": "application/json",
         }),
         body: JSON.stringify(payload),
+    });
+}
+
+export function apiPatchForm(url, payload) {
+    payload.set("_method", "PATCH");
+
+    return apiRequest(url, {
+        method: "POST",
+        headers: authHeaders(),
+        body: payload,
     });
 }
 
@@ -234,6 +253,10 @@ export function updateHome(homeId, payload) {
     return apiPatch(`/api/homeops/homes/${homeId}`, payload);
 }
 
+export function deleteHome(homeId) {
+    return apiDelete(`/api/homeops/homes/${homeId}`);
+}
+
 export function getHome(homeId) {
     return apiGet(`/api/homeops/homes/${homeId}`);
 }
@@ -246,12 +269,36 @@ export function addRoom(homeId, payload) {
     return apiPost(`/api/homeops/homes/${homeId}/rooms`, payload);
 }
 
+export function updateRoom(homeId, roomId, payload) {
+    return apiPatch(`/api/homeops/homes/${homeId}/rooms/${roomId}`, payload);
+}
+
+export function deleteRoom(homeId, roomId) {
+    return apiDelete(`/api/homeops/homes/${homeId}/rooms/${roomId}`);
+}
+
 export function addAsset(homeId, payload) {
     return apiPost(`/api/homeops/homes/${homeId}/assets`, payload);
 }
 
+export function updateAsset(homeId, assetId, payload) {
+    return apiPatch(`/api/homeops/homes/${homeId}/assets/${assetId}`, payload);
+}
+
+export function deleteAsset(homeId, assetId) {
+    return apiDelete(`/api/homeops/homes/${homeId}/assets/${assetId}`);
+}
+
 export function addTimelineEvent(homeId, payload) {
     return apiPost(`/api/homeops/homes/${homeId}/timeline`, payload);
+}
+
+export function updateTimelineEvent(homeId, eventId, payload) {
+    return apiPatch(`/api/homeops/homes/${homeId}/timeline/${eventId}`, payload);
+}
+
+export function deleteTimelineEvent(homeId, eventId) {
+    return apiDelete(`/api/homeops/homes/${homeId}/timeline/${eventId}`);
 }
 
 export function getCoreBills(homeId, context = {}) {
@@ -436,16 +483,61 @@ export function getDocuments(context = {}) {
     return apiGet(withContextQuery("/api/homeops/documents", context));
 }
 
+function withHomeFormData(payload, context = {}) {
+    const homeId = context.homeId || context.home_id || context.selectedHome?.id;
+
+    if (homeId && !payload.has("home_id")) {
+        payload.append("home_id", homeId);
+    }
+
+    return payload;
+}
+
 export function createDocument(payload, context = {}) {
+    if (payload instanceof FormData) {
+        return apiPostForm("/api/homeops/documents", withHomeFormData(payload, context));
+    }
+
     return apiPost("/api/homeops/documents", withHomePayload(payload, context));
 }
 
 export function updateDocument(documentId, payload, context = {}) {
+    if (payload instanceof FormData) {
+        return apiPatchForm(`/api/homeops/documents/${documentId}`, withHomeFormData(payload, context));
+    }
+
     return apiPatch(`/api/homeops/documents/${documentId}`, withHomePayload(payload, context));
 }
 
 export function deleteDocument(documentId, context = {}) {
     return apiDelete(withContextQuery(`/api/homeops/documents/${documentId}`, context));
+}
+
+export async function downloadDocumentFile(documentId, context = {}) {
+    const response = await fetch(apiUrl(withContextQuery(`/api/homeops/documents/${documentId}/file`, context)), {
+        headers: authHeaders(),
+    });
+
+    if (!response.ok) {
+        return parseResponse(response);
+    }
+
+    const disposition = response.headers.get("Content-Disposition") || "";
+    const utf8Match = disposition.match(/filename\*=UTF-8''([^;]+)/i);
+    const plainMatch = disposition.match(/filename="?([^";]+)"?/i);
+    const rawFilename = utf8Match?.[1] || plainMatch?.[1] || "document";
+    let filename = rawFilename;
+
+    try {
+        filename = decodeURIComponent(rawFilename);
+    } catch {
+        // Some servers return a plain filename containing an unescaped percent sign.
+    }
+
+    return {
+        blob: await response.blob(),
+        filename,
+    };
 }
 
 export function getReports(context = {}) {

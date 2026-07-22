@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Modal from "../components/Modal";
+import HomeOpsLoadingSkeleton, { HomeOpsLoadingPill } from "../components/HomeOpsLoadingSkeleton";
 import { useHomeOps } from "../context/HomeOpsContext";
 import {
     completeMaintenanceItem,
@@ -269,6 +270,7 @@ export default function MaintenancePage({ refreshToken, refreshEverything }) {
                     <h1>Maintenance</h1>
                     <p>Schedule recurring upkeep, track replacement stock, and know what is due next.</p>
                 </div>
+                <button className="page-primary-action" type="button" onClick={openAddMaintenance}>+ Maintenance</button>
             </header>
 
             <section className="panel full-panel">
@@ -276,13 +278,15 @@ export default function MaintenancePage({ refreshToken, refreshEverything }) {
                     <h2>Maintenance schedule</h2>
 
                     <div className="panel-header__actions">
-                        <span>{loading ? "Loading" : `${items.length} active`}</span>
+                        {loading ? <HomeOpsLoadingPill label="Loading maintenance count" /> : <span>{`${items.length} active`}</span>}
                         <button
-                            className="page-primary-action page-primary-action--compact"
+                            className="page-primary-action page-primary-action--compact page-primary-action--icon"
                             type="button"
                             onClick={openAddMaintenance}
+                            aria-label="Add maintenance item"
+                            title="Add maintenance item"
                         >
-                            + Maintenance
+                            +
                         </button>
                     </div>
                 </div>
@@ -297,7 +301,7 @@ export default function MaintenancePage({ refreshToken, refreshEverything }) {
                     </div>
                 )}
 
-                {loading && <div className="empty-box">Loading maintenance...</div>}
+                {loading && <HomeOpsLoadingSkeleton rows={3} label="Loading maintenance" />}
                 {!loading && items.length === 0 && <div className="empty-box">No maintenance items yet. Add your first recurring task.</div>}
 
                 <div className="record-list maintenance-record-list">

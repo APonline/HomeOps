@@ -21,35 +21,35 @@ import {
 
 const navGroups = [
     {
-        label: "Home",
+        label: "Workspace",
         items: [
-            { key: "dashboard", label: "Dashboard", Icon: DashboardIcon },
-            { key: "home", label: "Property Profile", Icon: PropertyIcon },
+            { key: "dashboard", label: "Overview", Icon: DashboardIcon },
+            { key: "home", label: "Property", Icon: PropertyIcon },
             { key: "documents", label: "Documents", Icon: DocumentsIcon },
         ],
     },
     {
-        label: "Money",
+        label: "Financials",
         items: [
             { key: "bills", label: "Bills", Icon: BillsIcon },
-            { key: "ledger", label: "Ledger", Icon: LedgerIcon },
-            { key: "receipts", label: "Receipts", Icon: ReceiptsIcon },
             { key: "financing", label: "Financing", Icon: FinancingIcon },
+            { key: "receipts", label: "Receipts", Icon: ReceiptsIcon },
+            { key: "ledger", label: "Transactions", Icon: LedgerIcon },
             { key: "reports", label: "Reports", Icon: ReportsIcon },
         ],
     },
     {
-        label: "Planning",
+        label: "Operations",
         items: [
             { key: "maintenance", label: "Maintenance", Icon: MaintenanceIcon },
-            { key: "wishlist", label: "Needs & Wants", Icon: NeedsWantsIcon },
-            { key: "periods", label: "Spending Periods", Icon: SpendingPeriodsIcon },
+            { key: "wishlist", label: "Projects & plans", Icon: NeedsWantsIcon },
+            { key: "periods", label: "Spending periods", Icon: SpendingPeriodsIcon },
         ],
     },
     {
-        label: "Account",
+        label: "Administration",
         items: [
-            { key: "accounts", label: "Account & Access", Icon: AccountsIcon },
+            { key: "accounts", label: "Account & access", Icon: AccountsIcon },
         ],
     },
 ];
@@ -67,6 +67,7 @@ function NavButton({ item, activePage, setActivePage, onDone }) {
                 onDone?.();
             }}
             title={item.label}
+            aria-current={isActive ? "page" : undefined}
         >
             <span className="homeops-nav-item__main">
                 <span className="homeops-nav-item__icon">
@@ -82,6 +83,12 @@ export default function HomeOpsSidebar({ activePage, setActivePage }) {
     const { user, logout } = useAuth();
     const [mobileNavOpen, setMobileNavOpen] = useState(false);
     const closeMobileNav = () => setMobileNavOpen(false);
+    const initials = (user?.name || user?.email || "A")
+        .split(/\s+|@/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part.charAt(0).toUpperCase())
+        .join("");
 
     useEffect(() => {
         document.body.classList.toggle("homeops-mobile-nav-open", mobileNavOpen);
@@ -103,10 +110,15 @@ export default function HomeOpsSidebar({ activePage, setActivePage }) {
         <>
             <aside className="sidebar homeops-nav">
                 <div className="homeops-nav__topbar">
-                    <div className="homeops-nav__brand">
+                    <button
+                        type="button"
+                        className="homeops-nav__brand"
+                        onClick={() => setActivePage("dashboard")}
+                        aria-label="Go to HomeOps overview"
+                    >
                         <img src={homeOpsLogo} alt="HomeOps" className="homeops-nav__logo homeops-nav__logo--default" />
                         <img src={homeOpsLogoLime} alt="HomeOps" className="homeops-nav__logo homeops-nav__logo--light" />
-                    </div>
+                    </button>
 
                     <div className="homeops-nav__actions">
                         <HomeOpsThemeToggle />
@@ -117,7 +129,7 @@ export default function HomeOpsSidebar({ activePage, setActivePage }) {
                             onClick={() => setActivePage("accounts")}
                             title={user?.email || "Account"}
                         >
-                            {user?.name?.slice(0, 1) || "A"}
+                            {initials || "A"}
                         </button>
 
                         <button
@@ -156,6 +168,15 @@ export default function HomeOpsSidebar({ activePage, setActivePage }) {
                         </button>
                     </div>
 
+                    <div className="homeops-nav__workspace-card">
+                        <span className="homeops-nav__workspace-icon">H</span>
+                        <span>
+                            <small>Workspace</small>
+                            <strong>Personal portfolio</strong>
+                        </span>
+                        <em>Owner</em>
+                    </div>
+
                     <nav className="homeops-nav-list" aria-label="HomeOps navigation">
                         {navGroups.map((group) => (
                             <section className="homeops-nav-group" key={group.label} aria-label={group.label}>
@@ -176,8 +197,14 @@ export default function HomeOpsSidebar({ activePage, setActivePage }) {
                     </nav>
 
                     <div className="homeops-nav__session">
-                        <span>{user?.name || "Signed in"}</span>
-                        <button type="button" onClick={logout}>Logout</button>
+                        <button type="button" className="homeops-nav__profile" onClick={() => setActivePage("accounts")}>
+                            <span className="homeops-nav__profile-avatar">{initials || "A"}</span>
+                            <span className="homeops-nav__profile-copy">
+                                <strong>{user?.name || "Account"}</strong>
+                                <small>{user?.email || "Private owner workspace"}</small>
+                            </span>
+                        </button>
+                        <button type="button" className="homeops-nav__logout" onClick={logout}>Sign out</button>
                     </div>
                 </div>
             </aside>

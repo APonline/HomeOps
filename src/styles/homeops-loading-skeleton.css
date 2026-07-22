@@ -1,0 +1,176 @@
+@keyframes homeops-skeleton-shimmer {
+    0% { background-position: 120% 0; }
+    100% { background-position: -120% 0; }
+}
+
+.homeops-loading-pill,
+.homeops-loading-row__icon,
+.homeops-loading-row__line,
+.homeops-loading-row__action {
+    background:
+        linear-gradient(
+            100deg,
+            color-mix(in srgb, var(--platform-surface-strong, #172038) 76%, transparent) 20%,
+            color-mix(in srgb, var(--platform-text, #eef2ff) 10%, var(--platform-surface-strong, #172038)) 42%,
+            color-mix(in srgb, var(--platform-surface-strong, #172038) 76%, transparent) 64%
+        );
+    background-size: 240% 100%;
+    animation: homeops-skeleton-shimmer 1.35s ease-in-out infinite;
+}
+
+.homeops-loading-pill {
+    display: inline-block;
+    flex: 0 0 auto;
+    width: var(--homeops-skeleton-width, 74px);
+    min-width: var(--homeops-skeleton-width, 74px);
+    height: var(--homeops-skeleton-height, 24px);
+    min-height: var(--homeops-skeleton-height, 24px);
+    border: 1px solid var(--platform-border, #293654);
+    border-radius: 999px;
+    color: transparent !important;
+    font-size: 0 !important;
+    pointer-events: none;
+}
+
+.homeops-loading-list {
+    display: grid;
+    gap: 9px;
+    width: 100%;
+    margin-top: 12px;
+}
+
+.homeops-loading-row {
+    display: grid;
+    grid-template-columns: 42px minmax(150px, 1fr) minmax(104px, auto) 42px;
+    align-items: center;
+    gap: 14px;
+    min-height: 82px;
+    padding: 13px 14px;
+    overflow: hidden;
+    border: 1px solid var(--platform-border, #293654);
+    border-left: 4px solid color-mix(in srgb, var(--platform-blue, #6f9cff) 65%, var(--platform-border, #293654));
+    border-radius: 13px;
+    background: var(--platform-surface, #101726);
+}
+
+.homeops-loading-row__icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+}
+
+.homeops-loading-row__copy,
+.homeops-loading-row__meta {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+}
+
+.homeops-loading-row__meta {
+    justify-items: end;
+}
+
+.homeops-loading-row__line {
+    display: block;
+    height: 10px;
+    border-radius: 999px;
+}
+
+.homeops-loading-row__line.is-title {
+    width: min(190px, 76%);
+    height: 13px;
+}
+
+.homeops-loading-row__line.is-subtitle {
+    width: min(145px, 58%);
+    height: 9px;
+}
+
+.homeops-loading-row__line.is-meta {
+    width: 58px;
+    height: 8px;
+}
+
+.homeops-loading-row__line.is-value {
+    width: 88px;
+    height: 12px;
+}
+
+.homeops-loading-row__action {
+    width: 42px;
+    height: 36px;
+    border-radius: 10px;
+}
+
+.homeops-loading-list.is-compact {
+    gap: 7px;
+    margin-top: 0;
+}
+
+.homeops-loading-list.is-compact .homeops-loading-row {
+    grid-template-columns: 30px minmax(0, 1fr) 34px;
+    min-height: 58px;
+    padding: 9px 10px;
+    border-left-width: 3px;
+}
+
+.homeops-loading-list.is-compact .homeops-loading-row__icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+}
+
+.homeops-loading-list.is-compact .homeops-loading-row__meta {
+    display: none;
+}
+
+.homeops-loading-list.is-compact .homeops-loading-row__action {
+    width: 34px;
+    height: 30px;
+}
+
+.homeops-loading-list.is-compact .homeops-loading-row__line.is-title {
+    width: min(160px, 72%);
+    height: 11px;
+}
+
+.homeops-loading-list.is-compact .homeops-loading-row__line.is-subtitle {
+    width: min(118px, 54%);
+    height: 8px;
+}
+
+:root[data-theme="light"] .homeops-loading-row {
+    background: color-mix(in srgb, var(--platform-surface, #ffffff) 94%, #eef3ff);
+}
+
+@media (max-width: 620px) {
+    .homeops-loading-row {
+        grid-template-columns: 38px minmax(0, 1fr) 38px;
+        gap: 11px;
+        min-height: 72px;
+        padding: 11px 12px;
+    }
+
+    .homeops-loading-row__icon {
+        width: 38px;
+        height: 38px;
+    }
+
+    .homeops-loading-row__meta {
+        display: none;
+    }
+
+    .homeops-loading-row__action {
+        width: 38px;
+        height: 34px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .homeops-loading-pill,
+    .homeops-loading-row__icon,
+    .homeops-loading-row__line,
+    .homeops-loading-row__action {
+        animation: none;
+    }
+}

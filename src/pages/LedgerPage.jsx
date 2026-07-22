@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import Modal from "../components/Modal";
+import HomeOpsLoadingSkeleton, { HomeOpsLoadingPill } from "../components/HomeOpsLoadingSkeleton";
 import { useHomeOps } from "../context/HomeOpsContext";
 import {
     createLedgerEntry,
@@ -87,11 +88,11 @@ export default function LedgerPage({ refreshToken, refreshEverything, receiptMod
         }
     }
 
-    const pageTitle = receiptMode ? "Receipts" : "Ledger";
+    const pageTitle = receiptMode ? "Receipts" : "Transactions";
     const pageNote = receiptMode
         ? "Manual receipt capture now. Photo/OCR comes next."
-        : "Money events: purchases, bills, financing payments, income, and weird chaos.";
-    const actionLabel = receiptMode ? "+ Receipt" : "+ Ledger Entry";
+        : "Money coming in, going out, or moving between your accounts.";
+    const actionLabel = receiptMode ? "+ Receipt" : "+ Transaction";
 
     return (
         <>
@@ -100,23 +101,35 @@ export default function LedgerPage({ refreshToken, refreshEverything, receiptMod
                     <h1>{pageTitle}</h1>
                     <p>{pageNote}</p>
                 </div>
+                <button
+                    className="page-primary-action"
+                    type="button"
+                    onClick={() => {
+                        setError("");
+                        setActiveModal("entry");
+                    }}
+                >
+                    {actionLabel}
+                </button>
             </header>
 
             <section className="panel full-panel">
                 <div className="panel-header">
-                    <h2>{receiptMode ? "Current Month Receipts" : "Current Month Entries"}</h2>
+                    <h2>{receiptMode ? "Current Month Receipts" : "Current Month Transactions"}</h2>
 
                     <div className="panel-header__actions">
-                        <span>{loading ? "loading" : `${entries.length} entries`}</span>
+                        {loading ? <HomeOpsLoadingPill label="Loading entry count" /> : <span>{`${entries.length} entries`}</span>}
                         <button
-                            className="page-primary-action page-primary-action--compact"
+                            className="page-primary-action page-primary-action--compact page-primary-action--icon"
                             type="button"
                             onClick={() => {
                                 setError("");
                                 setActiveModal("entry");
                             }}
+                            aria-label={receiptMode ? "Add receipt" : "Add transaction"}
+                            title={receiptMode ? "Add receipt" : "Add transaction"}
                         >
-                            {actionLabel}
+                            +
                         </button>
                     </div>
                 </div>
@@ -133,7 +146,7 @@ export default function LedgerPage({ refreshToken, refreshEverything, receiptMod
                     </div>
                 )}
 
-                {loading && <div className="empty-box">Loading records...</div>}
+                {loading && <HomeOpsLoadingSkeleton rows={4} label={receiptMode ? "Loading receipts" : "Loading transactions"} />}
                 {!loading && entries.length === 0 && <div className="empty-box">No records yet. Add one with {actionLabel}.</div>}
 
                 <div className="record-list">
@@ -150,7 +163,7 @@ export default function LedgerPage({ refreshToken, refreshEverything, receiptMod
                 </div>
             </section>
 
-            <Modal active={activeModal === "entry"} onClose={() => setActiveModal(null)} title={receiptMode ? "Add Receipt" : "Add Ledger Entry"}>
+            <Modal active={activeModal === "entry"} onClose={() => setActiveModal(null)} title={receiptMode ? "Add Receipt" : "Add Transaction"}>
                 <form className="form-grid" onSubmit={submit}>
                     {error && <div className="form-error">{error}</div>}
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import homeOpsLogo from "../assets/brand/homeops-logo-horizontal-master-transparent.png";
+import homeOpsLogoLime from "../assets/brand/homeops-logo-horizontal-lime-transparent.png";
 import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
@@ -34,13 +35,25 @@ export default function LoginPage() {
         <main className="homeops-login-page">
             <section className="homeops-login-card panel" aria-labelledby="homeops-login-title">
                 <div className="homeops-login-card__brand">
-                    <img src={homeOpsLogo} alt="HomeOps" className="homeops-login-card__logo" />
+                    <img
+                        src={homeOpsLogo}
+                        alt="HomeOps"
+                        className="homeops-login-card__logo homeops-login-card__logo--default"
+                    />
+                    <img
+                        src={homeOpsLogoLime}
+                        alt=""
+                        aria-hidden="true"
+                        className="homeops-login-card__logo homeops-login-card__logo--light"
+                    />
                 </div>
 
                 <div className="homeops-login-card__intro">
                     <p className="eyebrow">Private Owner Mode</p>
                     <h1 id="homeops-login-title">Sign in to HomeOps</h1>
-                    <p>Sign in to access your properties, bills, maintenance, receipts, and dashboard.</p>
+                    <p className="homeops-login-card__subtitle">
+                        Sign in to access your properties, bills, maintenance, receipts, and dashboard.
+                    </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="homeops-login-form">

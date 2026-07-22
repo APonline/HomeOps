@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Modal from "../components/Modal";
+import HomeOpsLoadingSkeleton, { HomeOpsLoadingPill } from "../components/HomeOpsLoadingSkeleton";
 import MetricCard from "../components/MetricCard";
 import { useHomeOps } from "../context/HomeOpsContext";
 import {
@@ -188,9 +189,9 @@ export default function FinancingPage({ refreshToken, refreshEverything }) {
             <MetricCard label="Monthly Payments" value={money(summary.scheduled_monthly_payments || 0)} note="scheduled debt payments" />
         </div>
         <section className="panel full-panel">
-            <div className="panel-header"><h2>Accounts</h2><span>{loading ? "loading" : `${accounts.length} active`}</span></div>
+            <div className="panel-header"><h2>Accounts</h2><div className="panel-header__actions">{loading ? <HomeOpsLoadingPill label="Loading account count" /> : <span>{`${accounts.length} active`}</span>}<button className="page-primary-action page-primary-action--compact page-primary-action--icon" type="button" onClick={() => edit()} disabled={!schemaReady} aria-label="Add account" title="Add account">+</button></div></div>
             {error && <div className="form-error">{error}</div>}
-            {loading && <div className="empty-box">Loading accounts...</div>}
+            {loading && <HomeOpsLoadingSkeleton rows={3} label="Loading financial accounts" />}
             {!loading && schemaReady && accounts.length === 0 && <div className="empty-box">Add your mortgage, LOC, cards, savings, or other financing.</div>}
             <div className="record-list">
                 {accounts.map((account) => <article className="record-row" key={account.id}>

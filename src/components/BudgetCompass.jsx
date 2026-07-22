@@ -145,7 +145,7 @@ export default function BudgetCompass({ data, selectedYear, selectedMonth, selec
     }
 
     const setupHint = model.hasIncomePlan
-        ? "Local planning lens. Does not change ledger records."
+        ? "Local planning lens. Does not change transaction records."
         : "Add income or a flex cap to turn this into a daily spending guide.";
 
     return (
@@ -265,7 +265,7 @@ export default function BudgetCompass({ data, selectedYear, selectedMonth, selec
 
             <div className="budget-compass__actions">
                 <button type="button" onClick={() => goToPage?.("bills")}>Review bills</button>
-                <button type="button" onClick={() => goToPage?.("ledger")}>Add ledger item</button>
+                <button type="button" onClick={() => goToPage?.("ledger")}>Add transaction</button>
                 <button type="button" onClick={() => goToPage?.("periods")}>Explain a spike</button>
             </div>
         </section>

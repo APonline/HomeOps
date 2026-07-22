@@ -3,6 +3,7 @@ import MetricCard from "../components/MetricCard";
 import PeriodChart from "../components/PeriodChart";
 import DashboardBillsList from "../components/DashboardBillsList";
 import BudgetCompass from "../components/BudgetCompass";
+import DashboardVisualizations from "../components/DashboardVisualizations";
 import Modal from "../components/Modal";
 import { useHomeOps } from "../context/HomeOpsContext";
 import {
@@ -63,7 +64,7 @@ const monthNames = [
     "July", "August", "September", "October", "November", "December",
 ];
 
-const defaultBillForm = { payee: "", amount: "", due_day: "", frequency: "monthly", notes: "" };
+const defaultBillForm = { payee: "", amount: "", due_day: "", bill_type: "recurring", frequency: "monthly", notes: "" };
 const defaultReceiptForm = { vendor: "", date: todayIso(), total: "", category: "Home Supplies", notes: "" };
 const defaultPeriodForm = { title: "", period_type: "custom", start_date: "", end_date: "", notes: "" };
 
@@ -188,6 +189,39 @@ function formatHourLabel(hour) {
     return `${hour - 12}p`;
 }
 
+function normalizeCategoryLabel(entry = {}) {
+    return entry.category || entry.category_name || entry.name || entry.label || entry.vendor || "Uncategorized";
+}
+
+function buildCategoryBreakdown(categoryTotals = [], recentLedger = [], limit = 5) {
+    const seeded = (categoryTotals || [])
+        .map((item) => ({
+            label: normalizeCategoryLabel(item),
+            amount: Math.abs(Number(item.total ?? item.amount ?? item.value ?? item.spend_total ?? 0)),
+        }))
+        .filter((item) => item.amount > 0);
+
+    if (seeded.length) {
+        return seeded
+            .sort((a, b) => b.amount - a.amount)
+            .slice(0, limit);
+    }
+
+    const grouped = (recentLedger || []).reduce((accumulator, entry) => {
+        const label = normalizeCategoryLabel(entry);
+        const amount = readEntryAmount(entry);
+        if (!amount) return accumulator;
+
+        accumulator[label] = (accumulator[label] || 0) + amount;
+        return accumulator;
+    }, {});
+
+    return Object.entries(grouped)
+        .map(([label, amount]) => ({ label, amount }))
+        .sort((a, b) => b.amount - a.amount)
+        .slice(0, limit);
+}
+
 function buildHourlyActivity(recentLedger = [], selectedDay = todayIso()) {
     const bars = Array.from({ length: 24 }, (_, hour) => ({
         key: `hour-${hour}`,
@@ -308,14 +342,21 @@ export default function Dashboard({ refreshToken, refreshEverything, goToPage })
         ? dailyChart
         : (displayData.chartDays.length ? displayData.chartDays : (isDemoMode ? demoData.chartDays : []));
     const chartTitle = viewMode === "day" ? "Purchase Activity By Hour" : "Spending With Period Markups";
+    const categoryBreakdown = useMemo(() => buildCategoryBreakdown(displayData.categoryTotals, displayData.recentLedger), [displayData.categoryTotals, displayData.recentLedger]);
     const chartButton = viewMode === "day" ? "selected day" : "Marked periods";
     const chartLegend = viewMode === "day"
         ? [
-            { className: "normal", label: "Purchase / ledger activity" },
+            { className: "normal", label: "Purchase / transaction activity" },
             { className: "marked", label: "Evening window" },
         ]
         : undefined;
     const billsForView = selectBillsForView(displayData, demoData, viewMode, isDemoMode);
+    const expectedTotal = Number(displayData.metrics.expectedBills || 0);
+    const paidTotal = Number(displayData.metrics.paidThisMonth || 0);
+    const paidProgress = expectedTotal > 0 ? Math.min(Math.round((paidTotal / expectedTotal) * 100), 100) : 0;
+    const propertyName = selectedHome?.name || displayData.home?.name || "Default property";
+    const propertyMeta = displayData.home?.city_region || selectedHome?.city_region || "Property workspace";
+    const openOperations = Number(displayData.unpaidBillCount || 0) + Number(displayData.today?.maintenance_due_count || 0);
 
     function drillIntoDay(day) {
         if (viewMode === "day" || viewMode === "all-time") return;
@@ -329,45 +370,75 @@ export default function Dashboard({ refreshToken, refreshEverything, goToPage })
 
     return (
         <>
-            <header className="topbar v0-command-header">
-                <div>
+            <header className="topbar v0-command-header platform-page-header">
+                <div className="platform-page-header__copy">
+                    <div className="platform-breadcrumbs">
+                        <span>Overview</span>
+                        <i>/</i>
+                        <strong>{propertyName}</strong>
+                    </div>
                     <span className="v0-eyebrow">{kicker}</span>
-                    <h1>{title}</h1>
-                    <p>{commandDescription(viewMode)}</p>
+                    <h1>Property operations</h1>
+                    <p>{commandDescription(viewMode)} Current context: <strong>{title}</strong>.</p>
                 </div>
-
 
             </header>
 
-            <section className={`v0-dashboard-body ${dashboardLoading ? "is-loading" : ""}`} aria-busy={dashboardLoading ? "true" : "false"}>
-                <section className="v0-dashboard-hierarchy">
-                    <article className="v0-hierarchy-card">
-                        <span>Annual Health</span>
-                        <strong>{displayData.annual?.status || "Foundation"}</strong>
-                        <p>{selectedYear} · YTD spend {money(displayData.annual?.spend_total || 0)}</p>
+            <section className={`v0-dashboard-body platform-dashboard ${dashboardLoading ? "is-loading" : ""}`} aria-busy={dashboardLoading ? "true" : "false"}>
+                <section className="platform-executive-grid" aria-label="Property overview">
+                    <article className="platform-financial-summary">
+                        <div className="platform-card-kicker">Monthly position</div>
+                        <div className="platform-financial-summary__headline">
+                            <div>
+                                <span>Remaining obligations</span>
+                                <strong>{money(displayData.metrics.stillDue)}</strong>
+                            </div>
+                            <em>{paidProgress}% paid</em>
+                        </div>
+                        <div className="platform-progress" aria-label={`${paidProgress}% of expected bills paid`}>
+                            <span style={{ width: `${paidProgress}%` }} />
+                        </div>
+                        <div className="platform-financial-summary__details">
+                            <span><small>Expected</small><strong>{money(expectedTotal)}</strong></span>
+                            <span><small>Paid</small><strong>{money(paidTotal)}</strong></span>
+                            <span><small>Open bills</small><strong>{displayData.unpaidBillCount ?? 0}</strong></span>
+                        </div>
                     </article>
-                    <article className="v0-hierarchy-card">
-                        <span>{viewMode === "day" ? "Selected Day" : "Monthly Detail"}</span>
-                        <strong>{title}</strong>
-                        <p>{kicker} · {viewMode === "month" ? `Month ${selectedMonth}` : viewMode}</p>
+
+                    <article className="platform-overview-card">
+                        <div className="platform-card-kicker">Property</div>
+                        <strong>{propertyName}</strong>
+                        <p>{propertyMeta}</p>
+                        <div className="platform-overview-card__footer">
+                            <span>{displayData.annual?.status || "Operational"}</span>
+                            <button type="button" onClick={() => goToPage?.("home")}>View profile</button>
+                        </div>
                     </article>
-                    <article className="v0-hierarchy-card">
-                        <span>Today Snapshot</span>
-                        <strong>{selectedDay}</strong>
-                        <p>{money(displayData.today?.spent_total || 0)} spent · {displayData.today?.maintenance_due_count || 0} maintenance due</p>
-                    </article>
-                    <article className="v0-hierarchy-card">
-                        <span>Home</span>
-                        <strong>{selectedHome?.name || displayData.home?.name || "Default Home"}</strong>
-                        <p>{displayData.home?.city_region || selectedHome?.city_region || "Home context active"}</p>
+
+                    <article className="platform-overview-card">
+                        <div className="platform-card-kicker">Attention</div>
+                        <strong>{openOperations} open items</strong>
+                        <p>{displayData.today?.maintenance_due_count || 0} maintenance due · {displayData.unpaidBillCount || 0} unpaid bills</p>
+                        <div className="platform-overview-card__footer">
+                            <span>{money(displayData.today?.spent_total || 0)} spent today</span>
+                            <button type="button" onClick={() => goToPage?.("maintenance")}>Review</button>
+                        </div>
                     </article>
                 </section>
 
+                <section className="platform-section-heading">
+                    <div>
+                        <span>Performance</span>
+                        <h2>Financial snapshot</h2>
+                    </div>
+                    <button type="button" onClick={() => setActiveModal("period")}>Mark spending period</button>
+                </section>
+
                 <section className="metric-grid">
-                    <MetricCard label="Expected Bills" value={money(displayData.metrics.expectedBills)} note={viewMode === "day" ? "Selected context" : "This month"} />
-                    <MetricCard label="Paid This Month" value={money(displayData.metrics.paidThisMonth)} note={`${displayData.paidBillCount ?? 0} bills paid`} />
-                    <MetricCard label="Still Due" value={money(displayData.metrics.stillDue)} note={`${displayData.unpaidBillCount ?? 0} unpaid`} />
-                    <MetricCard label={viewMode === "day" ? "Spent Today" : "Marked Spending"} value={money(viewMode === "day" ? displayData.today?.spent_total || 0 : displayData.metrics.markedSpending)} note={viewMode === "day" ? "Day activity" : "Period-linked spending"} />
+                    <MetricCard label="Expected bills" value={money(displayData.metrics.expectedBills)} note={viewMode === "day" ? "Selected context" : "Current period"} />
+                    <MetricCard label="Paid" value={money(displayData.metrics.paidThisMonth)} note={`${displayData.paidBillCount ?? 0} bills cleared`} />
+                    <MetricCard label="Outstanding" value={money(displayData.metrics.stillDue)} note={`${displayData.unpaidBillCount ?? 0} bills require action`} />
+                    <MetricCard label={viewMode === "day" ? "Spent today" : "Period spending"} value={money(viewMode === "day" ? displayData.today?.spent_total || 0 : displayData.metrics.markedSpending)} note={viewMode === "day" ? "Transaction activity" : "Linked to marked periods"} />
                 </section>
 
                 <BudgetCompass
@@ -381,6 +452,23 @@ export default function Dashboard({ refreshToken, refreshEverything, goToPage })
                     apiContext={apiContext}
                 />
 
+                <section className="platform-section-heading">
+                    <div>
+                        <span>Visual intelligence</span>
+                        <h2>Executive charts</h2>
+                    </div>
+                    <button type="button" onClick={() => goToPage?.("reports")}>Dashboard detail</button>
+                </section>
+
+                <DashboardVisualizations
+                    trendSeries={chartData}
+                    categoryBreakdown={categoryBreakdown}
+                    paidTotal={paidTotal}
+                    outstandingTotal={displayData.metrics.stillDue}
+                    expectedTotal={expectedTotal}
+                    money={money}
+                    viewMode={viewMode}
+                />
 
                 <main className="dashboard-grid dashboard-grid--balanced">
                     <section className="panel chart-panel chart-panel--full">
@@ -484,6 +572,7 @@ export default function Dashboard({ refreshToken, refreshEverything, goToPage })
                                 payee: billForm.payee,
                                 amount: nullableNumber(billForm.amount),
                                 due_day: nullableNumber(billForm.due_day),
+                                bill_type: billForm.bill_type,
                                 frequency: billForm.frequency,
                                 notes: billForm.notes || null,
                             },
@@ -496,7 +585,8 @@ export default function Dashboard({ refreshToken, refreshEverything, goToPage })
                     <label className="span-6"><span>Payee</span><input value={billForm.payee} onChange={(e) => setBillForm({ ...billForm, payee: e.target.value })} placeholder="HOA / Condo Fees" required /></label>
                     <label className="span-3"><span>Amount</span><input value={billForm.amount} onChange={(e) => setBillForm({ ...billForm, amount: e.target.value })} type="number" placeholder="727" /></label>
                     <label className="span-3"><span>Due Day</span><input value={billForm.due_day} onChange={(e) => setBillForm({ ...billForm, due_day: e.target.value })} type="number" min="1" max="31" placeholder="1" /></label>
-                    <label className="span-12"><span>Frequency</span><select value={billForm.frequency} onChange={(e) => setBillForm({ ...billForm, frequency: e.target.value })}><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option><option value="annual">Annual</option><option value="once">One-time</option></select></label>
+                    <label className="span-6"><span>Bill Type</span><select value={billForm.bill_type} onChange={(e) => setBillForm({ ...billForm, bill_type: e.target.value })}><option value="core">Core obligation</option><option value="recurring">Recurring household</option><option value="one_time">One-time / irregular</option></select></label>
+                    <label className="span-6"><span>Frequency</span><select value={billForm.frequency} onChange={(e) => setBillForm({ ...billForm, frequency: e.target.value })}><option value="weekly">Weekly</option><option value="biweekly">Every 2 weeks</option><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option><option value="semiannual">Twice yearly</option><option value="annual">Annual</option><option value="once">One-time</option></select></label>
                     <label className="span-12"><span>Notes</span><textarea value={billForm.notes} onChange={(e) => setBillForm({ ...billForm, notes: e.target.value })} /></label>
                     <button className="primary-action span-12" disabled={saving}>{saving ? "Saving..." : "Save Bill"}</button>
                 </form>

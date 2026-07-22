@@ -1,0 +1,494 @@
+/* Property Hub optional-context management and Spending Period actions. */
+
+/* The + button floats over the header only. The divider and saved records use
+   the complete card width instead of retaining a permanent empty action column. */
+.v0-structure-row.v0-structure-row--standard,
+.v0-structure-row.v0-structure-row--assets {
+    padding: 16px 18px;
+    grid-template-columns: minmax(130px, .45fr) minmax(0, 1.55fr);
+    grid-template-areas:
+        "heading description"
+        "content content";
+    column-gap: 18px;
+    row-gap: 10px;
+}
+
+.v0-structure-row .v0-structure-row__description {
+    max-width: none;
+    padding-right: 56px;
+}
+
+.v0-structure-row .v0-structure-row__content {
+    width: 100%;
+    min-width: 0;
+    margin-top: 3px;
+    padding-top: 12px;
+}
+
+.v0-context-item-grid {
+    display: grid;
+    width: 100%;
+    gap: 7px;
+}
+
+.v0-context-item-grid--rooms {
+    grid-template-columns: repeat(auto-fit, minmax(135px, max-content));
+    justify-content: start;
+}
+
+.v0-context-item-grid--assets {
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+}
+
+.v0-context-item-grid--milestones {
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.v0-structure-card .v0-context-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 0;
+    min-height: 42px;
+    margin: 0;
+    padding: 7px 10px;
+    border: 1px solid var(--platform-border-strong);
+    border-radius: 11px;
+    background: color-mix(in srgb, var(--platform-surface-subtle) 82%, transparent);
+    color: var(--platform-text-strong);
+    text-align: left;
+    box-shadow: none;
+    transition: border-color .16s ease, background .16s ease, transform .16s ease;
+}
+
+.v0-structure-card .v0-context-item:hover,
+.v0-structure-card .v0-context-item:focus-visible {
+    border-color: color-mix(in srgb, var(--platform-blue) 58%, var(--platform-border));
+    background: color-mix(in srgb, var(--platform-blue) 10%, var(--platform-surface-subtle));
+    transform: translateY(-1px);
+}
+
+.v0-structure-card .v0-context-item:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--platform-blue) 18%, transparent);
+    outline-offset: 2px;
+}
+
+.v0-structure-card .v0-context-item > span {
+    display: grid;
+    min-width: 0;
+    gap: 3px;
+    color: var(--platform-text-strong);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: normal;
+    line-height: 1.15;
+    text-transform: none;
+}
+
+.v0-structure-card .v0-context-item strong {
+    min-width: 0;
+    color: var(--platform-text-strong);
+    font-size: 12px;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+}
+
+.v0-structure-card .v0-context-item small {
+    min-width: 0;
+    color: var(--platform-muted);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: normal;
+    line-height: 1.2;
+    text-transform: none;
+    overflow-wrap: anywhere;
+}
+
+.v0-structure-card .v0-context-item svg {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+    color: color-mix(in srgb, var(--platform-blue) 74%, var(--platform-text));
+    opacity: .58;
+    transition: opacity .16s ease, transform .16s ease;
+}
+
+.v0-structure-card .v0-context-item:hover svg,
+.v0-structure-card .v0-context-item:focus-visible svg {
+    opacity: 1;
+    transform: translateY(-1px);
+}
+
+.v0-structure-card .v0-context-item--room {
+    min-height: 30px;
+    padding: 6px 10px;
+    border-radius: 999px;
+}
+
+.v0-structure-card .v0-context-item--room > span {
+    color: color-mix(in srgb, var(--platform-blue) 76%, var(--platform-text-strong));
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    white-space: normal;
+}
+
+.v0-related-periods {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 12px;
+    padding: 11px 12px;
+    border: 1px solid color-mix(in srgb, var(--platform-purple, #875cff) 28%, var(--platform-border));
+    border-radius: 12px;
+    background:
+        linear-gradient(135deg, color-mix(in srgb, var(--platform-purple, #875cff) 9%, transparent), transparent 70%),
+        color-mix(in srgb, var(--platform-surface-subtle) 88%, transparent);
+}
+
+.v0-related-periods > div {
+    min-width: 0;
+}
+
+.v0-related-periods > div > span {
+    display: block;
+    color: var(--platform-text-strong);
+    font-size: 11px;
+    font-weight: 850;
+    letter-spacing: .02em;
+    line-height: 1.2;
+    text-transform: none;
+}
+
+.v0-related-periods > div > p {
+    margin: 3px 0 0 !important;
+    color: var(--platform-muted);
+    font-size: 11px;
+    line-height: 1.35 !important;
+}
+
+.v0-structure-card .v0-related-periods > button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    flex: 0 0 auto;
+    min-height: 34px;
+    margin: 0;
+    padding: 0 12px;
+    border-color: color-mix(in srgb, var(--platform-purple, #875cff) 45%, var(--platform-border));
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--platform-purple, #875cff) 13%, var(--platform-surface));
+    color: var(--platform-text-strong);
+    font-size: 10px;
+    font-weight: 820;
+    white-space: nowrap;
+}
+
+.v0-related-periods > button > span {
+    color: inherit;
+    font-size: 13px;
+    letter-spacing: normal;
+    text-transform: none;
+}
+
+.v0-context-form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.v0-context-form-actions .primary-action {
+    width: auto;
+    min-width: 180px;
+}
+
+.spending-periods-panel__intro {
+    margin: 5px 0 0;
+    color: var(--platform-muted);
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.spending-period-list {
+    align-items: stretch;
+}
+
+.spending-period-card {
+    display: grid;
+    align-content: start;
+    gap: 8px;
+    min-height: 0;
+}
+
+.spending-period-card__heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.spending-period-card__heading > div:first-child {
+    display: grid;
+    min-width: 0;
+    gap: 4px;
+}
+
+.spending-period-card__heading > div:first-child > span {
+    color: var(--platform-muted);
+    font-size: 10px;
+    font-weight: 760;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.spending-period-card__actions {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 6px;
+}
+
+.spending-period-card .spending-period-card__actions .mini-button {
+    min-height: 30px;
+    margin: 0;
+    padding: 0 10px;
+}
+
+.mini-button--danger {
+    border-color: color-mix(in srgb, var(--platform-red) 36%, var(--platform-border)) !important;
+    color: color-mix(in srgb, var(--platform-red) 72%, white) !important;
+    background: color-mix(in srgb, var(--platform-red) 9%, var(--platform-surface-subtle)) !important;
+}
+
+.mini-button--danger:hover {
+    border-color: color-mix(in srgb, var(--platform-red) 62%, var(--platform-border)) !important;
+    background: color-mix(in srgb, var(--platform-red) 16%, var(--platform-surface-subtle)) !important;
+}
+
+@media (max-width: 760px) {
+    .v0-structure-row.v0-structure-row--standard,
+    .v0-structure-row.v0-structure-row--assets {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+            "heading"
+            "description"
+            "content";
+        padding: 15px;
+        row-gap: 9px;
+    }
+
+    .v0-structure-row .v0-structure-row__description {
+        padding-right: 48px;
+    }
+
+    .v0-context-item-grid--rooms,
+    .v0-context-item-grid--assets,
+    .v0-context-item-grid--milestones {
+        grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+    }
+
+    .v0-related-periods {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .v0-structure-card .v0-related-periods > button {
+        width: 100%;
+    }
+
+    .v0-context-form-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .v0-context-form-actions .primary-action,
+    .v0-context-form-actions .bill-action-button {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .spending-period-card__heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .spending-period-card__actions {
+        width: 100%;
+    }
+
+    .spending-period-card .spending-period-card__actions .mini-button {
+        flex: 1 1 0;
+    }
+}
+
+:root[data-theme="light"] .v0-structure-card .v0-context-item {
+    border-color: rgba(61, 120, 72, .22);
+    background: rgba(255, 255, 255, .72);
+    color: #17231a;
+}
+
+:root[data-theme="light"] .v0-structure-card .v0-context-item:hover,
+:root[data-theme="light"] .v0-structure-card .v0-context-item:focus-visible {
+    border-color: rgba(46, 142, 74, .42);
+    background: rgba(234, 249, 224, .94);
+}
+
+:root[data-theme="light"] .v0-structure-card .v0-context-item > span,
+:root[data-theme="light"] .v0-structure-card .v0-context-item strong {
+    color: #17231a;
+}
+
+:root[data-theme="light"] .v0-structure-card .v0-context-item small,
+:root[data-theme="light"] .v0-related-periods > div > p,
+:root[data-theme="light"] .spending-periods-panel__intro {
+    color: #5c6d60;
+}
+
+:root[data-theme="light"] .v0-related-periods {
+    border-color: rgba(104, 78, 184, .2);
+    background: linear-gradient(135deg, rgba(132, 99, 210, .08), rgba(255, 255, 255, .8));
+}
+
+:root[data-theme="light"] .v0-related-periods > div > span,
+:root[data-theme="light"] .v0-related-periods > button {
+    color: #20231f;
+}
+
+/* Compact explanatory hints are reserved for modal form headings so page
+   sections can keep their supporting copy visible. */
+.form-section-label--with-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-section-label--with-info {
+    width: 100%;
+}
+
+.form-section-label--with-info > span {
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+}
+
+.v0-inline-info-hint {
+    position: relative;
+    z-index: 4;
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    border: 1px solid color-mix(in srgb, var(--platform-blue) 62%, var(--platform-border));
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--platform-blue) 8%, var(--platform-surface));
+    color: color-mix(in srgb, var(--platform-blue) 78%, var(--platform-text-strong));
+    padding: 0;
+    cursor: help;
+    outline: none;
+}
+
+.v0-inline-info-hint svg {
+    width: 12px;
+    height: 12px;
+}
+
+.v0-inline-info-hint::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: calc(100% + 9px);
+    left: 0;
+    z-index: 30;
+    width: max-content;
+    max-width: min(330px, 72vw);
+    padding: 9px 11px;
+    border: 1px solid color-mix(in srgb, var(--platform-blue) 34%, var(--platform-border));
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--platform-surface) 96%, black 4%);
+    color: var(--platform-text);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, .3);
+    font-size: 11px;
+    font-weight: 620;
+    letter-spacing: normal;
+    line-height: 1.45;
+    text-align: left;
+    text-transform: none;
+    white-space: normal;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-3px);
+    transition: opacity .14s ease, transform .14s ease, visibility .14s ease;
+}
+
+.v0-inline-info-hint:hover::after,
+.v0-inline-info-hint:focus-visible::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.v0-inline-info-hint:focus-visible {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--platform-blue) 22%, transparent);
+}
+
+/* Keep the useful Bills count and navigation action beneath the visible
+   ownership guidance and metrics. */
+.v0-baseline-source.v0-baseline-source--compact {
+    width: auto;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 14px;
+    margin-left: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+.v0-baseline-source--compact > strong {
+    min-height: 34px;
+    padding: 7px 11px;
+}
+
+.v0-baseline-source--compact .v0-baseline-source__link {
+    min-height: 34px;
+    padding: 8px 12px;
+}
+
+/* The Property modal remains scrollable without reserving a permanent gutter
+   that reads visually as a second right-hand border. */
+.modal-card--property {
+    scrollbar-gutter: auto !important;
+    scrollbar-color: color-mix(in srgb, var(--platform-blue) 35%, transparent) transparent;
+}
+
+.modal-card--property::-webkit-scrollbar-track {
+    border: 0;
+    background: transparent;
+}
+
+@media (max-width: 760px) {
+    .v0-inline-info-hint::after {
+        right: 0;
+        left: auto;
+        max-width: min(280px, calc(100vw - 64px));
+    }
+
+    .v0-baseline-source.v0-baseline-source--compact {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .v0-baseline-source--compact .v0-baseline-source__link {
+        flex: 0 0 auto;
+        width: auto;
+        max-width: none;
+    }
+}

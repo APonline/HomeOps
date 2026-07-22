@@ -1,0 +1,328 @@
+/* Property snapshot semantic fact cards. Loaded last to preserve category accents. */
+
+.v0-detail-grid {
+    --property-fact-spec: var(--platform-blue, #62a5ff);
+    --property-fact-location: #42bfc4;
+    --property-fact-purchase: var(--platform-green, #45c98f);
+    --property-fact-asset: var(--platform-amber, #e5a84b);
+}
+
+.v0-detail-item {
+    --property-fact-accent: var(--property-fact-spec);
+
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-color: color-mix(
+        in srgb,
+        var(--property-fact-accent) 58%,
+        var(--platform-border)
+    ) !important;
+    background:
+        linear-gradient(
+            145deg,
+            color-mix(in srgb, var(--property-fact-accent) 9%, transparent),
+            transparent 74%
+        ),
+        var(--platform-surface-subtle) !important;
+    box-shadow:
+        inset 0 1px 0 color-mix(in srgb, var(--property-fact-accent) 11%, transparent),
+        var(--platform-shadow-sm) !important;
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        transform 0.18s ease,
+        background 0.18s ease;
+}
+
+.v0-detail-item::before {
+    content: "";
+    position: absolute;
+    inset: 10px auto 10px 0;
+    width: 3px;
+    border-radius: 0 999px 999px 0;
+    background: var(--property-fact-accent);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--property-fact-accent) 28%, transparent);
+}
+
+.v0-detail-item > span {
+    color: color-mix(
+        in srgb,
+        var(--property-fact-accent) 78%,
+        var(--platform-text)
+    ) !important;
+}
+
+.v0-detail-item > strong {
+    color: var(--platform-text-strong) !important;
+}
+
+.v0-detail-item.is-spec {
+    --property-fact-accent: var(--property-fact-spec);
+}
+
+.v0-detail-item.is-location {
+    --property-fact-accent: var(--property-fact-location);
+}
+
+.v0-detail-item.is-purchase {
+    --property-fact-accent: var(--property-fact-purchase);
+}
+
+.v0-detail-item.is-asset {
+    --property-fact-accent: var(--property-fact-asset);
+}
+
+@media (hover: hover) {
+    .v0-detail-item:hover {
+        border-color: color-mix(
+            in srgb,
+            var(--property-fact-accent) 76%,
+            var(--platform-border)
+        ) !important;
+        background:
+            linear-gradient(
+                145deg,
+                color-mix(in srgb, var(--property-fact-accent) 13%, transparent),
+                transparent 76%
+            ),
+            var(--platform-surface-subtle) !important;
+        box-shadow:
+            inset 0 1px 0 color-mix(in srgb, var(--property-fact-accent) 14%, transparent),
+            0 10px 24px color-mix(in srgb, var(--property-fact-accent) 8%, transparent) !important;
+        transform: translateY(-1px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .v0-detail-item {
+        transition: none;
+    }
+}
+
+/* Property Hub refinement pass: screenshot-directed spacing, hierarchy and layout. */
+
+/* The page-header button rule gives every button horizontal padding. Restore the
+ * compact info control so its glyph remains optically centred. */
+.page-header .v0-info-button,
+.v0-title-with-info .v0-info-button {
+    display: inline-grid !important;
+    place-items: center !important;
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 !important;
+    border-radius: 999px !important;
+}
+
+.page-header .v0-info-button svg,
+.v0-title-with-info .v0-info-button svg {
+    position: static !important;
+    display: block !important;
+    width: 18px !important;
+    height: 18px !important;
+    margin: 0 !important;
+    transform: none !important;
+}
+
+/* Info modal cards need a proper inset below the title and intro. */
+.modal-card > .v0-info-modal-copy {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 24px 24px !important;
+}
+
+/* Keep the Edit Property form comfortably sized and independently scrollable
+ * on desktop-height viewports. */
+.modal-card--property {
+    width: min(720px, calc(100vw - 32px)) !important;
+    max-width: 720px !important;
+    max-height: calc(100dvh - 40px) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+}
+
+.modal-card--property > h2 {
+    padding: 20px 22px 7px !important;
+    font-size: 22px !important;
+}
+
+.modal-card--property > .modal-intro {
+    padding: 0 22px 14px !important;
+}
+
+.modal-card--property > .form-grid {
+    gap: 12px 12px !important;
+    padding: 0 22px 22px !important;
+}
+
+.modal-card--property .form-section-label {
+    margin-top: 2px;
+    padding-top: 12px;
+}
+
+.modal-card--property .v0-property-form-note {
+    padding: 13px 15px;
+}
+
+.modal-card--property .form-grid textarea {
+    min-height: 88px !important;
+}
+
+/* The three optional-context totals should read as useful summary metrics,
+ * without assigning arbitrary semantic colours to each count. */
+.v0-profile-hero__stack .v0-profile-stat {
+    border-color: color-mix(in srgb, var(--platform-blue, #62a5ff) 42%, var(--platform-border)) !important;
+    background:
+        radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--platform-blue, #62a5ff) 13%, transparent), transparent 62%),
+        color-mix(in srgb, var(--platform-surface) 94%, transparent) !important;
+    box-shadow:
+        inset 0 1px 0 color-mix(in srgb, var(--platform-blue, #62a5ff) 12%, transparent),
+        0 8px 22px rgba(0, 0, 0, 0.12) !important;
+}
+
+.v0-profile-hero__stack .v0-profile-stat b {
+    color: var(--platform-text-strong) !important;
+    font-size: 27px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+.v0-profile-hero__stack .v0-profile-stat span {
+    color: color-mix(in srgb, var(--platform-blue, #62a5ff) 74%, var(--platform-text)) !important;
+    font-size: 9px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.14em !important;
+}
+
+/* Leave a clear visual gap between the hero edit control and the summary tiles. */
+@media (min-width: 901px) {
+    .v0-property-hero .v0-profile-hero__stack {
+        margin-top: 18px;
+    }
+}
+
+/* Give all three optional-context sections the same hierarchy: heading and
+ * explanation on the first row, then the saved items across the full width. */
+.v0-structure-row.v0-structure-row--standard,
+.v0-structure-row.v0-structure-row--assets {
+    grid-template-columns: minmax(120px, 0.45fr) minmax(0, 1.55fr);
+    grid-template-areas:
+        "heading description"
+        "content content";
+    column-gap: 16px;
+    row-gap: 10px;
+}
+
+.v0-structure-row .v0-structure-row__heading {
+    grid-area: heading;
+}
+
+.v0-structure-row .v0-structure-row__description {
+    grid-area: description;
+    max-width: 38rem;
+}
+
+.v0-structure-row .v0-structure-row__content {
+    grid-area: content;
+    margin-top: 2px;
+    padding-top: 12px;
+    border-top: 1px solid color-mix(
+        in srgb,
+        var(--platform-blue, #62a5ff) 28%,
+        var(--platform-border)
+    );
+}
+
+/* Saved records use the available width rather than a fixed two-column list. */
+.v0-structure-row__records {
+    grid-template-columns: repeat(auto-fit, minmax(178px, 1fr));
+    gap: 7px;
+}
+
+.v0-structure-row__records .record-row {
+    align-items: start;
+}
+
+.v0-structure-row__records .record-row strong,
+.v0-structure-row__records .record-row p {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+}
+
+/* Asset entries are compact chips/cards and flow into as many columns as fit. */
+.v0-structure-row--assets .v0-structure-row__records {
+    grid-template-columns: repeat(auto-fit, minmax(138px, 1fr));
+    gap: 6px;
+}
+
+.v0-structure-row--assets .v0-structure-row__records .record-row {
+    min-height: 40px;
+    padding: 6px 10px;
+    border-radius: 11px;
+}
+
+.v0-structure-row--assets .v0-structure-row__records .record-row strong {
+    font-size: 12px;
+    line-height: 1.1;
+}
+
+.v0-structure-row--assets .v0-structure-row__records .record-row p {
+    margin-top: 3px;
+    font-size: 10px;
+    line-height: 1.1;
+}
+
+@media (max-width: 1080px) and (min-width: 761px) {
+    .v0-structure-row.v0-structure-row--standard,
+    .v0-structure-row.v0-structure-row--assets {
+        grid-template-columns: minmax(110px, 0.4fr) minmax(0, 1.6fr);
+        column-gap: 14px;
+    }
+}
+
+@media (max-width: 760px) {
+    .modal-card > .v0-info-modal-copy {
+        padding: 0 16px 18px !important;
+    }
+
+    .modal-card--property {
+        width: 100% !important;
+        max-width: 520px !important;
+        max-height: none !important;
+        overflow: visible !important;
+        scrollbar-gutter: auto;
+    }
+
+    .modal-card--property > h2 {
+        padding: 20px 18px 7px !important;
+    }
+
+    .modal-card--property > .modal-intro {
+        padding: 0 18px 14px !important;
+    }
+
+    .modal-card--property > .form-grid {
+        padding: 0 18px 20px !important;
+    }
+
+    .v0-structure-row.v0-structure-row--standard,
+    .v0-structure-row.v0-structure-row--assets {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+            "heading"
+            "description"
+            "content";
+        gap: 9px;
+    }
+
+    .v0-structure-row__records,
+    .v0-structure-row--assets .v0-structure-row__records {
+        grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+    }
+}

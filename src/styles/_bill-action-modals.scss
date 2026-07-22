@@ -1,0 +1,163 @@
+/* Bills: styled action dialogs replace native browser prompt/confirm boxes. */
+
+.modal-card--compact {
+    width: min(500px, 100%);
+}
+
+.bill-action-confirmation,
+.bill-month-form {
+    min-width: 0;
+}
+
+.bill-action-confirmation {
+    display: grid;
+    gap: 18px;
+}
+
+.bill-action-summary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 5px 16px;
+    min-width: 0;
+    padding: 14px 15px;
+    border: 1px solid var(--platform-border);
+    border-radius: 12px;
+    background:
+        linear-gradient(135deg, color-mix(in srgb, var(--platform-accent) 7%, transparent), transparent 72%),
+        var(--platform-surface-subtle);
+}
+
+.bill-action-summary > span {
+    min-width: 0;
+    color: var(--platform-text-strong);
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.bill-action-summary > strong {
+    color: var(--platform-text-strong);
+    font-size: 18px;
+    font-weight: 860;
+    letter-spacing: -.025em;
+    line-height: 1;
+}
+
+.bill-action-summary > small {
+    grid-column: 1 / -1;
+    color: var(--platform-muted);
+    font-size: 10px;
+    font-weight: 650;
+}
+
+.bill-action-modal__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 2px;
+}
+
+.bill-action-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 126px;
+    min-height: 42px;
+    padding: 0 16px;
+    border: 1px solid transparent;
+    border-radius: 11px;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 820;
+    cursor: pointer;
+    transition: transform .16s ease, border-color .16s ease, background .16s ease, opacity .16s ease;
+}
+
+.bill-action-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.bill-action-button:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--platform-accent) 22%, transparent);
+    outline-offset: 2px;
+}
+
+.bill-action-button:disabled {
+    opacity: .58;
+    cursor: wait;
+}
+
+.bill-action-button--secondary {
+    border-color: var(--platform-border-strong);
+    color: var(--platform-text);
+    background: var(--platform-surface-subtle);
+}
+
+.bill-action-button--secondary:hover:not(:disabled) {
+    color: var(--platform-text-strong);
+    background: var(--platform-surface-strong);
+}
+
+.bill-action-button--primary {
+    color: #fff;
+    background: linear-gradient(135deg, var(--platform-blue), var(--platform-purple, #875cff));
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--platform-purple, #875cff) 20%, transparent);
+}
+
+.bill-action-button--warning {
+    border-color: color-mix(in srgb, var(--platform-amber) 44%, transparent);
+    color: var(--platform-text-strong);
+    background: color-mix(in srgb, var(--platform-amber) 18%, var(--platform-surface));
+}
+
+.bill-action-button--danger {
+    border-color: color-mix(in srgb, var(--platform-red) 44%, transparent);
+    color: #fff;
+    background: color-mix(in srgb, var(--platform-red) 78%, #3b1118);
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--platform-red) 17%, transparent);
+}
+
+.bill-month-form .form-error,
+.bill-action-confirmation .form-error {
+    margin: 0;
+}
+
+@media (max-width: 560px) {
+    .modal-card--compact {
+        width: 100%;
+    }
+
+    .bill-action-summary {
+        padding: 12px 13px;
+    }
+
+    .bill-action-modal__actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+    }
+
+    .bill-action-button {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+/* Compact confirmation modals need their own body padding because their child is not a form-grid. */
+.modal-card--compact > .bill-action-confirmation {
+    padding: 0 24px 24px;
+}
+
+@media (max-width: 560px) {
+    .modal-card--compact > .bill-action-confirmation {
+        padding: 0 18px 18px;
+    }
+
+    .bill-action-modal__actions {
+        gap: 9px;
+    }
+}

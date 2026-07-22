@@ -4,13 +4,13 @@ import HomeOpsThemeToggle from "./HomeOpsThemeToggle";
 const navItems = [
     { key: "dashboard", label: "Dashboard", enabled: true },
     { key: "bills", label: "Bills", enabled: true },
-    { key: "ledger", label: "Ledger", enabled: true },
+    { key: "financing", label: "Financing", enabled: true },
     { key: "receipts", label: "Receipts", enabled: true },
+    { key: "ledger", label: "Transactions", enabled: true },
     { key: "maintenance", label: "Maintenance", enabled: true },
     { key: "wishlist", label: "Needs & Wants", enabled: true },
     { key: "periods", label: "Spending Periods", enabled: true },
 
-    { key: "financing", label: "Financing", enabled: true },
     { key: "accounts", label: "Accounts", enabled: true },
     { key: "documents", label: "Documents", enabled: true },
     { key: "reports", label: "Reports", enabled: true },

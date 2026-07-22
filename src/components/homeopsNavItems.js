@@ -1,7 +1,7 @@
 export const primaryNavItems = [
   { key: "dashboard", label: "Dashboard", icon: "dashboard" },
   { key: "bills", label: "Bills", icon: "bills" },
-  { key: "ledger", label: "Ledger", icon: "ledger" },
+  { key: "ledger", label: "Transactions", icon: "ledger" },
   { key: "receipts", label: "Receipts", icon: "receipts" },
   { key: "maintenance", label: "Maintenance", icon: "maintenance" },
   { key: "needs-wants", label: "Needs & Wants", icon: "needs" },

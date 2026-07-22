@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import Modal from "../components/Modal";
+import HomeOpsLoadingSkeleton, { HomeOpsLoadingPill } from "../components/HomeOpsLoadingSkeleton";
 import { useHomeOps } from "../context/HomeOpsContext";
 import {
     createWishlistItem,
@@ -97,6 +98,16 @@ export default function WishlistPage({ refreshToken, refreshEverything }) {
                     <h1>Needs & Wants</h1>
                     <p>Separate survival stuff from dopamine stuff. Track cost, room, priority, and status.</p>
                 </div>
+                <button
+                    className="page-primary-action"
+                    type="button"
+                    onClick={() => {
+                        setError("");
+                        setActiveModal("item");
+                    }}
+                >
+                    + Item
+                </button>
             </header>
 
             <section className="panel full-panel">
@@ -104,16 +115,18 @@ export default function WishlistPage({ refreshToken, refreshEverything }) {
                     <h2>Tracked</h2>
 
                     <div className="panel-header__actions">
-                        <span>{loading ? "loading" : `${items.length} open`}</span>
+                        {loading ? <HomeOpsLoadingPill label="Loading item count" /> : <span>{`${items.length} open`}</span>}
                         <button
-                            className="page-primary-action page-primary-action--compact"
+                            className="page-primary-action page-primary-action--compact page-primary-action--icon"
                             type="button"
                             onClick={() => {
                                 setError("");
                                 setActiveModal("item");
                             }}
+                            aria-label="Add item"
+                            title="Add item"
                         >
-                            + Item
+                            +
                         </button>
                     </div>
                 </div>
@@ -128,7 +141,7 @@ export default function WishlistPage({ refreshToken, refreshEverything }) {
                     </div>
                 )}
 
-                {loading && <div className="empty-box">Loading needs/wants...</div>}
+                {loading && <HomeOpsLoadingSkeleton rows={3} label="Loading needs and wants" />}
                 {!loading && items.length === 0 && <div className="empty-box">No needs/wants yet. Add one with + Item.</div>}
 
                 <div className="record-list">

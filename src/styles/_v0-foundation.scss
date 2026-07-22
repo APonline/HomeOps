@@ -1946,6 +1946,88 @@
     background: rgba(8, 14, 28, 0.45);
 }
 
+.bill-engine-summary__card {
+    --summary-accent: var(--platform-blue);
+
+    position: relative;
+    display: grid;
+    place-content: center;
+    gap: 6px;
+    min-height: 76px;
+    padding: 14px;
+
+    border: 1px solid
+        color-mix(
+            in srgb,
+            var(--summary-accent) 52%,
+            var(--platform-border)
+        );
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            145deg,
+            color-mix(
+                in srgb,
+                var(--summary-accent) 7%,
+                transparent
+            ),
+            transparent 72%
+        ),
+        var(--platform-surface);
+
+    text-align: center;
+
+    box-shadow:
+        inset 0 1px 0
+            color-mix(
+                in srgb,
+                var(--summary-accent) 10%,
+                transparent
+            ),
+        var(--platform-shadow-sm);
+}
+
+.bill-engine-summary__card span {
+    color:
+        color-mix(
+            in srgb,
+            var(--summary-accent) 72%,
+            var(--platform-text)
+        );
+
+    font-size: 11px;
+    font-weight: 720;
+    line-height: 1.2;
+}
+
+.bill-engine-summary__card strong {
+    color: var(--platform-text-strong);
+    font-size: 18px;
+    font-weight: 860;
+    line-height: 1;
+    letter-spacing: -0.025em;
+}
+
+/* Semantic colours */
+
+.bill-engine-summary__card.is-expected {
+    --summary-accent: var(--platform-blue);
+}
+
+.bill-engine-summary__card.is-paid {
+    --summary-accent: var(--platform-green, #45c98f);
+}
+
+.bill-engine-summary__card.is-due {
+    --summary-accent: var(--platform-amber);
+}
+
+.bill-engine-summary__card.is-open {
+    --summary-accent: var(--platform-purple, #9171ff);
+}
+
 .bill-engine-summary span,
 .bill-subline {
     display: block;
@@ -1979,4 +2061,58 @@ td .bill-subline {
     .bill-engine-summary {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+}
+
+.bill-engine-summary > .bill-engine-summary__card {
+    --summary-accent: var(--platform-blue, #5f9cff);
+
+    position: relative;
+    border: 1px solid color-mix(
+        in srgb,
+        var(--summary-accent) 65%,
+        var(--platform-border)
+    );
+
+    background:
+        linear-gradient(
+            145deg,
+            color-mix(
+                in srgb,
+                var(--summary-accent) 9%,
+                transparent
+            ),
+            transparent 72%
+        ),
+        var(--platform-surface);
+}
+
+.bill-engine-summary > .bill-engine-summary__card > span {
+    color: color-mix(
+        in srgb,
+        var(--summary-accent) 82%,
+        white
+    );
+    font-weight: 750;
+}
+
+.bill-engine-summary > .bill-engine-summary__card > strong {
+    color: var(--platform-text-strong);
+}
+
+/* Individual card accents */
+
+.bill-engine-summary > .bill-engine-summary__card.is-expected {
+    --summary-accent: var(--platform-blue, #5f9cff);
+}
+
+.bill-engine-summary > .bill-engine-summary__card.is-paid {
+    --summary-accent: var(--platform-green, #42cf91);
+}
+
+.bill-engine-summary > .bill-engine-summary__card.is-due {
+    --summary-accent: var(--platform-amber, #e7a54b);
+}
+
+.bill-engine-summary > .bill-engine-summary__card.is-open {
+    --summary-accent: var(--platform-purple, #9a78ff);
 }

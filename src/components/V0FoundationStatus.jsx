@@ -113,7 +113,7 @@ export default function V0FoundationStatus({ apiContext, goToPage }) {
             <div className="v0-foundation-status__actions">
                 <button type="button" className="ghost-action" onClick={() => goToPage?.("home")}>Property Profile</button>
                 <button type="button" className="ghost-action" onClick={() => goToPage?.("bills")}>Bills Engine</button>
-                <button type="button" className="ghost-action" onClick={() => goToPage?.("ledger")}>Ledger</button>
+                <button type="button" className="ghost-action" onClick={() => goToPage?.("ledger")}>Transactions</button>
                 <button type="button" className="ghost-action" onClick={loadStatus} disabled={loading}>{loading ? "Checking..." : "Refresh Check"}</button>
             </div>
         </section>

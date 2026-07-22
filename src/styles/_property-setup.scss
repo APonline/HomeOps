@@ -753,7 +753,7 @@ body.property-setup-open {
     min-width: 220px;
 }
 
-:root[data-theme="light"].property-setup__scene {
+:root[data-theme="light"] .property-setup__scene {
     background:
         radial-gradient(circle at 12% 8%, rgba(165, 255, 55, .20), transparent 30rem),
         radial-gradient(circle at 86% 82%, rgba(83, 199, 101, .16), transparent 34rem),

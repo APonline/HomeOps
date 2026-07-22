@@ -1,0 +1,174 @@
+:root {
+    --period-tone-blue: #69a8ff;
+    --period-tone-purple: #9b7bff;
+    --period-tone-green: #4fd49c;
+    --period-tone-orange: #f0a14a;
+    --period-tone-teal: #45c7c2;
+    --period-tone-pink: #db78bd;
+    --period-tone-red: #e56b70;
+}
+
+.tone-blue {
+    --period-tone-color: var(--period-tone-blue);
+}
+
+.tone-purple {
+    --period-tone-color: var(--period-tone-purple);
+}
+
+.tone-green {
+    --period-tone-color: var(--period-tone-green);
+}
+
+.tone-orange {
+    --period-tone-color: var(--period-tone-orange);
+}
+
+.tone-teal {
+    --period-tone-color: var(--period-tone-teal);
+}
+
+.tone-pink {
+    --period-tone-color: var(--period-tone-pink);
+}
+
+.tone-red {
+    --period-tone-color: var(--period-tone-red);
+}
+
+.spending-period-card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-left-width: 4px;
+    border-left-color: var(--period-tone-color, var(--period-tone-purple));
+    background-image: linear-gradient(
+        135deg,
+        color-mix(
+            in srgb,
+            var(--period-tone-color, var(--period-tone-purple)) 12%,
+            transparent
+        ),
+        transparent 58%
+    );
+}
+
+.spending-period-card::after {
+    position: absolute;
+    z-index: 0;
+    top: -90px;
+    left: -80px;
+    width: 220px;
+    height: 220px;
+    border-radius: 999px;
+    background: var(--period-tone-color, var(--period-tone-purple));
+    content: "";
+    opacity: 0.055;
+    pointer-events: none;
+    filter: blur(24px);
+}
+
+.spending-period-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.spending-period-card__identity {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+}
+
+.spending-period-card__identity > div {
+    display: grid;
+    gap: 8px;
+}
+
+.spending-period-card__tone {
+    width: 9px;
+    height: 9px;
+    flex: 0 0 9px;
+    margin-top: 4px;
+    border-radius: 999px;
+    background: var(--period-tone-color, var(--period-tone-purple));
+    box-shadow: 0 0 0 4px
+        color-mix(
+            in srgb,
+            var(--period-tone-color, var(--period-tone-purple)) 16%,
+            transparent
+        );
+}
+
+.spending-period-card__type {
+    color: var(--period-tone-color, var(--period-tone-purple));
+}
+
+.bar.marked[class*="tone-"] {
+    border-color: color-mix(
+        in srgb,
+        var(--period-tone-color) 72%,
+        white
+    );
+    background-color: var(--period-tone-color);
+    background-image: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--period-tone-color) 74%, white),
+        var(--period-tone-color)
+    );
+    box-shadow: 0 7px 20px
+        color-mix(in srgb, var(--period-tone-color) 24%, transparent);
+}
+
+
+/* Spending period card refinement */
+.period-list .period-card.spending-period-card {
+    border: 1px solid
+        var(--period-tone-color, var(--period-tone-purple)) !important;
+    border-left-width: 4px !important;
+    box-shadow:
+        inset 0 0 0 1px
+            color-mix(
+                in srgb,
+                var(--period-tone-color, var(--period-tone-purple)) 8%,
+                transparent
+            ),
+        0 12px 28px rgb(0 0 0 / 8%);
+}
+
+.spending-period-card__date {
+    margin: 17px 0 6px;
+    color: color-mix(
+        in srgb,
+        var(--period-tone-color, var(--period-tone-purple)) 76%,
+        white
+    );
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.025em;
+}
+
+.spending-period-card__summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 0;
+    font-size: 0.76rem;
+    opacity: 0.86;
+}
+
+.spending-period-card__summary span {
+    display: inline-flex;
+    align-items: center;
+}
+
+.spending-period-card__summary span + span::before {
+    margin: 0 8px;
+    color: var(--period-tone-color, var(--period-tone-purple));
+    content: "•";
+    font-size: 0.72em;
+}
+
+.spending-period-card__summary + small {
+    display: block;
+    margin-top: 14px;
+}
