@@ -14,6 +14,7 @@ const pageLabels = {
     receipts: "Receipts",
     financing: "Financing",
     reports: "Reports",
+    closeout: "Month close",
     maintenance: "Maintenance",
     wishlist: "Plans",
     periods: "Spending periods",

@@ -265,6 +265,10 @@ export function getHomeRooms(homeId) {
     return apiGet(`/api/homeops/homes/${homeId}/rooms`);
 }
 
+export function getHomeAssets(homeId) {
+    return apiGet(`/api/homeops/homes/${homeId}/assets`);
+}
+
 export function addRoom(homeId, payload) {
     return apiPost(`/api/homeops/homes/${homeId}/rooms`, payload);
 }
@@ -372,7 +376,25 @@ export function createLedgerEntry(payload, context = {}) {
 }
 
 export function createReceipt(payload, context = {}) {
+    if (payload instanceof FormData) {
+        return apiPostForm("/api/homeops/receipts", withHomeFormData(payload, context));
+    }
+
     return apiPost("/api/homeops/receipts", withHomePayload(payload, context));
+}
+
+export function scanReceipt(file, context = {}) {
+    const payload = new FormData();
+    payload.append("receipt_file", file);
+    return apiPostForm("/api/homeops/receipts/scan", withHomeFormData(payload, context));
+}
+
+export function commitReceiptScan(scanId, payload, context = {}) {
+    return apiPost(`/api/homeops/receipts/scans/${scanId}/commit`, withHomePayload(payload, context));
+}
+
+export function cancelReceiptScan(scanId, context = {}) {
+    return apiDelete(withContextQuery(`/api/homeops/receipts/scans/${scanId}`, context));
 }
 
 export function getReceipts(context = {}) {
@@ -385,6 +407,21 @@ export function updateReceipt(receiptId, payload, context = {}) {
 
 export function deleteReceipt(receiptId, context = {}) {
     return apiDelete(withContextQuery(`/api/homeops/receipts/${receiptId}`, context));
+}
+
+export async function downloadReceiptFile(receiptId, context = {}) {
+    const response = await fetch(apiUrl(withContextQuery(`/api/homeops/receipts/${receiptId}/file`, context)), {
+        headers: authHeaders(),
+    });
+
+    if (!response.ok) {
+        return parseResponse(response);
+    }
+
+    return {
+        blob: await response.blob(),
+        filename: `receipt-${receiptId}`,
+    };
 }
 
 export function updateLedgerEntry(entryId, payload, context = {}) {
@@ -554,6 +591,18 @@ export function getBudgetProfile(context = {}) {
 
 export function updateBudgetProfile(payload = {}, context = {}) {
     return apiPatch(withContextQuery("/api/homeops/budget-profile", context), withHomePayload(payload, context));
+}
+
+export function getMonthClose(context = {}) {
+    return apiGet(withContextQuery("/api/homeops/month-close", context));
+}
+
+export function closeMonth(payload = {}, context = {}) {
+    return apiPost(withContextQuery("/api/homeops/month-close/close", context), withHomePayload(payload, context));
+}
+
+export function reopenMonth(context = {}) {
+    return apiPost(withContextQuery("/api/homeops/month-close/reopen", context), withHomePayload({}, context));
 }
 
 

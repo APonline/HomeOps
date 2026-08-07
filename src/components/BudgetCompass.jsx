@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useHomeOps } from "../context/HomeOpsContext";
+import { getBudgetProfile, nullableNumber, updateBudgetProfile } from "../lib/homeopsApi";
 
-const STORAGE_KEY = "homeops.budgetCompass.settings";
 
 const defaultSettings = {
     monthlyIncome: "",
@@ -8,25 +9,6 @@ const defaultSettings = {
     discretionaryCap: "",
     notes: "",
 };
-
-function readSettings() {
-    try {
-        return {
-            ...defaultSettings,
-            ...(JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "{}") || {}),
-        };
-    } catch {
-        return defaultSettings;
-    }
-}
-
-function writeSettings(settings) {
-    try {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-    } catch {
-        // Local settings are a convenience layer. The dashboard still works if storage is blocked.
-    }
-}
 
 function toNumber(value) {
     const number = Number(value);
@@ -72,9 +54,40 @@ function formatPlainNumber(value) {
 }
 
 export default function BudgetCompass({ data, selectedYear, selectedMonth, selectedDay, viewMode, money, goToPage }) {
-    const [settings, setSettings] = useState(readSettings);
-    const [draft, setDraft] = useState(settings);
+    const { apiContext } = useHomeOps();
+    const [settings, setSettings] = useState(defaultSettings);
+    const [draft, setDraft] = useState(defaultSettings);
     const [editing, setEditing] = useState(false);
+    const [profileLoading, setProfileLoading] = useState(true);
+    const [profileSaving, setProfileSaving] = useState(false);
+    const [profileError, setProfileError] = useState("");
+
+    useEffect(() => {
+        let current = true;
+        async function loadProfile() {
+            setProfileLoading(true);
+            setProfileError("");
+            try {
+                const json = await getBudgetProfile(apiContext);
+                if (!current) return;
+                const profile = json.budget_profile || {};
+                const next = {
+                    monthlyIncome: formatPlainNumber(profile.monthly_take_home),
+                    savingsTarget: formatPlainNumber(profile.savings_target),
+                    discretionaryCap: formatPlainNumber(profile.discretionary_cap),
+                    notes: profile.notes || "",
+                };
+                setSettings(next);
+                setDraft(next);
+            } catch (error) {
+                if (current) setProfileError(error.message || "Could not load this property's Budget Lens.");
+            } finally {
+                if (current) setProfileLoading(false);
+            }
+        }
+        loadProfile();
+        return () => { current = false; };
+    }, [apiContext]);
 
     const model = useMemo(() => {
         const monthDays = daysInMonth(selectedYear, selectedMonth);
@@ -125,7 +138,7 @@ export default function BudgetCompass({ data, selectedYear, selectedMonth, selec
         };
     }, [data, selectedDay, selectedMonth, selectedYear, settings]);
 
-    function saveSettings(event) {
+    async function saveSettings(event) {
         event.preventDefault();
         const nextSettings = {
             monthlyIncome: formatPlainNumber(draft.monthlyIncome),
@@ -134,9 +147,24 @@ export default function BudgetCompass({ data, selectedYear, selectedMonth, selec
             notes: draft.notes || "",
         };
 
-        setSettings(nextSettings);
-        writeSettings(nextSettings);
-        setEditing(false);
+        setProfileSaving(true);
+        setProfileError("");
+        try {
+            await updateBudgetProfile({
+                scope: "home",
+                monthly_take_home: nullableNumber(nextSettings.monthlyIncome),
+                savings_target: nullableNumber(nextSettings.savingsTarget),
+                discretionary_cap: nullableNumber(nextSettings.discretionaryCap),
+                currency: "CAD",
+                notes: nextSettings.notes || null,
+            }, apiContext);
+            setSettings(nextSettings);
+            setEditing(false);
+        } catch (error) {
+            setProfileError(error.message || "Could not save the Budget Lens.");
+        } finally {
+            setProfileSaving(false);
+        }
     }
 
     function cancelSettings() {
@@ -144,9 +172,11 @@ export default function BudgetCompass({ data, selectedYear, selectedMonth, selec
         setEditing(false);
     }
 
-    const setupHint = model.hasIncomePlan
-        ? "Local planning lens. Does not change transaction records."
-        : "Add income or a flex cap to turn this into a daily spending guide.";
+    const setupHint = profileLoading
+        ? "Loading this property's saved plan…"
+        : model.hasIncomePlan
+            ? "Saved to this property. Does not change transaction records."
+            : "Add income or a flex cap to turn this into a daily spending guide.";
 
     return (
         <section className={`budget-compass panel ${viewMode === "day" ? "is-day-view" : ""}`}>
@@ -213,6 +243,8 @@ export default function BudgetCompass({ data, selectedYear, selectedMonth, selec
                 </div>
             </div>
 
+            {profileError && <div className="form-error">{profileError}</div>}
+
             {editing && (
                 <form className="budget-compass__settings" onSubmit={saveSettings}>
                     <label>
@@ -258,7 +290,7 @@ export default function BudgetCompass({ data, selectedYear, selectedMonth, selec
                     </label>
                     <div className="budget-compass__settings-actions">
                         <button className="secondary-action" type="button" onClick={cancelSettings}>Cancel</button>
-                        <button className="primary-action" type="submit">Save lens</button>
+                        <button className="primary-action" type="submit" disabled={profileSaving}>{profileSaving ? "Saving…" : "Save lens"}</button>
                     </div>
                 </form>
             )}

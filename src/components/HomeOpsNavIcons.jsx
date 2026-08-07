@@ -60,6 +60,10 @@ export const ReportsIcon = (props) => (
   <svg {...base} {...props}><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 15V9"/><path d="M12 15V7"/><path d="M16 15v-4"/></svg>
 );
 
+export const CloseoutIcon = (props) => (
+  <svg {...base} {...props}><path d="M6 3h12v18H6z"/><path d="M9 8h6"/><path d="M9 12h3"/><path d="m10 16 1.4 1.4L15 14"/></svg>
+);
+
 export const LockIcon = (props) => (
   <svg {...base} {...props}><rect x="6" y="11" width="12" height="9" rx="2"/><path d="M8 11V8a4 4 0 1 1 8 0v3"/></svg>
 );
@@ -77,4 +81,5 @@ export const iconMap = {
   accounts: AccountsIcon,
   documents: DocumentsIcon,
   reports: ReportsIcon,
+  closeout: CloseoutIcon,
 };

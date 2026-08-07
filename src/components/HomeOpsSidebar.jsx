@@ -17,6 +17,7 @@ import {
     AccountsIcon,
     DocumentsIcon,
     ReportsIcon,
+    CloseoutIcon,
 } from "./HomeOpsNavIcons";
 
 const navGroups = [
@@ -35,6 +36,7 @@ const navGroups = [
             { key: "financing", label: "Financing", Icon: FinancingIcon },
             { key: "receipts", label: "Receipts", Icon: ReceiptsIcon },
             { key: "ledger", label: "Transactions", Icon: LedgerIcon },
+            { key: "closeout", label: "Month close", Icon: CloseoutIcon },
             { key: "reports", label: "Reports", Icon: ReportsIcon },
         ],
     },

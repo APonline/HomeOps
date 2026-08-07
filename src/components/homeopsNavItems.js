@@ -3,6 +3,7 @@ export const primaryNavItems = [
   { key: "bills", label: "Bills", icon: "bills" },
   { key: "ledger", label: "Transactions", icon: "ledger" },
   { key: "receipts", label: "Receipts", icon: "receipts" },
+  { key: "closeout", label: "Month Close", icon: "closeout" },
   { key: "maintenance", label: "Maintenance", icon: "maintenance" },
   { key: "needs-wants", label: "Needs & Wants", icon: "needs" },
   { key: "spending-periods", label: "Spending Periods", icon: "periods" },
