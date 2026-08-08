@@ -32,6 +32,13 @@
     gap: 18px;
 }
 
+/* The platform modal shell intentionally owns its header padding and resets
+   the card body to padding: 0. ReceiptScannerModal is a custom direct child,
+   so give it the same content gutter as standard form-grid modals. */
+.modal-card > .receipt-scanner {
+    padding: 0 24px 24px !important;
+}
+
 .receipt-capture-zone {
     position: relative;
     display: grid;
@@ -318,6 +325,18 @@
     font-size: 10px;
 }
 
+.receipt-line-items__list {
+    display: grid;
+    gap: 9px;
+    max-height: 270px;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-right: 5px;
+    scrollbar-gutter: stable;
+    overscroll-behavior: contain;
+}
+
 .receipt-line-items__empty {
     padding: 12px;
     border: 1px dashed var(--platform-border);
@@ -592,6 +611,14 @@
 }
 
 @media (max-width: 680px) {
+    .modal-card > .receipt-scanner {
+        padding: 0 16px 18px !important;
+    }
+
+    .receipt-line-items__list {
+        max-height: min(240px, 34dvh);
+    }
+
     .receipts-page-header .page-header__button-group {
         width: 100%;
         display: grid;

@@ -302,15 +302,17 @@ export default function ReceiptsPage({ refreshToken, refreshEverything }) {
                                 <div><strong>Line items</strong><p>Correct, add, or remove captured items.</p></div>
                                 <button className="mini-button" type="button" onClick={() => setForm({ ...form, line_items: [...form.line_items, { description: "", quantity: "", unit_price: "", line_total: "", category_hint: "" }] })}>+ Item</button>
                             </div>
-                            {form.line_items.map((item, index) => (
-                                <div className="receipt-line-item" key={`${index}-${item.description}`}>
-                                    <input className="receipt-line-item__description" value={item.description} onChange={(e) => updateLineItem(index, "description", e.target.value)} placeholder="Item description" />
-                                    <input type="number" min="0" step="0.001" value={item.quantity} onChange={(e) => updateLineItem(index, "quantity", e.target.value)} placeholder="Qty" />
-                                    <input type="number" min="0" step="0.01" value={item.unit_price} onChange={(e) => updateLineItem(index, "unit_price", e.target.value)} placeholder="Each" />
-                                    <input type="number" min="0" step="0.01" value={item.line_total} onChange={(e) => updateLineItem(index, "line_total", e.target.value)} placeholder="Total" />
-                                    <button className="mini-button danger" type="button" onClick={() => setForm({ ...form, line_items: form.line_items.filter((_, itemIndex) => itemIndex !== index) })}>×</button>
-                                </div>
-                            ))}
+                            <div className="receipt-line-items__list">
+                                {form.line_items.map((item, index) => (
+                                    <div className="receipt-line-item" key={`${index}-${item.description}`}>
+                                        <input className="receipt-line-item__description" value={item.description} onChange={(e) => updateLineItem(index, "description", e.target.value)} placeholder="Item description" />
+                                        <input type="number" min="0" step="0.001" value={item.quantity} onChange={(e) => updateLineItem(index, "quantity", e.target.value)} placeholder="Qty" />
+                                        <input type="number" min="0" step="0.01" value={item.unit_price} onChange={(e) => updateLineItem(index, "unit_price", e.target.value)} placeholder="Each" />
+                                        <input type="number" min="0" step="0.01" value={item.line_total} onChange={(e) => updateLineItem(index, "line_total", e.target.value)} placeholder="Total" />
+                                        <button className="mini-button danger" type="button" onClick={() => setForm({ ...form, line_items: form.line_items.filter((_, itemIndex) => itemIndex !== index) })}>×</button>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     )}
 

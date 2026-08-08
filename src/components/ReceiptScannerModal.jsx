@@ -406,16 +406,18 @@ export default function ReceiptScannerModal({ active, onClose, apiContext, onSav
                                     <div><strong>Line items</strong><p>Optional, but useful for warranty, project, and spending history.</p></div>
                                     <button className="mini-button" type="button" onClick={addLineItem}>+ Item</button>
                                 </div>
-                                {review.line_items.length === 0 && <div className="receipt-line-items__empty">No itemized rows detected. The receipt can still be saved.</div>}
-                                {review.line_items.map((item, index) => (
-                                    <div className="receipt-line-item" key={`${index}-${item.description}`}>
-                                        <input className="receipt-line-item__description" value={item.description} onChange={(e) => updateLineItem(index, "description", e.target.value)} placeholder="Item description" />
-                                        <input type="number" min="0" step="0.001" value={item.quantity} onChange={(e) => updateLineItem(index, "quantity", e.target.value)} placeholder="Qty" />
-                                        <input type="number" min="0" step="0.01" value={item.unit_price} onChange={(e) => updateLineItem(index, "unit_price", e.target.value)} placeholder="Each" />
-                                        <input type="number" min="0" step="0.01" value={item.line_total} onChange={(e) => updateLineItem(index, "line_total", e.target.value)} placeholder="Total" />
-                                        <button className="mini-button danger" type="button" onClick={() => removeLineItem(index)} aria-label="Remove line item">×</button>
-                                    </div>
-                                ))}
+                                <div className="receipt-line-items__list">
+                                    {review.line_items.length === 0 && <div className="receipt-line-items__empty">No itemized rows detected. The receipt can still be saved.</div>}
+                                    {review.line_items.map((item, index) => (
+                                        <div className="receipt-line-item" key={`${index}-${item.description}`}>
+                                            <input className="receipt-line-item__description" value={item.description} onChange={(e) => updateLineItem(index, "description", e.target.value)} placeholder="Item description" />
+                                            <input type="number" min="0" step="0.001" value={item.quantity} onChange={(e) => updateLineItem(index, "quantity", e.target.value)} placeholder="Qty" />
+                                            <input type="number" min="0" step="0.01" value={item.unit_price} onChange={(e) => updateLineItem(index, "unit_price", e.target.value)} placeholder="Each" />
+                                            <input type="number" min="0" step="0.01" value={item.line_total} onChange={(e) => updateLineItem(index, "line_total", e.target.value)} placeholder="Total" />
+                                            <button className="mini-button danger" type="button" onClick={() => removeLineItem(index)} aria-label="Remove line item">×</button>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
 
                             <label className="span-12"><span>Notes</span><textarea value={review.notes} onChange={(e) => setReview({ ...review, notes: e.target.value })} placeholder="Warranty, return window, project, room, or anything worth remembering…" /></label>
